@@ -7,14 +7,11 @@ import com.example.pi_dev.repository.MessageRepository;
 
 import com.example.pi_dev.session.Session;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Alert;
+import javafx.geometry.Side; //hethy le side button
+import javafx.scene.control.*;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -49,6 +46,7 @@ public class ChatController {
                     loadMessages();
                 });
         messageList.setCellFactory(list -> new ListCell<>() {
+
             @Override
             protected void updateItem(Message msg, boolean empty) {
                 super.updateItem(msg, empty);
@@ -58,6 +56,21 @@ public class ChatController {
                     setGraphic(null);
                     return;
                 }
+                Button menuBtn = new Button("⋮");//add the button change or delete
+                menuBtn.getStyleClass().add("menu-button");
+
+                //this is the actual menue and buttons it contains
+                ContextMenu menu = new ContextMenu();
+
+                MenuItem edit = new MenuItem("Edit");
+                MenuItem delete = new MenuItem("Delete");
+
+                menu.getItems().addAll(edit, delete);
+                menuBtn.setOnAction(e -> menu.show(menuBtn, Side.BOTTOM, 0, 0));
+
+                //the option to delete lezemha persmission 5ater hethy 5demha hard delete donc ahaya persission
+                boolean isMine = msg.getSenderId() == Session.getCurrentUserId();
+                menuBtn.setVisible(isMine);
 
                 // Header: username + time
                 Label header = new Label(
@@ -65,8 +78,38 @@ public class ChatController {
                                 msg.getCreatedAt().toLocalTime().withNano(0)
                 );
                 header.getStyleClass().add("message-header");
+                //hethia function ta delete
+                delete.setOnAction(e -> {
+                    try {
+                        messageRepo.delete(
+                                msg.getId(),
+                                Session.getCurrentUserId()
+                        );
+                        loadMessages();
+                    } catch (SQLException ex) {
+                        showError(ex.getMessage());
+                    }
+                });
+                //function ta update
+                edit.setOnAction(e -> {
+                    TextInputDialog dialog = new TextInputDialog(msg.getContent());
+                    dialog.setHeaderText("Edit message");
 
-                // Message content
+                    dialog.showAndWait().ifPresent(newText -> {
+                        try {
+                            messageRepo.update(
+                                    msg.getId(),
+                                    Session.getCurrentUserId(),
+                                    newText
+                            );
+                            loadMessages();
+                        } catch (SQLException ex) {
+                            showError(ex.getMessage());
+                        }
+                    });
+                });
+
+                // Message content just zina hetha
                 Label content = new Label(msg.getContent());
                 content.setWrapText(true);
                 content.setMaxWidth(300);
@@ -75,16 +118,27 @@ public class ChatController {
                 VBox bubble = new VBox(header, content);
                 bubble.setSpacing(3);
 
-                HBox container = new HBox(bubble);
-                container.setPadding(new Insets(5));
-
+                // container that holds bubble + menu button
+                HBox messageRow = new HBox(bubble, menuBtn);
                 if (msg.getSenderId() == Session.getCurrentUserId()) {
-                    container.setAlignment(Pos.CENTER_RIGHT);
+                    messageRow = new HBox(menuBtn, bubble); // menu on LEFT
+                    messageRow.setAlignment(Pos.CENTER_RIGHT);
                     bubble.getStyleClass().add("mine");
                 } else {
-                    container.setAlignment(Pos.CENTER_LEFT);
+                    messageRow = new HBox(bubble, menuBtn); // menu on RIGHT
+                    messageRow.setAlignment(Pos.CENTER_LEFT);
                     bubble.getStyleClass().add("theirs");
                 }
+
+                messageRow.setSpacing(6);
+                //hetha llmenue li zedneh zina zeda bch yemchy fih e css
+                HBox container = new HBox(messageRow);
+                container.setPadding(new Insets(5));
+                container.setAlignment(
+                        msg.getSenderId() == Session.getCurrentUserId()
+                                ? Pos.CENTER_RIGHT
+                                : Pos.CENTER_LEFT
+                );
 
                 setGraphic(container);
             }

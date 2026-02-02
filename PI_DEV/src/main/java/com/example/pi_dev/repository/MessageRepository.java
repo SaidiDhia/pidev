@@ -53,4 +53,42 @@ public class MessageRepository {
         }
         return list;
     }
+    public void delete(long messageId, long userId) throws SQLException {
+        String sql = """
+        DELETE FROM message
+        WHERE id = ? AND sender_id = ?
+    """;
+
+        try (PreparedStatement ps = DatabaseConnection
+                .getInstance()
+                .getConnection()
+                .prepareStatement(sql)) {
+
+            ps.setLong(1, messageId);
+            ps.setLong(2, userId);
+            ps.executeUpdate();
+        }
+    }
+    public void update(long messageId, long userId, String newContent)
+            throws SQLException {
+
+        String sql = """
+        UPDATE message
+        SET content = ?
+        WHERE id = ? AND sender_id = ?
+    """;
+
+        try (PreparedStatement ps = DatabaseConnection
+                .getInstance()
+                .getConnection()
+                .prepareStatement(sql)) {
+
+            ps.setString(1, newContent);
+            ps.setLong(2, messageId);
+            ps.setLong(3, userId);
+            ps.executeUpdate();
+        }
+    }
+
+
 }
