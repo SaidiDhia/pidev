@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.pi_dev.controller.ChatController">
+
+    <!-- LEFT: conversations -->
+    <left>
+        <ListView fx:id="conversationList" prefWidth="200"/>
+    </left>
+
+    <!-- CENTER: messages -->
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <ListView fx:id="messageList" VBox.vgrow="ALWAYS"/>
+
+            <HBox spacing="5">
+                <TextField fx:id="messageInput" HBox.hgrow="ALWAYS"/>
+                <Button text="Send" onAction="#sendMessage"/>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>

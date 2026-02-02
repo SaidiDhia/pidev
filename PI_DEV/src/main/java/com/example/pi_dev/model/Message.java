@@ -19,6 +19,11 @@ public class Message {
         this.content = content;
         this.createdAt = createdAt;
     }
+    public Message(long conversationId, long senderId, String content) {
+        this.conversationId = conversationId;
+        this.senderId = senderId;
+        this.content = content;
+    }
 
     // Getters & Setters
     public long getId() { return id; }
@@ -35,4 +40,12 @@ public class Message {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    @Override
+    public String toString() {
+        return "[" + createdAt.toLocalTime().withSecond(0) + "] User "
+                + senderId + ": " + content;
+    }
+
+
 }
