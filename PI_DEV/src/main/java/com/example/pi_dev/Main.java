@@ -10,7 +10,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Session.login(1L); //na77iha ta nwalli ena the other guy lanci ta tefhem
+        Session.login(2L); //na77iha ta nwalli ena the other guy lanci ta tefhem
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/example/pi_dev/chat.fxml")
         );

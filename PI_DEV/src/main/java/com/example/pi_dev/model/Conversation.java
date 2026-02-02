@@ -38,7 +38,8 @@ public class Conversation {
 
     @Override
     public String toString() {
-        return type + " (" + contextType + " #" + contextId + ")";
+        return type + " - " + contextType + " #" + contextId;
     }
+
 
 }
