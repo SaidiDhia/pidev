@@ -16,7 +16,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-
+import javafx.scene.layout.VBox;
 
 
 import java.sql.SQLException;
@@ -59,28 +59,37 @@ public class ChatController {
                     return;
                 }
 
-                Label label = new Label(msg.getContent());
-                label.setWrapText(true);
-                label.setMaxWidth(300);
-                label.setStyle("""
-            -fx-padding: 8;
-            -fx-background-radius: 10;
-        """);
+                // Header: username + time
+                Label header = new Label(
+                        "User " + msg.getSenderId() + " • " +
+                                msg.getCreatedAt().toLocalTime().withNano(0)
+                );
+                header.getStyleClass().add("message-header");
 
-                HBox box = new HBox(label);
-                box.setPadding(new Insets(5));
+                // Message content
+                Label content = new Label(msg.getContent());
+                content.setWrapText(true);
+                content.setMaxWidth(300);
+                content.getStyleClass().add("message-bubble");
+
+                VBox bubble = new VBox(header, content);
+                bubble.setSpacing(3);
+
+                HBox container = new HBox(bubble);
+                container.setPadding(new Insets(5));
 
                 if (msg.getSenderId() == Session.getCurrentUserId()) {
-                    box.setAlignment(Pos.CENTER_RIGHT);
-                    label.setStyle(label.getStyle() + "-fx-background-color: #DCF8C6;");
+                    container.setAlignment(Pos.CENTER_RIGHT);
+                    bubble.getStyleClass().add("mine");
                 } else {
-                    box.setAlignment(Pos.CENTER_LEFT);
-                    label.setStyle(label.getStyle() + "-fx-background-color: #EEEEEE;");
+                    container.setAlignment(Pos.CENTER_LEFT);
+                    bubble.getStyleClass().add("theirs");
                 }
 
-                setGraphic(box);
+                setGraphic(container);
             }
         });
+        messageInput.setOnAction(e -> sendMessage()); // added this so when I press entrer it works
 
     }
 
@@ -101,6 +110,7 @@ public class ChatController {
             messageList.getItems().setAll(
                     messageRepo.findByConversation(selectedConversation.getId())
             );
+            messageList.scrollTo(messageList.getItems().size() - 1);//added this line to force scroll down
         } catch (SQLException e) {
             showError(e.getMessage());
         }

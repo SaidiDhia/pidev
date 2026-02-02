@@ -17,8 +17,14 @@ public class Main extends Application {
 
 
         Scene scene = new Scene(loader.load(), 800, 600);
+        scene.getStylesheets().add(//this is for the css I added
+                getClass().getResource("/com/example/pi_dev/chat.css").toExternalForm()
+        );
+
         stage.setTitle("WonderLust - Messaging");
+
         stage.setScene(scene);
+
         stage.show();
     }
 

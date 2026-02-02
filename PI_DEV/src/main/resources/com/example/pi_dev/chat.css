@@ -1,0 +1,48 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial;
+}
+
+/* Message header (username + time) */
+.message-header {
+    -fx-font-size: 10px;
+    -fx-text-fill: #666666;
+}
+
+/* Message bubble */
+.message-bubble {
+    -fx-padding: 8;
+    -fx-background-radius: 12;
+    -fx-font-size: 13px;
+}
+
+/* My messages */
+.mine .message-bubble {
+    -fx-background-color: #DCF8C6;
+}
+
+/* Other messages */
+.theirs .message-bubble {
+    -fx-background-color: #EEEEEE;
+}
+
+/* Conversation list */
+.list-view {
+    -fx-background-color: #F7F7F7;
+}
+
+/* Text field */
+.text-field {
+    -fx-background-radius: 20;
+    -fx-padding: 8 12;
+}
+
+/* Send button */
+.button {
+    -fx-background-radius: 20;
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
+.button:hover {
+    -fx-background-color: #43A047;
+}
