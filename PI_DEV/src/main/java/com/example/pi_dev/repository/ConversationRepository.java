@@ -13,7 +13,8 @@ public class ConversationRepository {
     public void create(Conversation c) throws SQLException {
         String sql = "INSERT INTO conversation (type, context_type, context_id, created_at) VALUES (?, ?, ?, NOW())";
 
-        PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement(sql);
+        //zedt lget instance bch yaarf li na7kiw 3leha
+        PreparedStatement ps = DatabaseConnection.getInstance().getConnection().prepareStatement(sql);
         ps.setString(1, c.getType());
         ps.setString(2, c.getContextType());
         ps.setLong(3, c.getContextId());
@@ -27,7 +28,7 @@ public class ConversationRepository {
             String sql = "SELECT * FROM conversation";
 
             try (
-                    Statement st = DatabaseConnection.getConnection().createStatement();
+                    Statement st = DatabaseConnection.getInstance().getConnection().createStatement();
                     ResultSet rs = st.executeQuery(sql)
             ) {
                 while (rs.next()) {

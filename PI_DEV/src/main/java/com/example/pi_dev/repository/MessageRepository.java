@@ -16,7 +16,7 @@ public class MessageRepository {
         """;
 
         try (PreparedStatement ps =
-                     DatabaseConnection.getConnection().prepareStatement(sql)) {
+                     DatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
 
             ps.setLong(1, m.getConversationId());
             ps.setLong(2, m.getSenderId());
@@ -36,7 +36,7 @@ public class MessageRepository {
         """;
 
         try (PreparedStatement ps =
-                     DatabaseConnection.getConnection().prepareStatement(sql)) {
+                     DatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
 
             ps.setLong(1, conversationId);
             ResultSet rs = ps.executeQuery();

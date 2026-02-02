@@ -1,5 +1,6 @@
 package com.example.pi_dev;
 
+import com.example.pi_dev.database.DatabaseConnection;
 import com.example.pi_dev.session.Session;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +11,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        DatabaseConnection.getInstance();
         Session.login(2L); //na77iha ta nwalli ena the other guy lanci ta tefhem
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/example/pi_dev/chat.fxml")
