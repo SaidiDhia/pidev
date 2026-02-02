@@ -17,7 +17,7 @@ public class Main extends Application {
                 getClass().getResource("/com/example/pi_dev/chat.fxml")
         );
 
-
+        //concept ta scene hen houa esmo 3le jesmo houa lppearence ta lapp
         Scene scene = new Scene(loader.load(), 800, 600);
         scene.getStylesheets().add(//this is for the css I added
                 getClass().getResource("/com/example/pi_dev/chat.css").toExternalForm()

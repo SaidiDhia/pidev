@@ -8,6 +8,7 @@ import com.example.pi_dev.repository.MessageRepository;
 import com.example.pi_dev.session.Session;
 import javafx.fxml.FXML;
 import javafx.geometry.Side; //hethy le side button
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 import javafx.geometry.Insets;
@@ -38,6 +39,14 @@ public class ChatController {
         loadConversations();
         conversationList.setFixedCellSize(50);//same
         messageList.setFixedCellSize(-1); //addec these as an ui improvement on 2/2 also
+        //Zeyda zeda When no conversation selected:
+        messageList.setPlaceholder(
+                new Label("Select a conversation to start chatting")
+        );
+        //zeyeda 5taer 9ale9 When no messages:
+        messageList.setPlaceholder(
+                new Label("No messages yet 👋")
+        );
 
         conversationList.getSelectionModel()
                 .selectedItemProperty()
@@ -45,6 +54,30 @@ public class ChatController {
                     selectedConversation = newVal;
                     loadMessages();
                 });
+        //I added this later after the message oine it contains the convos and alows me to add css
+        conversationList.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(Conversation c, boolean empty) {
+                super.updateItem(c, empty);
+
+                if (empty || c == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                Label title = new Label("Conversation " + c.getId());
+                title.getStyleClass().add("conv-title");
+
+                Label subtitle = new Label(c.getContextType());
+                subtitle.getStyleClass().add("conv-subtitle");
+
+                VBox box = new VBox(title, subtitle);
+                box.setSpacing(3);
+
+                setGraphic(box);
+            }
+        });
+
         messageList.setCellFactory(list -> new ListCell<>() {
 
             @Override
@@ -78,18 +111,28 @@ public class ChatController {
                                 msg.getCreatedAt().toLocalTime().withNano(0)
                 );
                 header.getStyleClass().add("message-header");
-                //hethia function ta delete
+                //hethia function ta delete w lklem li feha houa lUI ta pop up message de confirmation
                 delete.setOnAction(e -> {
-                    try {
-                        messageRepo.delete(
-                                msg.getId(),
-                                Session.getCurrentUserId()
-                        );
-                        loadMessages();
-                    } catch (SQLException ex) {
-                        showError(ex.getMessage());
-                    }
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirm.setTitle("Delete message");
+                    confirm.setHeaderText("Are you sure?");
+                    confirm.setContentText("This action cannot be undone.");
+
+                    confirm.showAndWait().ifPresent(result -> {
+                        if (result == ButtonType.OK) {
+                            try {
+                                messageRepo.delete(
+                                        msg.getId(),
+                                        Session.getCurrentUserId()
+                                );
+                                loadMessages();
+                            } catch (SQLException ex) {
+                                showError(ex.getMessage());
+                            }
+                        }
+                    });
                 });
+
                 //function ta update
                 edit.setOnAction(e -> {
                     TextInputDialog dialog = new TextInputDialog(msg.getContent());
@@ -210,6 +253,34 @@ public class ChatController {
         } catch (SQLException e) {
             showError(e.getMessage());
         }
+    }
+
+    //okay wa9t lapp tlanci testaaml e sheet ta css li mawjoud fel main donc kima 3malt fe react
+    //bedhabt 7abbit naalm mode sombre donc zedt variable marbout b boutton w ylanci external form w ye9lb loun
+    @FXML
+    private Button themeBtn;
+    private boolean darkMode = false;
+
+    @FXML
+    private void toggleTheme() {
+        Scene scene = themeBtn.getScene();
+
+        //hethy bch me yekrachich ylanci ania li y7eb mellouel jdid
+        scene.getStylesheets().clear();
+
+        if (darkMode) {
+            scene.getStylesheets().add(
+                    getClass().getResource("/com/example/pi_dev/chat.css").toExternalForm()
+            );
+            themeBtn.setText("🌙");
+        } else {
+            scene.getStylesheets().add(
+                    getClass().getResource("/com/example/pi_dev/chat-dark.css").toExternalForm()
+            );
+            themeBtn.setText("☀️");
+        }
+
+        darkMode = !darkMode;
     }
 
 

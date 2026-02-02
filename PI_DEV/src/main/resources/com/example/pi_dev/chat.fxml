@@ -38,6 +38,12 @@
 
         </VBox>
     </center>
+    <right>
+        <Button text="🌙"
+                fx:id="themeBtn"
+                onAction="#toggleTheme"
+                style="-fx-font-size: 16;"/>
 
+    </right>
 
 </BorderPane>

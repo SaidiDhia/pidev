@@ -10,10 +10,15 @@
 
 /* Message bubble */
 .message-bubble {
-    -fx-padding: 8;
+    -fx-padding: 8 12;
     -fx-background-radius: 12;
     -fx-font-size: 13px;
 }
+.mine .message-bubble,
+.theirs .message-bubble {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 1);
+}
+
 
 /* My messages */
 .mine .message-bubble {
@@ -41,6 +46,8 @@
     -fx-background-radius: 20;
     -fx-background-color: #4CAF50;
     -fx-text-fill: white;
+    -fx-font-weight: bold;
+
 }
 
 .button:hover {
@@ -58,4 +65,26 @@
 
 .menu-button:hover {
     -fx-text-fill: #000;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+.list-view {
+    -fx-background-color: #F8F9FA;
+}
+
+.conv-title {
+    -fx-font-weight: bold;
+}
+
+.conv-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: gray;
+}
+.list-view .scroll-bar:vertical {
+    -fx-pref-width: 8;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #CCCCCC;
+    -fx-background-radius: 10;
 }
