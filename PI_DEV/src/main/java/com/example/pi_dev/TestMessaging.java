@@ -1,8 +1,8 @@
 package com.example.pi_dev;
 
 
-import com.example.pi_dev.model.Message;
-import com.example.pi_dev.repository.MessageRepository;
+import com.example.pi_dev.messaging.messagingmodel.Message;
+import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
 
 import java.sql.SQLException;
 

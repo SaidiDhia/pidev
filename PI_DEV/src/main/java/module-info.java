@@ -15,8 +15,8 @@ module com.example.pi_dev {
     requires java.base;  // Contient java.util
 
     opens com.example.pi_dev to javafx.fxml;
-    opens com.example.pi_dev.messagecontroller to javafx.fxml;
-    opens com.example.pi_dev.model to javafx.base;
+    opens com.example.pi_dev.messaging.messagecontroller to javafx.fxml;
+    opens com.example.pi_dev.messaging.messagingmodel to javafx.base;
     exports com.example.pi_dev;
 
 }

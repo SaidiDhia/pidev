@@ -1,4 +1,4 @@
-package com.example.pi_dev.session;
+package com.example.pi_dev.messaging.messagingsession;
 
 public class Session {
 

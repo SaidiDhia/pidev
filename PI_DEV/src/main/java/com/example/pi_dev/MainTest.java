@@ -1,9 +1,9 @@
 package com.example.pi_dev;
 
-import com.example.pi_dev.model.Conversation;
-import com.example.pi_dev.model.Message;
-import com.example.pi_dev.repository.ConversationRepository;
-import com.example.pi_dev.repository.MessageRepository;
+import com.example.pi_dev.messaging.messagingmodel.Conversation;
+import com.example.pi_dev.messaging.messagingmodel.Message;
+import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
+import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
 
 public class MainTest {
     public static void main(String[] args) throws Exception {

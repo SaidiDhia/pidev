@@ -1,4 +1,4 @@
-package com.example.pi_dev.model;
+package com.example.pi_dev.messaging.messagingmodel;
 
 import java.time.LocalDateTime;
 

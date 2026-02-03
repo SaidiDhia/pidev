@@ -9,7 +9,7 @@
 <?import javafx.scene.control.Button?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.pi_dev.messagecontroller.ChatController">
+            fx:controller="com.example.pi_dev.messaging.messagecontroller.ChatController">
 
 
     <!-- LEFT: conversations -->

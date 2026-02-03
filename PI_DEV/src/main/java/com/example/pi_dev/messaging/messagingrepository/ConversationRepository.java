@@ -1,7 +1,7 @@
-package com.example.pi_dev.repository;
+package com.example.pi_dev.messaging.messagingrepository;
 
-import com.example.pi_dev.database.DatabaseConnection;
-import com.example.pi_dev.model.Conversation;
+import com.example.pi_dev.messaging.messagingdatabase.DatabaseConnection;
+import com.example.pi_dev.messaging.messagingmodel.Conversation;
 
 import java.sql.*;
 import java.util.ArrayList;

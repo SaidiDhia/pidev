@@ -1,11 +1,11 @@
-package com.example.pi_dev.messagecontroller;
+package com.example.pi_dev.messaging.messagecontroller;
 
-import com.example.pi_dev.model.Conversation;
-import com.example.pi_dev.model.Message;
-import com.example.pi_dev.repository.ConversationRepository;
-import com.example.pi_dev.repository.MessageRepository;
+import com.example.pi_dev.messaging.messagingmodel.Conversation;
+import com.example.pi_dev.messaging.messagingmodel.Message;
+import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
+import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
 
-import com.example.pi_dev.session.Session;
+import com.example.pi_dev.messaging.messagingsession.Session;
 import javafx.fxml.FXML;
 import javafx.geometry.Side; //hethy le side button
 import javafx.scene.Scene;
@@ -270,12 +270,12 @@ public class ChatController {
 
         if (darkMode) {
             scene.getStylesheets().add(
-                    getClass().getResource("/com/example/pi_dev/chat.css").toExternalForm()
+                    getClass().getResource("/com/example/pi_dev/messagingchat.css").toExternalForm()
             );
             themeBtn.setText("🌙");
         } else {
             scene.getStylesheets().add(
-                    getClass().getResource("/com/example/pi_dev/chat-dark.css").toExternalForm()
+                    getClass().getResource("/com/example/pi_dev/messagingchat-dark.css").toExternalForm()
             );
             themeBtn.setText("☀️");
         }

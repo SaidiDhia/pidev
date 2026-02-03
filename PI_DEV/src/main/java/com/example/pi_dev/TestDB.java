@@ -1,6 +1,6 @@
 package com.example.pi_dev;
 
-import com.example.pi_dev.database.DatabaseConnection;
+import com.example.pi_dev.messaging.messagingdatabase.DatabaseConnection;
 import java.sql.Connection;
 
 public class TestDB {

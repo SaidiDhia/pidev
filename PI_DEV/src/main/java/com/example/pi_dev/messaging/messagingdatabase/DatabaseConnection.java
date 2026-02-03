@@ -1,4 +1,4 @@
-package com.example.pi_dev.database;
+package com.example.pi_dev.messaging.messagingdatabase;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
