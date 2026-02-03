@@ -1,4 +1,4 @@
-package com.example.pi_dev.controller;
+package com.example.pi_dev.messagecontroller;
 
 import com.example.pi_dev.model.Conversation;
 import com.example.pi_dev.model.Message;
