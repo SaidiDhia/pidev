@@ -1,0 +1,90 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial;
+}
+
+/* Message header (username + time) */
+.message-header {
+    -fx-font-size: 10px;
+    -fx-text-fill: #666666;
+}
+
+/* Message bubble */
+.message-bubble {
+    -fx-padding: 8 12;
+    -fx-background-radius: 12;
+    -fx-font-size: 13px;
+}
+.mine .message-bubble,
+.theirs .message-bubble {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 1);
+}
+
+
+/* My messages */
+.mine .message-bubble {
+    -fx-background-color: #DCF8C6;
+}
+
+/* Other messages */
+.theirs .message-bubble {
+    -fx-background-color: #EEEEEE;
+}
+
+/* Conversation list */
+.list-view {
+    -fx-background-color: #F7F7F7;
+}
+
+/* Text field */
+.text-field {
+    -fx-background-radius: 20;
+    -fx-padding: 8 12;
+}
+
+/* Send button */
+.button {
+    -fx-background-radius: 20;
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+
+}
+
+.button:hover {
+    -fx-background-color: #43A047;
+}
+.menu-button {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-text-fill: #555;
+    -fx-padding: 0 6 0 6;
+
+}
+
+.menu-button:hover {
+    -fx-text-fill: #000;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+.list-view {
+    -fx-background-color: #F8F9FA;
+}
+
+.conv-title {
+    -fx-font-weight: bold;
+}
+
+.conv-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: gray;
+}
+.list-view .scroll-bar:vertical {
+    -fx-pref-width: 8;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #CCCCCC;
+    -fx-background-radius: 10;
+}
