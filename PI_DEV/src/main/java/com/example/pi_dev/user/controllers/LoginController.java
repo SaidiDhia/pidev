@@ -53,28 +53,34 @@ public class LoginController {
                         .orElseThrow();
 
                 UserSession.getInstance().login(user, token);
-                
+
                 System.out.println("Login successful!");
                 System.out.println("JWT Token: " + token);
-                
+
                 // Check for 2FA
                 if (user.getTfaMethod() != null) {
                     // Navigate to 2FA Verify
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/user/2fa.fxml"));
                     Parent root = loader.load();
-                    
+
                     TwoFactorController controller = loader.getController();
                     controller.initData(false); // Verify Mode (auto-detects method)
-                    
+
                     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                     stage.setScene(new Scene(root));
                     stage.show();
                 } else {
-                    // Navigate based on Role
-                    if (user.getRole() == RoleEnum.ADMIN) {
-                        navigateTo("/com/example/pi_dev/user/admin_dashboard.fxml", event);
-                    } else {
-                        navigateTo("/com/example/pi_dev/user/settings.fxml", event);
+                    // Navigate to Venue Home for all users
+                    try {
+                        FXMLLoader loader = new FXMLLoader(
+                                getClass().getResource("/com/example/pi_dev/venue/views/home-view.fxml"));
+                        Parent root = loader.load();
+                        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        stage.setScene(new Scene(root));
+                        stage.show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        errorLabel.setText("Navigation error: " + e.getMessage());
                     }
                 }
 
@@ -91,7 +97,7 @@ public class LoginController {
     void goToSignup(ActionEvent event) {
         navigateTo("/com/example/pi_dev/user/signup.fxml", event);
     }
-    
+
     @FXML
     void goToForgotPassword(ActionEvent event) {
         navigateTo("/com/example/pi_dev/user/forgot_password.fxml", event);
