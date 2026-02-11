@@ -70,10 +70,14 @@ public class LoginController {
                     stage.setScene(new Scene(root));
                     stage.show();
                 } else {
-                    // Navigate to Venue Home for all users
+                    // Navigate to appropriate dashboard
                     try {
-                        FXMLLoader loader = new FXMLLoader(
-                                getClass().getResource("/com/example/pi_dev/venue/views/home-view.fxml"));
+                        String path = "/com/example/pi_dev/venue/views/home-view.fxml";
+                        if (user.getRole() == RoleEnum.ADMIN) {
+                            path = "/com/example/pi_dev/user/admin_dashboard.fxml";
+                        }
+                        
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
                         Parent root = loader.load();
                         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                         stage.setScene(new Scene(root));

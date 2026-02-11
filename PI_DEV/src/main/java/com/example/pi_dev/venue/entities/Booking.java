@@ -9,10 +9,11 @@ public class Booking {
     private LocalDate startDate;
     private LocalDate endDate;
     private double totalPrice;
+    private int guestsCount;
     private Status status;
 
     public enum Status {
-        PENDING, CONFIRMED, CANCELLED, COMPLETED
+        PENDING, CONFIRMED, REJECTED, CANCELLED, COMPLETED
     }
 
     public Booking() {
@@ -75,6 +76,14 @@ public class Booking {
 
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public int getGuestsCount() {
+        return guestsCount;
+    }
+
+    public void setGuestsCount(int guestsCount) {
+        this.guestsCount = guestsCount;
     }
 
     public Status getStatus() {

@@ -4,6 +4,9 @@ import com.example.pi_dev.user.enums.RoleEnum;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
+import com.example.pi_dev.venue.dao.PlaceDAO;
+import com.example.pi_dev.venue.entities.Place;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,15 +37,106 @@ public class AdminDashboardController {
     @FXML private TableColumn<User, String> colStatus;
     @FXML private TableColumn<User, Void> colActions;
 
+    // Venue Requests Fields
+    @FXML private TableView<Place> pendingPlacesTable;
+    @FXML private TableColumn<Place, String> titleColumn;
+    @FXML private TableColumn<Place, String> hostColumn;
+    @FXML private TableColumn<Place, Double> priceColumn;
+    @FXML private TableColumn<Place, Void> actionColumn;
+
     private final UserService userService = new UserService();
+    private final PlaceDAO placeDAO = new PlaceDAO();
+    
     private ObservableList<User> masterData = FXCollections.observableArrayList();
     private FilteredList<User> filteredData;
+    private ObservableList<Place> pendingPlaces = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         setupTable();
         setupFilters();
         loadData();
+        
+        setupVenueTable();
+        loadVenueData();
+    }
+
+    private void setupVenueTable() {
+        titleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTitle()));
+        hostColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getHostId()));
+        priceColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getPricePerDay()));
+
+        actionColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button approveBtn = new Button("Approve");
+            private final Button denyBtn = new Button("Deny");
+            private final HBox pane = new HBox(10, approveBtn, denyBtn);
+
+            {
+                approveBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 5 10;");
+                denyBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 5 10;");
+
+                approveBtn.setOnAction(event -> {
+                    Place place = getTableView().getItems().get(getIndex());
+                    handleApprovePlace(place);
+                });
+
+                denyBtn.setOnAction(event -> {
+                    Place place = getTableView().getItems().get(getIndex());
+                    handleDenyPlace(place);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(pane);
+                }
+            }
+        });
+
+        pendingPlacesTable.setItems(pendingPlaces);
+    }
+
+    private void loadVenueData() {
+        try {
+            pendingPlaces.setAll(placeDAO.findPending());
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to load pending places.");
+        }
+    }
+
+    private void handleApprovePlace(Place place) {
+        try {
+            placeDAO.updateStatus(place.getId(), Place.Status.APPROVED);
+            pendingPlaces.remove(place);
+            showAlert("Success", "Place approved successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to approve place.");
+        }
+    }
+
+    private void handleDenyPlace(Place place) {
+        try {
+            placeDAO.updateStatus(place.getId(), Place.Status.DENIED);
+            pendingPlaces.remove(place);
+            showAlert("Success", "Place denied.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to deny place.");
+        }
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void setupTable() {
@@ -171,6 +265,19 @@ public class AdminDashboardController {
     void handleSettings(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/user/settings.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleBackToHome(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/venue/views/home-view.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));

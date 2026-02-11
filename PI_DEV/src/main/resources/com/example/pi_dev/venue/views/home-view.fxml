@@ -48,6 +48,8 @@
                   </HBox>
                   <Button mnemonicParsing="false" onAction="#handleBecomeHost" style="-fx-background-color: transparent; -fx-text-fill: #333;" text="Become a Host" />
                   <Button fx:id="myPlacesButton" mnemonicParsing="false" onAction="#handleMyPlaces" style="-fx-background-color: transparent; -fx-text-fill: #333;" text="My Places" visible="false" managed="false" />
+                  <Button fx:id="myReservationsButton" mnemonicParsing="false" onAction="#handleMyReservations" style="-fx-background-color: transparent; -fx-text-fill: #333;" text="My Reservations" visible="false" managed="false" />
+                  <Button fx:id="bookingRequestsButton" mnemonicParsing="false" onAction="#handleBookingRequests" style="-fx-background-color: transparent; -fx-text-fill: #333;" text="Booking Requests" visible="false" managed="false" />
                   <Button fx:id="signInButton" mnemonicParsing="false" onAction="#handleSignIn" style="-fx-background-color: transparent; -fx-border-color: #ddd; -fx-border-radius: 24;" text="Sign In" />
                   <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#handleSettings" style="-fx-background-color: transparent; -fx-text-fill: #333;" text="Settings" />
                   <Button fx:id="adminButton" mnemonicParsing="false" onAction="#handleAdminDashboard" style="-fx-background-color: #333; -fx-text-fill: white; -fx-background-radius: 24;" text="Admin Dashboard" visible="false" managed="false" />

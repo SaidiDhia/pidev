@@ -83,7 +83,21 @@ public class MyPlacesController implements Initializable {
 
         if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
             try {
-                Image image = new Image(place.getImageUrl(), 260, 180, true, true, true);
+                String imageUrl = place.getImageUrl();
+                // Handle relative local paths from DB
+                if (!imageUrl.startsWith("http") && !imageUrl.startsWith("file:") && !imageUrl.startsWith("jar:")) {
+                    java.io.File file = new java.io.File(imageUrl);
+                    if (file.exists()) {
+                        imageUrl = file.toURI().toString();
+                    } else {
+                        // Try as resource
+                        java.net.URL resource = getClass().getResource(imageUrl);
+                        if (resource != null) {
+                            imageUrl = resource.toExternalForm();
+                        }
+                    }
+                }
+                Image image = new Image(imageUrl, 260, 180, true, true, true);
                 imageView.setImage(image);
             } catch (Exception e) {
                 // Keep placeholder

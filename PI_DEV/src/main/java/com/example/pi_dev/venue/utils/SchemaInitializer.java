@@ -18,6 +18,7 @@ public class SchemaInitializer {
                                                 "description TEXT, " +
                                                 "price_per_day DECIMAL(10, 2) NOT NULL, " +
                                                 "capacity INT NOT NULL, " +
+                                                "max_guests INT NOT NULL DEFAULT 1, " +
                                                 "address VARCHAR(255) NOT NULL, " +
                                                 "city VARCHAR(100) NOT NULL, " +
                                                 "latitude DECIMAL(10, 8), " +
@@ -53,7 +54,8 @@ public class SchemaInitializer {
                                                 "start_date DATE NOT NULL, " +
                                                 "end_date DATE NOT NULL, " +
                                                 "total_price DECIMAL(10, 2) NOT NULL, " +
-                                                "status ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') DEFAULT 'PENDING', "
+                                                "guests_count INT NOT NULL DEFAULT 1, " +
+                                                "status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED', 'COMPLETED') DEFAULT 'PENDING', "
                                                 +
                                                 "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                                                 "FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE, " +
@@ -98,6 +100,21 @@ public class SchemaInitializer {
                                         // Continue to next statement
                                 }
                         }
+
+                        // Ensure new columns exist in case table was already created
+                        try {
+                                stmt.execute("ALTER TABLE places ADD COLUMN IF NOT EXISTS max_guests INT NOT NULL DEFAULT 1 AFTER capacity");
+                                stmt.execute("ALTER TABLE bookings ADD COLUMN IF NOT EXISTS guests_count INT NOT NULL DEFAULT 1 AFTER total_price");
+                                // Try to update status enum if possible, or just ignore if it fails
+                                try {
+                                    stmt.execute("ALTER TABLE bookings MODIFY COLUMN status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED', 'COMPLETED') DEFAULT 'PENDING'");
+                                } catch (SQLException ex) {
+                                    // Some DBs might not support MODIFY COLUMN or ENUM updates this way
+                                }
+                        } catch (SQLException e) {
+                                System.err.println("Error updating table columns: " + e.getMessage());
+                        }
+
                         System.out.println("Venue schema initialization completed.");
 
                 } catch (SQLException e) {

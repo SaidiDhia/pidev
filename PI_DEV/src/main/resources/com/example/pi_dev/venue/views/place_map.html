@@ -4,39 +4,139 @@
     <title>Place Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { padding: 0; margin: 0; }
-        html, body, #map { height: 100%; width: 100%; }
+        html, body { 
+            height: 100%; 
+            width: 100%;
+            margin: 0; 
+            padding: 0; 
+            background-color: #f8f9fa; 
+            overflow: hidden;
+        }
+        #map { 
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%; 
+            width: 100%; 
+        }
+        .map-error { 
+            display: none; 
+            padding: 20px; 
+            text-align: center; 
+            font-family: sans-serif; 
+            color: #721c24;
+            background-color: #f8d7da;
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="error" class="map-error">
+        Unable to load map. Please check your internet connection.
+    </div>
     <script>
         var map;
-        var marker;
+        var markers = L.layerGroup();
+        var editMarker;
 
-        function initMap(lat, lon, title) {
-            if (map) {
-                map.remove();
+        function initMap(lat, lon, zoom) {
+            try {
+                if (typeof L === 'undefined') {
+                    document.getElementById('error').style.display = 'block';
+                    return;
+                }
+
+                if (!map) {
+                    map = L.map('map', {
+                        zoomControl: true,
+                        fadeAnimation: false,
+                        zoomAnimation: false,
+                        markerZoomAnimation: false,
+                        inertia: false,
+                        zoomSnap: 1,
+                        zoomDelta: 1,
+                        trackResize: true
+                    }).setView([lat || 36.8065, lon || 10.1815], zoom || 13);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors',
+                        maxZoom: 19,
+                        minZoom: 2,
+                        detectRetina: false, // Changed to false as it can cause tile misalignment in some WebViews
+                        updateWhenIdle: true,
+                        updateWhenZooming: false,
+                        noWrap: false,
+                        bounds: [[-90, -180], [90, 180]]
+                    }).addTo(map);
+                    
+                    markers.addTo(map);
+                    
+                    var fixSize = function() {
+                        if (map) {
+                            map.invalidateSize({debounceMoveEvents: true});
+                            window.dispatchEvent(new Event('resize'));
+                        }
+                    };
+                    window.addEventListener('load', fixSize);
+                    setTimeout(fixSize, 100);
+                    setTimeout(fixSize, 500);
+                    setTimeout(fixSize, 1000);
+                    setTimeout(fixSize, 2000); 
+                    setTimeout(fixSize, 5000); // Final check for slow loading
+                } else {
+                    map.setView([lat || 36.8065, lon || 10.1815], zoom || 13);
+                    setTimeout(function() { map.invalidateSize(); }, 100);
+                }
+            } catch (e) {
+                console.error("Map init error:", e);
             }
+        }
+
+        function enableEditMode(lat, lon) {
+            if (!map) initMap(lat, lon);
             
-            // Default if invalid
-            if (lat == null || lon == null) {
-                lat = 40.7128;
-                lon = -74.0060;
-            }
-
-            map = L.map('map').setView([lat, lon], 13);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            if (editMarker) map.removeLayer(editMarker);
+            
+            editMarker = L.marker([lat || 36.8065, lon || 10.1815], {
+                draggable: true
             }).addTo(map);
 
-            marker = L.marker([lat, lon]).addTo(map)
-                .bindPopup(title)
-                .openPopup();
+            function updateCoords(lat, lng) {
+                if (window.javaApp && window.javaApp.updateCoordinates) {
+                    window.javaApp.updateCoordinates(lat, lng);
+                }
+            }
+
+            editMarker.on('dragend', function(e) {
+                var pos = editMarker.getLatLng();
+                updateCoords(pos.lat, pos.lng);
+            });
+
+            map.on('click', function(e) {
+                editMarker.setLatLng(e.latlng);
+                updateCoords(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        function clearMarkers() {
+            markers.clearLayers();
+        }
+
+        function addMarker(lat, lon, title) {
+            if (!map) initMap();
+            var marker = L.marker([lat, lon]).bindPopup(title);
+            markers.addLayer(marker);
+        }
+
+        function setView(lat, lon, zoom) {
+            if (map) {
+                map.setView([lat, lon], zoom);
+            }
         }
     </script>
 </body>

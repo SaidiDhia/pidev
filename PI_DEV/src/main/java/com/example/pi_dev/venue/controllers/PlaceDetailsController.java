@@ -32,6 +32,8 @@ public class PlaceDetailsController extends BaseController {
     @FXML
     private DatePicker checkOutDate;
     @FXML
+    private javafx.scene.control.TextField guestsField;
+    @FXML
     private Label totalPriceLabel;
 
     @FXML
@@ -55,7 +57,26 @@ public class PlaceDetailsController extends BaseController {
         // Load Image
         if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
             try {
-                Image image = new Image(place.getImageUrl(), 700, 400, true, true, true);
+                String imageUrl = place.getImageUrl();
+                // Handle relative local paths from DB
+                if (!imageUrl.startsWith("http") && !imageUrl.startsWith("file:") && !imageUrl.startsWith("jar:")) {
+                    java.io.File file = new java.io.File(imageUrl);
+                    if (!file.exists()) {
+                        // Try with PI_DEV prefix if working dir is parent
+                        file = new java.io.File("PI_DEV/" + imageUrl);
+                    }
+                    
+                    if (file.exists()) {
+                        imageUrl = file.toURI().toString();
+                    } else {
+                        // Try as resource
+                        java.net.URL resource = getClass().getResource(imageUrl);
+                        if (resource != null) {
+                            imageUrl = resource.toExternalForm();
+                        }
+                    }
+                }
+                Image image = new Image(imageUrl, 700, 400, true, true, true);
                 mainImageView.setImage(image);
             } catch (Exception e) {
                 System.err.println("Failed to load image: " + place.getImageUrl());
@@ -109,20 +130,30 @@ public class PlaceDetailsController extends BaseController {
                 webEngine.load(url.toExternalForm());
 
                 // Wait for page to load then set coordinates
-                webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-                    System.out.println("WebView State: " + newValue);
-                    if (newValue == javafx.concurrent.Worker.State.SUCCEEDED) {
+                webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newState) -> {
+                    System.out.println("WebView State: " + newState);
+                    if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
                         try {
-                            double lat = currentPlace.getLatitude();
-                            double lon = currentPlace.getLongitude();
+                            double finalLat = currentPlace.getLatitude();
+                            double finalLon = currentPlace.getLongitude();
                             // If 0, use default
-                            if (lat == 0 && lon == 0) {
-                                lat = 36.8065;
-                                lon = 10.1815;
+                            if (finalLat == 0 && finalLon == 0) {
+                                finalLat = 36.8065;
+                                finalLon = 10.1815;
                             }
-                            String title = currentPlace.getTitle().replace("'", "\\'");
+                            String finalTitle = currentPlace.getTitle().replace("'", "\\'");
 
-                            webEngine.executeScript("initMap(" + lat + ", " + lon + ", '" + title + "')");
+                            final double mapLat = finalLat;
+                            final double mapLon = finalLon;
+
+                            javafx.application.Platform.runLater(() -> {
+                                try {
+                                    webEngine.executeScript(String.format(java.util.Locale.US, "initMap(%f, %f, 13);", mapLat, mapLon));
+                                    webEngine.executeScript(String.format(java.util.Locale.US, "addMarker(%f, %f, '%s');", mapLat, mapLon, finalTitle));
+                                } catch (Exception e) {
+                                    System.err.println("Details map script failed: " + e.getMessage());
+                                }
+                            });
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -171,6 +202,18 @@ public class PlaceDetailsController extends BaseController {
             return;
         }
 
+        int guests;
+        try {
+            guests = Integer.parseInt(guestsField.getText());
+            if (guests <= 0 || guests > currentPlace.getMaxGuests()) {
+                showAlert("Invalid Guests", "Please enter a guest count between 1 and " + currentPlace.getMaxGuests());
+                return;
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter a valid number for guests.");
+            return;
+        }
+
         try {
             if (bookingDAO.isAvailable(currentPlace.getId(), java.sql.Date.valueOf(start),
                     java.sql.Date.valueOf(end))) {
@@ -178,6 +221,7 @@ public class PlaceDetailsController extends BaseController {
                 // User ID is UUID, converted to String for Booking entity
                 Booking booking = new Booking(0, currentPlace.getId(), currentUser.getUserId().toString(), start, end,
                         total, Booking.Status.PENDING);
+                booking.setGuestsCount(guests);
                 bookingDAO.create(booking);
                 showAlert("Success", "Booking request sent successfully!");
             } else {

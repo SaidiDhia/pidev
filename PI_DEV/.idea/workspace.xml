@@ -5,10 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/AdminDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/AdminDashboardController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/AddPlaceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/AddPlaceController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/HomeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/MyPlacesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/MyPlacesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/PlaceDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/PlaceDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/dao/BookingDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/dao/BookingDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/dao/PlaceDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/dao/PlaceDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Booking.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Place.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Place.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/utils/SchemaInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/utils/SchemaInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/admin_dashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/admin_dashboard.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/add-place-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/add-place-view.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/home-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/home-view.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place-details-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place-details-view.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place_map.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place_map.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,11 +96,11 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "venue-features",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/yasmi/OneDrive/Desktop/pi dev/pidev/PI_DEV",
+    "last_opened_file_path": "C:/Users/jacer/Desktop/pi_dev/YASMINE/PI_DEV",
     "list.type.of.created.stylesheet": "CSS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -176,8 +189,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26199.169" />
-        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-IU-252.26199.169" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
       </set>
     </attachedChunks>
   </component>
@@ -200,6 +213,7 @@
       <workItem from="1770563698814" duration="2521000" />
       <workItem from="1770566315192" duration="6091000" />
       <workItem from="1770744572936" duration="5176000" />
+      <workItem from="1770825730261" duration="5728000" />
     </task>
     <servers />
   </component>

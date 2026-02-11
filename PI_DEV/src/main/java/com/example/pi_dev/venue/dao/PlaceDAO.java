@@ -19,19 +19,20 @@ public class PlaceDAO {
     }
 
     public void create(Place place) throws SQLException {
-        String sql = "INSERT INTO places (host_id, title, description, price_per_day, capacity, address, city, latitude, longitude, category, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO places (host_id, title, description, price_per_day, capacity, max_guests, address, city, latitude, longitude, category, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, place.getHostId());
             stmt.setString(2, place.getTitle());
             stmt.setString(3, place.getDescription());
             stmt.setDouble(4, place.getPricePerDay());
             stmt.setInt(5, place.getCapacity());
-            stmt.setString(6, place.getAddress());
-            stmt.setString(7, place.getCity());
-            stmt.setDouble(8, place.getLatitude());
-            stmt.setDouble(9, place.getLongitude());
-            stmt.setString(10, place.getCategory());
-            stmt.setString(11, place.getStatus().name());
+            stmt.setInt(6, place.getMaxGuests());
+            stmt.setString(7, place.getAddress());
+            stmt.setString(8, place.getCity());
+            stmt.setDouble(9, place.getLatitude());
+            stmt.setDouble(10, place.getLongitude());
+            stmt.setString(11, place.getCategory());
+            stmt.setString(12, place.getStatus().name());
 
             stmt.executeUpdate();
 
@@ -39,6 +40,21 @@ public class PlaceDAO {
             if (rs.next()) {
                 place.setId(rs.getInt(1));
             }
+            
+            // If place has an image URL, save it
+            if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
+                saveImage(place.getId(), place.getImageUrl());
+            }
+        }
+    }
+
+    public void saveImage(int placeId, String imageUrl) throws SQLException {
+        String sql = "INSERT INTO place_images (place_id, image_url, sort_order) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, placeId);
+            stmt.setString(2, imageUrl);
+            stmt.setInt(3, 0); // Default sort order
+            stmt.executeUpdate();
         }
     }
 
@@ -79,20 +95,32 @@ public class PlaceDAO {
 
     public void update(Place place) throws SQLException {
         String sql = "UPDATE places SET title = ?, description = ?, price_per_day = ?, " +
-                "capacity = ?, address = ?, city = ?, category = ?, latitude = ?, longitude = ? " +
+                "capacity = ?, max_guests = ?, address = ?, city = ?, category = ?, latitude = ?, longitude = ? " +
                 "WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, place.getTitle());
             stmt.setString(2, place.getDescription());
             stmt.setDouble(3, place.getPricePerDay());
             stmt.setInt(4, place.getCapacity());
-            stmt.setString(5, place.getAddress());
-            stmt.setString(6, place.getCity());
-            stmt.setString(7, place.getCategory());
-            stmt.setDouble(8, place.getLatitude());
-            stmt.setDouble(9, place.getLongitude());
-            stmt.setInt(10, place.getId());
+            stmt.setInt(5, place.getMaxGuests());
+            stmt.setString(6, place.getAddress());
+            stmt.setString(7, place.getCity());
+            stmt.setString(8, place.getCategory());
+            stmt.setDouble(9, place.getLatitude());
+            stmt.setDouble(10, place.getLongitude());
+            stmt.setInt(11, place.getId());
             stmt.executeUpdate();
+
+            // If place has an image URL, update it (or add if it doesn't exist)
+            if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
+                // Delete old images first for simplicity (or we could manage them better)
+                String deleteSql = "DELETE FROM place_images WHERE place_id = ?";
+                try (PreparedStatement delStmt = conn.prepareStatement(deleteSql)) {
+                    delStmt.setInt(1, place.getId());
+                    delStmt.executeUpdate();
+                }
+                saveImage(place.getId(), place.getImageUrl());
+            }
         }
     }
 
@@ -109,6 +137,16 @@ public class PlaceDAO {
         return places;
     }
 
+    public void addImage(int placeId, String imageUrl, int sortOrder) throws SQLException {
+        String sql = "INSERT INTO place_images (place_id, image_url, sort_order) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, placeId);
+            stmt.setString(2, imageUrl);
+            stmt.setInt(3, sortOrder);
+            stmt.executeUpdate();
+        }
+    }
+
     private Place extractPlace(ResultSet rs) throws SQLException {
         Place place = new Place(
                 rs.getInt("id"),
@@ -123,6 +161,7 @@ public class PlaceDAO {
                 rs.getDouble("longitude"),
                 rs.getString("category"),
                 Place.Status.valueOf(rs.getString("status")));
+        place.setMaxGuests(rs.getInt("max_guests"));
 
         // Fetch first image
         String imgSql = "SELECT image_url FROM place_images WHERE place_id = ? ORDER BY sort_order LIMIT 1";

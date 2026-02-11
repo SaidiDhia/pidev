@@ -7,6 +7,7 @@ public class Place {
     private String description;
     private double pricePerDay;
     private int capacity;
+    private int maxGuests; // Maximum number of guests allowed
     private String address;
     private String city;
     private double latitude;
@@ -85,6 +86,14 @@ public class Place {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public int getMaxGuests() {
+        return maxGuests;
+    }
+
+    public void setMaxGuests(int maxGuests) {
+        this.maxGuests = maxGuests;
     }
 
     public String getAddress() {

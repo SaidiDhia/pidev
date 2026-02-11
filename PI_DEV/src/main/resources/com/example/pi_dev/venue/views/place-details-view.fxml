@@ -115,6 +115,8 @@
                               <DatePicker fx:id="checkInDate" maxWidth="1.7976931348623157E308" />
                               <Label text="Check-out" />
                               <DatePicker fx:id="checkOutDate" maxWidth="1.7976931348623157E308" />
+                              <Label text="Guests" />
+                              <javafx.scene.control.TextField fx:id="guestsField" promptText="Number of guests" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="20.0" />
