@@ -13,89 +13,104 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="700.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.venue.controllers.AddPlaceController">
+<AnchorPane prefHeight="750.0" prefWidth="900.0" stylesheets="@../../user/style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.venue.controllers.AddPlaceController">
     <children>
-        <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" style="-fx-background-color: transparent;">
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <content>
-                <VBox alignment="TOP_CENTER" spacing="15.0">
+                <VBox alignment="TOP_CENTER" spacing="30.0" style="-fx-background-color: #F9FAFB;">
                     <padding>
-                        <Insets bottom="40.0" left="100.0" right="100.0" top="40.0" />
+                        <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
                     </padding>
                     <children>
-                        <Label text="List Your Space">
-                            <font>
-                                <Font name="System Bold" size="24.0" />
-                            </font>
-                        </Label>
-                        
-                        <VBox spacing="5" alignment="CENTER_LEFT">
-                            <Label text="Title" style="-fx-font-weight: bold;"/>
-                            <TextField fx:id="titleField" promptText="e.g., Cozy Mountain Cabin" />
+                        <VBox alignment="CENTER" spacing="10.0">
+                            <children>
+                                <Label styleClass="text-h1" text="List Your Space" />
+                                <Label styleClass="text-p" text="Share your beautiful place with the world" style="-fx-text-fill: #6B7280;" />
+                            </children>
                         </VBox>
                         
-                        <VBox spacing="5" alignment="CENTER_LEFT">
-                            <Label text="Description" style="-fx-font-weight: bold;"/>
-                            <TextArea fx:id="descriptionArea" prefHeight="100.0" promptText="Description of your place..." wrapText="true" />
-                        </VBox>
-                        
-                        <HBox spacing="10">
-                            <VBox spacing="5" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                                <Label text="Price per Day ($)" style="-fx-font-weight: bold;"/>
-                                <TextField fx:id="priceField" promptText="0.00" />
-                            </VBox>
-                            <VBox spacing="5" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                                <Label text="Capacity" style="-fx-font-weight: bold;"/>
-                                <TextField fx:id="capacityField" promptText="Room capacity" />
-                            </VBox>
-                            <VBox spacing="5" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                                <Label text="Max Guests" style="-fx-font-weight: bold;"/>
-                                <TextField fx:id="maxGuestsField" promptText="Max guests" />
-                            </VBox>
-                        </HBox>
-                        
-                        <HBox spacing="10">
-                            <VBox spacing="5" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                                <Label text="Address" style="-fx-font-weight: bold;"/>
-                                <TextField fx:id="addressField" promptText="Street name and number" />
-                            </VBox>
-                            <VBox spacing="5" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                                <Label text="City" style="-fx-font-weight: bold;"/>
-                                <TextField fx:id="cityField" promptText="City" />
-                            </VBox>
-                        </HBox>
-                        
-                        <VBox spacing="5" alignment="CENTER_LEFT">
-                            <Label text="Category" style="-fx-font-weight: bold;"/>
-                            <TextField fx:id="categoryField" promptText="e.g. Apartment, House, Villa" />
-                        </VBox>
+                        <VBox maxWidth="800.0" spacing="25.0" styleClass="card">
+                            <padding>
+                                <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+                            </padding>
+                            <children>
+                                <VBox spacing="8.0">
+                                    <Label styleClass="text-p" text="Title" style="-fx-font-weight: bold;"/>
+                                    <TextField fx:id="titleField" promptText="e.g., Cozy Mountain Cabin" styleClass="text-input" />
+                                </VBox>
+                                
+                                <VBox spacing="8.0">
+                                    <Label styleClass="text-p" text="Description" style="-fx-font-weight: bold;"/>
+                                    <TextArea fx:id="descriptionArea" prefHeight="120.0" promptText="Describe what makes your place special..." styleClass="text-input" wrapText="true" />
+                                </VBox>
+                                
+                                <HBox spacing="20.0">
+                                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="text-p" text="Price per Day ($)" style="-fx-font-weight: bold;"/>
+                                        <TextField fx:id="priceField" promptText="0.00" styleClass="text-input" />
+                                    </VBox>
+                                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="text-p" text="Capacity" style="-fx-font-weight: bold;"/>
+                                        <TextField fx:id="capacityField" promptText="e.g. 2 Rooms" styleClass="text-input" />
+                                    </VBox>
+                                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="text-p" text="Max Guests" style="-fx-font-weight: bold;"/>
+                                        <TextField fx:id="maxGuestsField" promptText="e.g. 4" styleClass="text-input" />
+                                    </VBox>
+                                </HBox>
+                                
+                                <HBox spacing="20.0">
+                                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="text-p" text="Address" style="-fx-font-weight: bold;"/>
+                                        <TextField fx:id="addressField" promptText="Street name and number" styleClass="text-input" />
+                                    </VBox>
+                                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="text-p" text="City" style="-fx-font-weight: bold;"/>
+                                        <TextField fx:id="cityField" promptText="City" styleClass="text-input" />
+                                    </VBox>
+                                </HBox>
+                                
+                                <VBox spacing="8.0">
+                                    <Label styleClass="text-p" text="Category" style="-fx-font-weight: bold;"/>
+                                    <TextField fx:id="categoryField" promptText="e.g. Apartment, House, Villa" styleClass="text-input" />
+                                </VBox>
 
-                        <VBox spacing="10" alignment="CENTER_LEFT">
-                            <Label text="Photos" style="-fx-font-weight: bold;"/>
-                            <HBox spacing="15" alignment="CENTER_LEFT">
-                                <Button text="Upload Photo" onAction="#handleUploadPhoto" style="-fx-background-color: #eee; -fx-border-color: #ddd; -fx-border-radius: 4;"/>
-                                <Label fx:id="imagePathLabel" text="No photo selected" style="-fx-text-fill: #666;"/>
-                            </HBox>
-                            <ImageView fx:id="imagePreview" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false" managed="false" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 0);"/>
-                        </VBox>
-                        
-                        <VBox spacing="5" alignment="CENTER_LEFT">
-                            <Label text="Location" style="-fx-font-weight: bold;"/>
-                            <HBox spacing="10">
-                                <TextField fx:id="latitudeField" promptText="Latitude" HBox.hgrow="ALWAYS" />
-                                <TextField fx:id="longitudeField" promptText="Longitude" HBox.hgrow="ALWAYS" />
-                            </HBox>
-                            <Label text="Click on the map to set location:" style="-fx-font-size: 12; -fx-text-fill: #666;" />
-                            <WebView fx:id="mapWebView" prefHeight="250.0" />
-                        </VBox>
+                                <VBox spacing="15.0">
+                                    <Label styleClass="text-p" text="Photos" style="-fx-font-weight: bold;"/>
+                                    <HBox spacing="15" alignment="CENTER_LEFT">
+                                        <Button text="Add Photos" onAction="#handleUploadPhoto" styleClass="btn" style="-fx-background-color: #F3F4F6; -fx-text-fill: #374151;"/>
+                                        <Label fx:id="imagePathLabel" text="No photos selected" styleClass="text-p" style="-fx-text-fill: #6B7280;"/>
+                                    </HBox>
+                                    <ScrollPane fitToHeight="true" prefHeight="160.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER">
+                                        <content>
+                                            <HBox fx:id="imagePreviewContainer" spacing="10.0" style="-fx-padding: 5;">
+                                                <!-- Multiple ImageViews will be added here -->
+                                            </HBox>
+                                        </content>
+                                    </ScrollPane>
+                                </VBox>
+                                
+                                <VBox spacing="12.0">
+                                    <Label styleClass="text-p" text="Location" style="-fx-font-weight: bold;"/>
+                                    <HBox spacing="20.0">
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <Label text="Latitude" style="-fx-font-size: 12px; -fx-text-fill: #6B7280;" />
+                                            <TextField fx:id="latitudeField" promptText="Latitude" styleClass="text-input" />
+                                        </VBox>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <Label text="Longitude" style="-fx-font-size: 12px; -fx-text-fill: #6B7280;" />
+                                            <TextField fx:id="longitudeField" promptText="Longitude" styleClass="text-input" />
+                                        </VBox>
+                                    </HBox>
+                                    <Label text="Click on the map to set location" styleClass="text-p" style="-fx-font-size: 12px; -fx-text-fill: #6B7280;" />
+                                    <WebView fx:id="mapWebView" prefHeight="400.0" prefWidth="600.0" styleClass="card" />
+                                </VBox>
 
-                        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20 0 0 0;">
-                            <Button mnemonicParsing="false" onAction="#handleSubmit" prefWidth="200.0" style="-fx-background-color: #4F46E5; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8;" text="Submit Listing">
-                                <font>
-                                    <Font name="System Bold" size="14.0" />
-                                </font>
-                            </Button>
-                            
-                            <Button mnemonicParsing="false" onAction="#handleBack" style="-fx-background-color: transparent; -fx-text-fill: #666;" text="Cancel" />
+                                <HBox spacing="20.0" alignment="CENTER_RIGHT" style="-fx-padding: 20 0 0 0;">
+                                    <Button mnemonicParsing="false" onAction="#handleBack" styleClass="btn" style="-fx-background-color: transparent; -fx-text-fill: #6B7280;" text="Cancel" />
+                                    <Button mnemonicParsing="false" onAction="#handleSubmit" prefWidth="200.0" styleClass="btn, btn-primary" text="Submit Listing" />
+                                </HBox>
+                            </children>
                         </VBox>
                     </children>
                 </VBox>

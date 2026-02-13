@@ -6,6 +6,10 @@ import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
 import com.example.pi_dev.venue.dao.PlaceDAO;
 import com.example.pi_dev.venue.entities.Place;
+import com.example.pi_dev.venue.entities.Booking;
+import com.example.pi_dev.venue.dao.BookingDAO;
+import com.example.pi_dev.common.dao.ActivityLogDAO;
+import com.example.pi_dev.common.models.ActivityLog;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -14,14 +18,23 @@ import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -30,6 +43,7 @@ public class AdminDashboardController {
     @FXML private TextField searchField;
     @FXML private ComboBox<RoleEnum> roleFilter;
     @FXML private TableView<User> userTable;
+    @FXML private TableColumn<User, User> colAvatar;
     @FXML private TableColumn<User, String> colName;
     @FXML private TableColumn<User, String> colEmail;
     @FXML private TableColumn<User, String> colPhone;
@@ -38,18 +52,28 @@ public class AdminDashboardController {
     @FXML private TableColumn<User, Void> colActions;
 
     // Venue Requests Fields
-    @FXML private TableView<Place> pendingPlacesTable;
-    @FXML private TableColumn<Place, String> titleColumn;
-    @FXML private TableColumn<Place, String> hostColumn;
-    @FXML private TableColumn<Place, Double> priceColumn;
-    @FXML private TableColumn<Place, Void> actionColumn;
+    @FXML private FlowPane venueRequestsFlowPane;
+
+    // All Places Fields
+    @FXML private FlowPane allPlacesFlowPane;
+
+    @FXML private FlowPane reservationsFlowPane;
+    @FXML private TableView<ActivityLog> activityLogTable;
+    @FXML private TableColumn<ActivityLog, String> colTimestamp;
+    @FXML private TableColumn<ActivityLog, String> colUser;
+    @FXML private TableColumn<ActivityLog, String> colAction;
+    @FXML private TableColumn<ActivityLog, String> colDetails;
 
     private final UserService userService = new UserService();
     private final PlaceDAO placeDAO = new PlaceDAO();
+    private final BookingDAO bookingDAO = new BookingDAO();
+    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
     
     private ObservableList<User> masterData = FXCollections.observableArrayList();
     private FilteredList<User> filteredData;
     private ObservableList<Place> pendingPlaces = FXCollections.observableArrayList();
+    private ObservableList<Place> allPlaces = FXCollections.observableArrayList();
+    private ObservableList<ActivityLog> activityLogs = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
@@ -57,63 +81,325 @@ public class AdminDashboardController {
         setupFilters();
         loadData();
         
-        setupVenueTable();
         loadVenueData();
+
+        setupActivityLogTable();
+        loadActivityLogs();
+        loadReservationsAsCards();
     }
 
-    private void setupVenueTable() {
-        titleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTitle()));
-        hostColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getHostId()));
-        priceColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getPricePerDay()));
+    private void setupActivityLogTable() {
+        colTimestamp.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTimestamp().toString()));
+        colUser.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUserEmail()));
+        colAction.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAction()));
+        colDetails.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDetails()));
+        activityLogTable.setItems(activityLogs);
+    }
 
-        actionColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button approveBtn = new Button("Approve");
-            private final Button denyBtn = new Button("Deny");
-            private final HBox pane = new HBox(10, approveBtn, denyBtn);
+    private void loadActivityLogs() {
+        try {
+            activityLogs.setAll(activityLogDAO.findAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            {
-                approveBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 5 10;");
-                denyBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 5 10;");
-
-                approveBtn.setOnAction(event -> {
-                    Place place = getTableView().getItems().get(getIndex());
-                    handleApprovePlace(place);
-                });
-
-                denyBtn.setOnAction(event -> {
-                    Place place = getTableView().getItems().get(getIndex());
-                    handleDenyPlace(place);
-                });
+    private void loadReservationsAsCards() {
+        try {
+            java.util.List<Booking> allBookings = bookingDAO.findAll();
+            reservationsFlowPane.getChildren().clear();
+            for (Booking booking : allBookings) {
+                reservationsFlowPane.getChildren().add(createReservationCard(booking));
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(pane);
-                }
+    private VBox createReservationCard(Booking booking) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("card");
+        card.setPrefWidth(350);
+        card.setStyle("-fx-padding: 20; -fx-background-radius: 12; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
+
+        // Fetch User and Place details
+        User renter = userService.getUserById(java.util.UUID.fromString(booking.getRenterId()));
+        Place place = null;
+        try {
+            place = placeDAO.findById(booking.getPlaceId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HBox header = new HBox(15);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        // Profile Picture
+        Circle profileCircle = new Circle(25);
+        Image avatarImage = null;
+        if (renter != null && renter.getProfilePicture() != null && !renter.getProfilePicture().isEmpty()) {
+            File file = new File("uploads/profiles/" + renter.getProfilePicture());
+            if (file.exists()) {
+                avatarImage = new Image(file.toURI().toString(), 50, 50, true, true);
             }
-        });
+        }
+        if (avatarImage == null) {
+            java.io.InputStream stream = getClass().getResourceAsStream("/com/example/pi_dev/user/default-avatar.png");
+            if (stream != null) {
+                avatarImage = new Image(stream, 50, 50, true, true);
+            }
+        }
+        
+        if (avatarImage != null) {
+            profileCircle.setFill(new ImagePattern(avatarImage));
+        } else {
+            profileCircle.setFill(javafx.scene.paint.Color.web("#D1D5DB"));
+        }
 
-        pendingPlacesTable.setItems(pendingPlaces);
+        VBox userDetails = new VBox(2);
+        Label nameLabel = new Label(renter != null ? renter.getFullName() : "Unknown User");
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        Label emailLabel = new Label(renter != null ? renter.getEmail() : booking.getRenterId());
+        emailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280;");
+        Label phoneLabel = new Label(renter != null ? renter.getPhoneNumber() : "No phone");
+        phoneLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280;");
+        
+        userDetails.getChildren().addAll(nameLabel, emailLabel, phoneLabel);
+        header.getChildren().addAll(profileCircle, userDetails);
+
+        Separator separator = new Separator();
+
+        VBox bookingInfo = new VBox(8);
+        bookingInfo.getChildren().addAll(
+            createDetailRow("Venue:", place != null ? place.getTitle() : "Place #" + booking.getPlaceId()),
+            createDetailRow("Check-in:", booking.getStartDate().toString()),
+            createDetailRow("Check-out:", booking.getEndDate().toString()),
+            createDetailRow("Guests:", String.valueOf(booking.getGuestsCount())),
+            createDetailRow("Total:", String.format("$%.2f", booking.getTotalPrice()))
+        );
+
+        Label statusBadge = new Label(booking.getStatus().name());
+        String statusColor = switch (booking.getStatus()) {
+            case PENDING -> "#FBBF24";
+            case CONFIRMED -> "#10B981";
+            case REJECTED, CANCELLED -> "#EF4444";
+            case COMPLETED -> "#6366F1";
+            default -> "#6B7280";
+        };
+        statusBadge.setStyle("-fx-background-color: " + statusColor + "; -fx-text-fill: white; -fx-padding: 4 12; -fx-background-radius: 20; -fx-font-size: 11px; -fx-font-weight: bold;");
+        
+        HBox footer = new HBox(statusBadge);
+        footer.setAlignment(Pos.CENTER_RIGHT);
+
+        card.getChildren().addAll(header, separator, bookingInfo, footer);
+        return card;
+    }
+
+    private HBox createDetailRow(String label, String value) {
+        HBox row = new HBox(10);
+        Label lbl = new Label(label);
+        lbl.setStyle("-fx-font-weight: bold; -fx-text-fill: #6B7280; -fx-min-width: 70;");
+        Label val = new Label(value);
+        val.setStyle("-fx-text-fill: #374151;");
+        row.getChildren().addAll(lbl, val);
+        return row;
     }
 
     private void loadVenueData() {
         try {
             pendingPlaces.setAll(placeDAO.findPending());
+            allPlaces.setAll(placeDAO.findAll());
+
+            venueRequestsFlowPane.getChildren().clear();
+            for (Place place : pendingPlaces) {
+                venueRequestsFlowPane.getChildren().add(createPlaceCard(place, true));
+            }
+
+            allPlacesFlowPane.getChildren().clear();
+            for (Place place : allPlaces) {
+                allPlacesFlowPane.getChildren().add(createPlaceCard(place, false));
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to load pending places.");
+            showAlert("Error", "Failed to load places.");
+        }
+    }
+
+    private VBox createPlaceCard(Place place, boolean isRequest) {
+        VBox card = new VBox(15);
+        card.getStyleClass().add("card");
+        card.setStyle("-fx-padding: 0; -fx-background-radius: 12; -fx-pref-width: 380; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-background-color: white; -fx-overflow: hidden;");
+
+        // Place Image Header
+        VBox imageContainer = new VBox();
+        imageContainer.setStyle("-fx-background-radius: 12 12 0 0; -fx-overflow: hidden;");
+        ImageView placeImageView = new ImageView();
+        placeImageView.setFitWidth(380);
+        placeImageView.setFitHeight(180);
+        placeImageView.setPreserveRatio(false);
+        
+        Image placeImage = null;
+        if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
+            File file = new File("uploads/places/" + place.getImageUrl());
+            if (file.exists()) {
+                placeImage = new Image(file.toURI().toString(), 380, 180, false, true);
+            }
+        }
+        if (placeImage == null) {
+            java.io.InputStream stream = getClass().getResourceAsStream("/com/example/pi_dev/user/default-place.png");
+            if (stream != null) {
+                placeImage = new Image(stream, 380, 180, false, true);
+            }
+        }
+        if (placeImage != null) {
+            placeImageView.setImage(placeImage);
+        } else {
+            // If no image, show a placeholder background
+            imageContainer.setStyle("-fx-background-color: #E5E7EB; -fx-background-radius: 12 12 0 0; -fx-min-height: 180;");
+        }
+        
+        // Rounded corners for the image header
+        Rectangle clip = new Rectangle(380, 180);
+        clip.setArcWidth(24);
+        clip.setArcHeight(24);
+        placeImageView.setClip(clip);
+        imageContainer.getChildren().add(placeImageView);
+
+        VBox content = new VBox(12);
+        content.setStyle("-fx-padding: 20;");
+
+        // Place Title
+        Label titleLabel = new Label(place.getTitle());
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
+        titleLabel.setWrapText(true);
+
+        // Category Badge
+        Label categoryBadge = new Label(place.getCategory());
+        categoryBadge.setStyle("-fx-background-color: #EEF2FF; -fx-text-fill: #4F46E5; -fx-padding: 4 10; -fx-background-radius: 20; -fx-font-size: 11px; -fx-font-weight: bold;");
+        
+        HBox titleRow = new HBox(10);
+        titleRow.setAlignment(Pos.CENTER_LEFT);
+        titleRow.getChildren().addAll(titleLabel, categoryBadge);
+
+        // Fetch Host details
+        User host = null;
+        try {
+            host = userService.getUserById(java.util.UUID.fromString(place.getHostId()));
+        } catch (Exception e) {
+            System.err.println("Error fetching host: " + e.getMessage());
+        }
+
+        // Host Info Section
+        HBox hostInfo = new HBox(12);
+        hostInfo.setAlignment(Pos.CENTER_LEFT);
+        hostInfo.setStyle("-fx-background-color: #F9FAFB; -fx-padding: 12; -fx-background-radius: 10; -fx-border-color: #E5E7EB; -fx-border-radius: 10;");
+
+        // Host Profile Picture
+        Circle profileCircle = new Circle(22);
+        Image avatarImage = null;
+        if (host != null && host.getProfilePicture() != null && !host.getProfilePicture().isEmpty()) {
+            File file = new File("uploads/profiles/" + host.getProfilePicture());
+            if (file.exists()) {
+                avatarImage = new Image(file.toURI().toString(), 44, 44, true, true);
+            }
+        }
+        if (avatarImage == null) {
+            java.io.InputStream stream = getClass().getResourceAsStream("/com/example/pi_dev/user/default-avatar.png");
+            if (stream != null) {
+                avatarImage = new Image(stream, 44, 44, true, true);
+            }
+        }
+        
+        if (avatarImage != null) {
+            profileCircle.setFill(new ImagePattern(avatarImage));
+        } else {
+            // Fallback: Gray circle with initials or just color
+            profileCircle.setFill(javafx.scene.paint.Color.web("#D1D5DB"));
+        }
+
+        VBox hostDetails = new VBox(2);
+        Label hostNameLabel = new Label(host != null ? host.getFullName() : "Unknown Host");
+        hostNameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;");
+        Label hostEmailLabel = new Label(host != null ? host.getEmail() : "No email");
+        hostEmailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280;");
+        Label hostPhoneLabel = new Label(host != null ? host.getPhoneNumber() : "No phone");
+        hostPhoneLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280;");
+        
+        hostDetails.getChildren().addAll(hostNameLabel, hostEmailLabel, hostPhoneLabel);
+        hostInfo.getChildren().addAll(profileCircle, hostDetails);
+
+        // Description
+        Label descLabel = new Label(place.getDescription());
+        descLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #4B5563; -fx-line-spacing: 2;");
+        descLabel.setWrapText(true);
+        descLabel.setMaxHeight(60);
+
+        // Grid-like details
+        VBox details = new VBox(10);
+        details.setStyle("-fx-background-color: #FFFFFF;");
+        
+        HBox locationRow = createDetailRow("Address:", place.getAddress() + ", " + place.getCity());
+        HBox priceRow = createDetailRow("Price:", String.format("$%.2f / day", place.getPricePerDay()));
+        
+        HBox capacityRow = new HBox(20);
+        capacityRow.getChildren().addAll(
+            createDetailRow("Capacity:", String.valueOf(place.getCapacity())),
+            createDetailRow("Max Guests:", String.valueOf(place.getMaxGuests()))
+        );
+
+        details.getChildren().addAll(locationRow, priceRow, capacityRow);
+
+        HBox actions = new HBox(12);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+        actions.setStyle("-fx-padding: 10 0 0 0;");
+
+        if (isRequest) {
+            Button approveBtn = new Button("Approve Request");
+            approveBtn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8; -fx-font-weight: bold;");
+            approveBtn.setOnAction(e -> handleApprovePlace(place));
+
+            Button denyBtn = new Button("Reject");
+            denyBtn.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8; -fx-font-weight: bold;");
+            denyBtn.setOnAction(e -> handleDenyPlace(place));
+
+            actions.getChildren().addAll(denyBtn, approveBtn);
+        } else {
+            Button deleteBtn = new Button("Remove Venue");
+            deleteBtn.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8; -fx-font-weight: bold;");
+            deleteBtn.setOnAction(e -> handleDeletePlace(place));
+            actions.getChildren().add(deleteBtn);
+        }
+
+        content.getChildren().addAll(titleRow, hostInfo, descLabel, details, actions);
+        card.getChildren().addAll(imageContainer, content);
+        return card;
+    }
+
+    private void handleDeletePlace(Place place) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Place");
+        alert.setHeaderText("Delete " + place.getTitle() + "?");
+        alert.setContentText("Are you sure you want to delete this place? This will also delete all associated images and bookings.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                placeDAO.delete(place.getId());
+                loadVenueData();
+                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_DELETE", "Deleted place: " + place.getTitle());
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Error", "Failed to delete place.");
+            }
         }
     }
 
     private void handleApprovePlace(Place place) {
         try {
             placeDAO.updateStatus(place.getId(), Place.Status.APPROVED);
-            pendingPlaces.remove(place);
+            loadVenueData();
             showAlert("Success", "Place approved successfully.");
+            activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_APPROVE", "Approved place: " + place.getTitle());
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Failed to approve place.");
@@ -123,8 +409,9 @@ public class AdminDashboardController {
     private void handleDenyPlace(Place place) {
         try {
             placeDAO.updateStatus(place.getId(), Place.Status.DENIED);
-            pendingPlaces.remove(place);
+            loadVenueData();
             showAlert("Success", "Place denied.");
+            activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_DENY", "Denied place: " + place.getTitle());
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Failed to deny place.");
@@ -140,6 +427,43 @@ public class AdminDashboardController {
     }
 
     private void setupTable() {
+        colAvatar.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue()));
+        colAvatar.setCellFactory(param -> new TableCell<>() {
+            private final Circle circle = new Circle(20);
+            
+            @Override
+            protected void updateItem(User user, boolean empty) {
+                super.updateItem(user, empty);
+                if (empty || user == null) {
+                    setGraphic(null);
+                } else {
+                    String photoPath = user.getProfilePicture();
+                    Image image = null;
+                    if (photoPath != null && !photoPath.isEmpty()) {
+                        File file = new File("uploads/profiles/" + photoPath);
+                        if (file.exists()) {
+                            image = new Image(file.toURI().toString(), 40, 40, true, true);
+                        }
+                    }
+                    
+                    if (image == null) {
+                        java.io.InputStream stream = getClass().getResourceAsStream("/com/example/pi_dev/user/default-avatar.png");
+                        if (stream != null) {
+                            image = new Image(stream, 40, 40, true, true);
+                        }
+                    }
+                    
+                    if (image != null) {
+                        circle.setFill(new ImagePattern(image));
+                    } else {
+                        circle.setFill(javafx.scene.paint.Color.web("#D1D5DB"));
+                    }
+                    setGraphic(circle);
+                    setAlignment(Pos.CENTER);
+                }
+            }
+        });
+
         colName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFullName()));
         colEmail.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
         colPhone.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPhoneNumber()));

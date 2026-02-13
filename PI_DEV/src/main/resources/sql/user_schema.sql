@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
     is_active BOOLEAN DEFAULT TRUE,
     role VARCHAR(50) NOT NULL, -- ADMIN, HOST, PARTICIPANT
     tfa_method VARCHAR(50), -- FACE, QR, EMAIL
-    created_at DATETIME
+    created_at DATETIME,
+    profile_picture VARCHAR(255)
 );
 
 -- Password Reset Token Table
@@ -30,9 +31,9 @@ CREATE TABLE IF NOT EXISTS tfa_secrets (
 
 -- Activity Log Table
 CREATE TABLE IF NOT EXISTS activity_logs (
-    log_id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL,
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_email VARCHAR(255) NOT NULL,
     action VARCHAR(255) NOT NULL,
-    created_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    details TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

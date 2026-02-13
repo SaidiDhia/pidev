@@ -6,31 +6,46 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="15.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.user.controllers.LoginController" stylesheets="@style.css">
+<VBox alignment="CENTER" spacing="25.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.user.controllers.LoginController" stylesheets="@style.css">
     <padding>
-        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+        <Insets bottom="60.0" left="60.0" right="60.0" top="60.0" />
     </padding>
 
-    <Label styleClass="label-title" text="Welcome Back" />
-    <Label styleClass="label-subtitle" text="Sign in to continue" />
-
-    <VBox spacing="5" maxWidth="300">
-        <Label text="Email" />
-        <TextField fx:id="emailField" promptText="Enter your email" />
+    <VBox alignment="CENTER" spacing="8.0">
+        <Label styleClass="text-h1" text="Welcome Back" />
+        <Label styleClass="text-p" text="Sign in to your account" />
     </VBox>
 
-    <VBox spacing="5" maxWidth="300">
-        <Label text="Password" />
-        <PasswordField fx:id="passwordField" promptText="Enter your password" />
+    <VBox spacing="20.0" maxWidth="400.0" styleClass="card">
+        <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+        </padding>
+        <children>
+            <VBox spacing="8.0">
+                <Label styleClass="text-p" text="Email" style="-fx-font-weight: bold;"/>
+                <TextField fx:id="emailField" promptText="you@example.com" styleClass="text-input" />
+            </VBox>
+
+            <VBox spacing="8.0">
+                <HBox alignment="CENTER_LEFT">
+                    <Label styleClass="text-p" text="Password" style="-fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308"/>
+                    <Hyperlink onAction="#goToForgotPassword" text="Forgot password?" styleClass="nav-link" style="-fx-font-size: 12px;"/>
+                </HBox>
+                <PasswordField fx:id="passwordField" promptText="••••••••" styleClass="text-input" />
+            </VBox>
+
+            <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" />
+
+            <Button onAction="#handleLogin" styleClass="btn, btn-primary" text="Sign in" maxWidth="1.7976931348623157E308" />
+        </children>
     </VBox>
 
-    <Label fx:id="errorLabel" styleClass="error-label" />
-
-    <Button onAction="#handleLogin" styleClass="button-primary" text="Login" maxWidth="300" />
-
-    <Hyperlink onAction="#goToSignup" text="Don't have an account? Sign up" />
-    <Hyperlink onAction="#goToForgotPassword" text="Forgot Password?" />
+    <HBox alignment="CENTER" spacing="5.0">
+        <Label styleClass="text-p" text="Don't have an account?" />
+        <Hyperlink onAction="#goToSignup" text="Sign up" styleClass="nav-link" style="-fx-font-weight: bold;"/>
+    </HBox>
 
 </VBox>

@@ -4,6 +4,7 @@ import com.example.pi_dev.user.enums.RoleEnum;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
+import com.example.pi_dev.common.dao.ActivityLogDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,7 +20,18 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+
 public class SettingsController {
+
+    @FXML
+    private ImageView profileImageView;
 
     @FXML
     private TextField fullNameField;
@@ -46,6 +58,7 @@ public class SettingsController {
     private Label tfaStatusLabel;
 
     private final UserService userService = new UserService();
+    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
     private User currentUser;
 
     @FXML
@@ -55,8 +68,62 @@ public class SettingsController {
             fullNameField.setText(currentUser.getFullName());
             emailField.setText(currentUser.getEmail());
             phoneField.setText(currentUser.getPhoneNumber());
-            
+            loadProfilePicture();
             updateTfaStatus();
+        }
+    }
+
+    private void loadProfilePicture() {
+        String photoPath = currentUser.getProfilePicture();
+        Image image = null;
+        if (photoPath != null && !photoPath.isEmpty()) {
+            File file = new File("uploads/profiles/" + photoPath);
+            if (file.exists()) {
+                image = new Image(file.toURI().toString());
+            }
+        }
+        
+        if (image == null) {
+            java.io.InputStream stream = getClass().getResourceAsStream("/com/example/pi_dev/user/default-avatar.png");
+            if (stream != null) {
+                image = new Image(stream);
+            }
+        }
+        
+        if (image != null) {
+            profileImageView.setImage(image);
+        } else {
+            // If even the default is missing, just set it to null to avoid NPE
+            profileImageView.setImage(null);
+        }
+    }
+
+    @FXML
+    void handleUploadProfilePic(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Profile Picture");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
+        );
+        File selectedFile = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
+
+        if (selectedFile != null) {
+            try {
+                File uploadDir = new File("uploads/profiles");
+                if (!uploadDir.exists()) uploadDir.mkdirs();
+
+                String fileName = UUID.randomUUID().toString() + "_" + selectedFile.getName();
+                File destFile = new File(uploadDir, fileName);
+                Files.copy(selectedFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                currentUser.setProfilePicture(fileName);
+                userService.updateUser(currentUser);
+                activityLogDAO.log(currentUser.getEmail(), "PROFILE_PIC_UPDATE", "Updated profile picture");
+                profileImageView.setImage(new Image(destFile.toURI().toString()));
+                System.out.println("Profile picture updated!");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
     
@@ -79,7 +146,7 @@ public class SettingsController {
             
             try {
                 userService.updateUser(currentUser);
-                // Show success message (Optional: Alert)
+                activityLogDAO.log(currentUser.getEmail(), "PROFILE_UPDATE", "Updated personal information");
                 System.out.println("Profile updated!");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -114,6 +181,7 @@ public class SettingsController {
         boolean success = userService.changePassword(currentUser.getUserId(), currentPass, newPass);
         
         if (success) {
+            activityLogDAO.log(currentUser.getEmail(), "PASSWORD_CHANGE", "User changed their password");
             passwordErrorLabel.setText("Password updated successfully! 2FA disabled.");
             passwordErrorLabel.setStyle("-fx-text-fill: green;");
             currentPasswordField.clear();
@@ -148,6 +216,7 @@ public class SettingsController {
         if (currentUser != null) {
             currentUser.setTfaMethod(null);
             userService.updateUser(currentUser);
+            activityLogDAO.log(currentUser.getEmail(), "2FA_DISABLE", "Disabled two-factor authentication");
             updateTfaStatus();
             System.out.println("2FA Disabled");
         }
@@ -171,7 +240,7 @@ public class SettingsController {
     
     @FXML
     void handleBack(ActionEvent event) {
-        navigateTo("/com/example/pi_dev/user/admin_dashboard.fxml", event);
+        navigateTo("/com/example/pi_dev/venue/views/home-view.fxml", event);
     }
 
     @FXML

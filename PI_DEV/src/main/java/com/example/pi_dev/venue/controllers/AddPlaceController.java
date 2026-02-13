@@ -4,8 +4,10 @@ import com.example.pi_dev.venue.dao.PlaceDAO;
 import com.example.pi_dev.venue.entities.Place;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.utils.UserSession;
+import com.example.pi_dev.common.dao.ActivityLogDAO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -15,11 +17,15 @@ import java.sql.SQLException;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class AddPlaceController {
@@ -45,174 +51,86 @@ public class AddPlaceController {
     @FXML
     private TextField longitudeField;
     @FXML
-    private javafx.scene.web.WebView mapWebView;
+    private HBox imagePreviewContainer;
     @FXML
     private Label imagePathLabel;
     @FXML
-    private ImageView imagePreview;
-
+    private javafx.scene.web.WebView mapWebView;
+    
     private PlaceDAO placeDAO;
+    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
     private Place editingPlace;
-    private File selectedFile;
-    private String selectedImageUrl;
+    private List<File> selectedFiles = new ArrayList<>();
+    private List<String> existingImageUrls = new ArrayList<>();
+    
+    // Bridge for JS communication
+    public class JavaBridge {
+        public void updateCoordinates(double lat, double lon) {
+            javafx.application.Platform.runLater(() -> {
+                latitudeField.setText(String.format(java.util.Locale.US, "%.6f", lat));
+                longitudeField.setText(String.format(java.util.Locale.US, "%.6f", lon));
+                mapWebView.getEngine().executeScript(String.format(java.util.Locale.US, "addMarker(%f, %f, 'Selected Location', true, '');", lat, lon));
+            });
+        }
+    }
 
     public AddPlaceController() {
         placeDAO = new PlaceDAO();
     }
-
+    
     @FXML
-    private void handleUploadPhoto() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select Place Photo");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
-
-        this.selectedFile = fileChooser.showOpenDialog(imagePreview.getScene().getWindow());
-        if (this.selectedFile != null) {
-            selectedImageUrl = this.selectedFile.toURI().toString();
-            imagePreview.setImage(new Image(selectedImageUrl));
-            imagePathLabel.setText(this.selectedFile.getName());
-            imagePreview.setVisible(true);
-            imagePreview.setManaged(true);
+    public void initialize() {
+        if (mapWebView != null) {
+             initMap();
         }
     }
+    
+    private void initMap() {
+        javafx.scene.web.WebEngine webEngine = mapWebView.getEngine();
+        
+        // Console logging bridge
+        webEngine.setOnAlert(event -> System.out.println("[WebView Alert] " + event.getData()));
+        webEngine.getLoadWorker().exceptionProperty().addListener((obs, old, ex) -> {
+            if (ex != null) System.err.println("[WebView Error] " + ex.getMessage());
+        });
 
-    @FXML
-    private void handleSubmit() {
-        if (!validateInput()) {
-            return;
-        }
+        java.net.URL url = getClass().getResource("/com/example/pi_dev/venue/views/place_map.html");
+        
+        // Force refresh on resize and visibility changes
+        mapWebView.widthProperty().addListener((obs, old, newVal) -> {
+            webEngine.executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+        });
+        mapWebView.heightProperty().addListener((obs, old, newVal) -> {
+            webEngine.executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+        });
 
-        User currentUser = UserSession.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            showAlert("Error", "You must be logged in to add a place.");
-            return;
-        }
+        if (url != null) {
+            webEngine.load(url.toExternalForm());
+            webEngine.getLoadWorker().stateProperty().addListener((obs, old, newState) -> {
+                if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                    netscape.javascript.JSObject window = (netscape.javascript.JSObject) webEngine.executeScript("window");
+                    window.setMember("javaApp", new JavaBridge());
+                    
+                    if (editingPlace != null) {
+                        double lat = editingPlace.getLatitude() != 0 ? editingPlace.getLatitude() : 36.8065;
+                        double lon = editingPlace.getLongitude() != 0 ? editingPlace.getLongitude() : 10.1815;
+                        webEngine.executeScript(String.format(java.util.Locale.US, "initMap(%f, %f, 13);", lat, lon));
+                        webEngine.executeScript(String.format(java.util.Locale.US, "addMarker(%f, %f, 'Selected Location', true, '');", lat, lon));
+                    }
 
-        try {
-            double price = Double.parseDouble(priceField.getText());
-            int capacity = Integer.parseInt(capacityField.getText());
-            int maxGuests = Integer.parseInt(maxGuestsField.getText());
-            double lat = latitudeField.getText().isEmpty() ? 36.8065 : Double.parseDouble(latitudeField.getText());
-            double lon = longitudeField.getText().isEmpty() ? 10.1815 : Double.parseDouble(longitudeField.getText());
-
-            if (editingPlace == null) {
-                // Create new place
-                Place newPlace = new Place();
-                newPlace.setHostId(currentUser.getUserId().toString());
-                newPlace.setTitle(titleField.getText());
-                newPlace.setDescription(descriptionArea.getText());
-                newPlace.setPricePerDay(price);
-                newPlace.setCapacity(capacity);
-                newPlace.setMaxGuests(maxGuests);
-                newPlace.setAddress(addressField.getText());
-                newPlace.setCity(cityField.getText());
-                newPlace.setCategory(categoryField.getText());
-                newPlace.setStatus(Place.Status.PENDING);
-                newPlace.setLatitude(lat);
-                newPlace.setLongitude(lon);
-
-                // Handle image upload if selected
-                if (selectedFile != null) {
-                    String savedPath = saveImage(selectedFile);
-                    if (savedPath != null) {
-                        newPlace.setImageUrl(savedPath);
+                    // Series of refreshes to handle JavaFX layout timing
+                    for (int delay : new int[]{200, 500, 1000, 2000}) {
+                        javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(delay));
+                        pause.setOnFinished(e -> {
+                            try {
+                                webEngine.executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+                            } catch (Exception ex) {}
+                        });
+                        pause.play();
                     }
                 }
-
-                placeDAO.create(newPlace);
-                showAlert("Success", "Your place has been submitted for approval!");
-            } else {
-                // Update existing place
-                editingPlace.setTitle(titleField.getText());
-                editingPlace.setDescription(descriptionArea.getText());
-                editingPlace.setPricePerDay(price);
-                editingPlace.setCapacity(capacity);
-                editingPlace.setMaxGuests(maxGuests);
-                editingPlace.setAddress(addressField.getText());
-                editingPlace.setCity(cityField.getText());
-                editingPlace.setCategory(categoryField.getText());
-                editingPlace.setLatitude(lat);
-                editingPlace.setLongitude(lon);
-
-                // Handle image upload if selected
-                if (selectedFile != null) {
-                    String savedPath = saveImage(selectedFile);
-                    if (savedPath != null) {
-                        editingPlace.setImageUrl(savedPath);
-                    }
-                }
-
-                placeDAO.update(editingPlace);
-                showAlert("Success", "Your place has been updated!");
-            }
-
-            closeWindow();
-
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Price, Capacity, Latitude, and Longitude must be valid numbers.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert("Database Error", "Failed to save place: " + e.getMessage());
+            });
         }
-    }
-
-    private String saveImage(File file) {
-        try {
-            // Create uploads directory if it doesn't exist
-            File uploadDir = new File("uploads/venues");
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
-            // Generate unique filename
-            String extension = "";
-            String fileName = file.getName();
-            int i = fileName.lastIndexOf('.');
-            if (i > 0) {
-                extension = fileName.substring(i);
-            }
-            String newFileName = UUID.randomUUID().toString() + extension;
-            File destFile = new File(uploadDir, newFileName);
-
-            // Copy file
-            Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-            // Return relative path for storage in DB
-            return "uploads/venues/" + newFileName;
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to save image: " + e.getMessage());
-            return null;
-        }
-    }
-
-    @FXML
-    private void handleBack() {
-        closeWindow();
-    }
-
-    private boolean validateInput() {
-        if (titleField.getText().isEmpty() || priceField.getText().isEmpty() || 
-            capacityField.getText().isEmpty() || maxGuestsField.getText().isEmpty() || 
-            cityField.getText().isEmpty()) {
-            showAlert("Validation Error", "Please fill in all required fields.");
-            return false;
-        }
-        return true;
-    }
-
-    private void closeWindow() {
-        Stage stage = (Stage) titleField.getScene().getWindow();
-        stage.close();
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     public void setPlace(Place place) {
@@ -227,77 +145,170 @@ public class AddPlaceController {
         categoryField.setText(place.getCategory());
         latitudeField.setText(String.valueOf(place.getLatitude()));
         longitudeField.setText(String.valueOf(place.getLongitude()));
-        this.selectedImageUrl = place.getImageUrl();
-        if (selectedImageUrl != null && !selectedImageUrl.isEmpty()) {
-            String imagePath = selectedImageUrl;
-            if (!imagePath.startsWith("http") && !imagePath.startsWith("file:") && !imagePath.startsWith("jar:")) {
-                File file = new File(imagePath);
-                if (file.exists()) {
-                    imagePath = file.toURI().toString();
-                }
+        
+        try {
+            existingImageUrls = placeDAO.getImages(place.getId());
+            refreshImagePreviews();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshImagePreviews() {
+        imagePreviewContainer.getChildren().clear();
+        
+        // Show existing images
+        for (String url : existingImageUrls) {
+            addImagePreview(url, false);
+        }
+        
+        // Show newly selected images
+        for (File file : selectedFiles) {
+            addImagePreview(file.toURI().toString(), true);
+        }
+        
+        int total = existingImageUrls.size() + selectedFiles.size();
+        imagePathLabel.setText(total + " photo(s) selected");
+    }
+
+    private void addImagePreview(String imageUrl, boolean isNew) {
+        VBox container = new VBox(5);
+        container.setAlignment(javafx.geometry.Pos.CENTER);
+        
+        ImageView imageView = new ImageView();
+        imageView.setFitHeight(120);
+        imageView.setFitWidth(150);
+        imageView.setPreserveRatio(true);
+        imageView.getStyleClass().add("card");
+
+        try {
+            String finalUrl = imageUrl;
+            if (!imageUrl.startsWith("http") && !imageUrl.startsWith("file:") && !imageUrl.startsWith("jar:")) {
+                File file = new File(imageUrl);
+                if (file.exists()) finalUrl = file.toURI().toString();
             }
-            try {
-                imagePreview.setImage(new Image(imagePath));
-                imagePreview.setVisible(true);
-                imagePreview.setManaged(true);
-                imagePathLabel.setText("Current Image");
-            } catch (Exception e) {
-                System.err.println("Failed to load image: " + imagePath);
-                e.printStackTrace();
-            }
+            imageView.setImage(new Image(finalUrl, 150, 120, true, true));
+        } catch (Exception e) {
+            System.err.println("Failed to load preview: " + imageUrl);
         }
 
-        // Update map to show selected location
-        if (mapWebView != null) {
-            initializeMap(place.getLatitude(), place.getLongitude());
+        Button removeBtn = new Button("Remove");
+        removeBtn.getStyleClass().addAll("btn", "btn-danger");
+        removeBtn.setStyle("-fx-font-size: 10px; -fx-padding: 2 5;");
+        removeBtn.setOnAction(e -> {
+            if (isNew) {
+                selectedFiles.removeIf(f -> f.toURI().toString().equals(imageUrl));
+            } else {
+                existingImageUrls.remove(imageUrl);
+            }
+            refreshImagePreviews();
+        });
+
+        container.getChildren().addAll(imageView, removeBtn);
+        imagePreviewContainer.getChildren().add(container);
+    }
+
+    @FXML
+    private void handleUploadPhoto() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Place Images");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+        
+        List<File> files = fileChooser.showOpenMultipleDialog(titleField.getScene().getWindow());
+        if (files != null) {
+            selectedFiles.addAll(files);
+            refreshImagePreviews();
         }
     }
 
     @FXML
-    private void initialize() {
-        if (mapWebView != null) {
-            mapWebView.getEngine().setJavaScriptEnabled(true);
-            // Optional: prevent right-click menu in webview
-            mapWebView.setContextMenuEnabled(false);
-        }
-        initializeMap(36.8065, 10.1815); // Default to Tunisia
-    }
+    private void handleSubmit() {
+        if (!validateInput()) return;
 
-    private void initializeMap(double initialLat, double initialLon) {
-        if (mapWebView == null)
-            return;
+        Place place = (editingPlace != null) ? editingPlace : new Place();
+        place.setTitle(titleField.getText());
+        place.setDescription(descriptionArea.getText());
+        place.setPricePerDay(Double.parseDouble(priceField.getText()));
+        place.setCapacity(Integer.parseInt(capacityField.getText()));
+        place.setMaxGuests(Integer.parseInt(maxGuestsField.getText()));
+        place.setAddress(addressField.getText());
+        place.setCity(cityField.getText());
+        place.setCategory(categoryField.getText());
+        place.setLatitude(Double.parseDouble(latitudeField.getText()));
+        place.setLongitude(Double.parseDouble(longitudeField.getText()));
+        place.setHostId(UserSession.getInstance().getCurrentUser().getUserId().toString());
+        place.setStatus(Place.Status.PENDING);
 
-        javafx.scene.web.WebEngine webEngine = mapWebView.getEngine();
-  
-          // JavaScript bridge to get coordinates from map - set BEFORE loading content
-        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
-            if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
-                try {
-                    JSObject window = (JSObject) webEngine.executeScript("window");
-                    window.setMember("javaApp", new JavaBridge());
-                    
-                    // Enable edit mode after load
-                    webEngine.executeScript(String.format(java.util.Locale.US, "enableEditMode(%f, %f);", initialLat, initialLon));
-                } catch (Exception e) {
-                    System.err.println("Failed to initialize map bridge: " + e.getMessage());
+        try {
+            if (editingPlace == null) {
+                placeDAO.create(place);
+                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_CREATE", "Created new place: " + place.getTitle());
+            } else {
+                placeDAO.update(place);
+                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_UPDATE", "Updated place: " + place.getTitle());
+                
+                // Handle multiple images for update: clear and re-add all current + new
+                placeDAO.clearImages(place.getId());
+                for (String url : existingImageUrls) {
+                    placeDAO.saveImage(place.getId(), url);
                 }
             }
-        });
 
-        java.net.URL url = getClass().getResource("/com/example/pi_dev/venue/views/place_map.html");
-        if (url != null) {
-            webEngine.load(url.toExternalForm());
-        } else {
-            System.err.println("Could not find place_map.html for AddPlaceView");
+            // Save new images
+            File destDir = new File("uploads/places");
+            if (!destDir.exists()) destDir.mkdirs();
+
+            for (File selectedFile : selectedFiles) {
+                String fileName = UUID.randomUUID().toString() + "_" + selectedFile.getName();
+                File destFile = new File(destDir, fileName);
+                try {
+                    Files.copy(selectedFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    placeDAO.saveImage(place.getId(), destFile.getPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            showAlert("Success", "Listing submitted for approval!");
+            handleBack();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to save listing: " + e.getMessage());
         }
     }
 
-    public class JavaBridge {
-        public void updateCoordinates(double lat, double lng) {
-            javafx.application.Platform.runLater(() -> {
-                latitudeField.setText(String.format(java.util.Locale.US, "%.6f", lat));
-                longitudeField.setText(String.format(java.util.Locale.US, "%.6f", lng));
-            });
+    private boolean validateInput() {
+        if (titleField.getText().isEmpty() || priceField.getText().isEmpty() || 
+            addressField.getText().isEmpty() || cityField.getText().isEmpty()) {
+            showAlert("Error", "Please fill in all required fields.");
+            return false;
         }
+        try {
+            Double.parseDouble(priceField.getText());
+            Integer.parseInt(capacityField.getText());
+            Integer.parseInt(maxGuestsField.getText());
+            Double.parseDouble(latitudeField.getText());
+            Double.parseDouble(longitudeField.getText());
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Invalid numeric values.");
+            return false;
+        }
+        return true;
+    }
+
+    @FXML
+    private void handleBack() {
+        Stage stage = (Stage) titleField.getScene().getWindow();
+        stage.close();
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

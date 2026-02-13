@@ -8,20 +8,39 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/AdminDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/AdminDashboardController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SettingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SettingsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SignupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SignupController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/UserFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/UserFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/repositories/UserRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/AddPlaceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/AddPlaceController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/HomeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/HomeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/MyPlacesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/MyPlacesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/OwnerReservationsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/OwnerReservationsController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/PlaceDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/PlaceDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/UserReservationsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/UserReservationsController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/dao/BookingDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/dao/BookingDAO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/dao/PlaceDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/dao/PlaceDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Booking.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Place.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Place.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/utils/SchemaInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/utils/SchemaInitializer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/admin_dashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/admin_dashboard.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/settings.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/settings.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/signup.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/user_form.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/user_form.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/assets/leaflet-geocoder/Control.Geocoder.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/assets/leaflet-geocoder/Control.Geocoder.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/assets/leaflet/images/marker-icon-2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/assets/leaflet/images/marker-icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/assets/leaflet/images/marker-shadow.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/assets/leaflet/leaflet.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/assets/leaflet/leaflet.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/add-place-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/add-place-view.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/home-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/home-view.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/owner-reservations.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/owner-reservations.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place-details-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place-details-view.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place_map.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place_map.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/user-reservations.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/user-reservations.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/sql/user_schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sql/user_schema.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,43 +97,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.HelloApplication.executor": "Run",
-    "Application.Main.executor": "Run",
-    "Application.MainTest.executor": "Run",
-    "Application.MessagingMain.executor": "Run",
-    "Application.TestDB.executor": "Run",
-    "Application.TestMessaging.executor": "Run",
-    "Application.UserMain.executor": "Run",
-    "Application.VenueMain.executor": "Run",
-    "Application.com.example.pi_dev.user.UserMain.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "venue-features",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/jacer/Desktop/pi_dev/YASMINE/PI_DEV",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "project.propCompiler",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainTest.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MessagingMain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.TestDB.executor&quot;: &quot;Run&quot;,
+    &quot;Application.TestMessaging.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UserMain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.VenueMain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.com.example.pi_dev.user.UserMain.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;venue-features&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jacer/Desktop/pi_dev/YASMINE/PI_DEV&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propCompiler&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\resources\com\example\pi_dev" />
@@ -213,7 +232,8 @@
       <workItem from="1770563698814" duration="2521000" />
       <workItem from="1770566315192" duration="6091000" />
       <workItem from="1770744572936" duration="5176000" />
-      <workItem from="1770825730261" duration="5728000" />
+      <workItem from="1770825730261" duration="6504000" />
+      <workItem from="1770992750314" duration="14472000" />
     </task>
     <servers />
   </component>

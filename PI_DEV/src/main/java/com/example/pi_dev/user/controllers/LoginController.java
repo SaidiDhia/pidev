@@ -5,6 +5,7 @@ import com.example.pi_dev.user.enums.TFAMethod;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
+import com.example.pi_dev.common.dao.ActivityLogDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,6 +31,7 @@ public class LoginController {
     private Label errorLabel;
 
     private final UserService userService = new UserService();
+    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
 
     @FXML
     void handleLogin(ActionEvent event) {
@@ -53,6 +55,7 @@ public class LoginController {
                         .orElseThrow();
 
                 UserSession.getInstance().login(user, token);
+                activityLogDAO.log(user.getEmail(), "SIGNIN", "User logged in: " + user.getFullName());
 
                 System.out.println("Login successful!");
                 System.out.println("JWT Token: " + token);

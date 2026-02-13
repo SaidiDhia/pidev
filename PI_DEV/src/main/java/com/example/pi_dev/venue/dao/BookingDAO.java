@@ -130,6 +130,31 @@ public class BookingDAO {
         return dates;
     }
 
+    public List<String> getPlaceImages(int placeId) throws SQLException {
+        List<String> images = new ArrayList<>();
+        String sql = "SELECT image_url FROM place_images WHERE place_id = ? ORDER BY sort_order";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, placeId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                images.add(rs.getString("image_url"));
+            }
+        }
+        return images;
+    }
+
+    public List<Booking> findAll() throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        String sql = "SELECT * FROM bookings";
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                bookings.add(extractBooking(rs));
+            }
+        }
+        return bookings;
+    }
+
     private Booking extractBooking(ResultSet rs) throws SQLException {
         Booking booking = new Booking(
             rs.getInt("id"),

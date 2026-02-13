@@ -2,8 +2,12 @@ package com.example.pi_dev.venue.controllers;
 
 import com.example.pi_dev.venue.dao.BookingDAO;
 import com.example.pi_dev.venue.entities.Booking;
+import com.example.pi_dev.venue.entities.Place;
+import com.example.pi_dev.venue.dao.PlaceDAO;
 import com.example.pi_dev.user.models.User;
+import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
+import com.example.pi_dev.common.dao.ActivityLogDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,70 +16,37 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
+
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.FlowPane;
+import javafx.geometry.Pos;
+import javafx.scene.shape.Circle;
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
+import java.io.File;
+import java.io.InputStream;
 
 public class OwnerReservationsController {
 
-    @FXML private TableView<Booking> reservationsTable;
-    @FXML private TableColumn<Booking, String> placeColumn;
-    @FXML private TableColumn<Booking, String> renterColumn;
-    @FXML private TableColumn<Booking, String> datesColumn;
-    @FXML private TableColumn<Booking, String> guestsColumn;
-    @FXML private TableColumn<Booking, String> priceColumn;
-    @FXML private TableColumn<Booking, String> statusColumn;
-    @FXML private TableColumn<Booking, Void> actionsColumn;
+    @FXML private FlowPane reservationsFlowPane;
 
     private BookingDAO bookingDAO;
+    private PlaceDAO placeDAO;
+    private UserService userService;
+    private ActivityLogDAO activityLogDAO;
     private ObservableList<Booking> reservationsList = FXCollections.observableArrayList();
 
     public OwnerReservationsController() {
         bookingDAO = new BookingDAO();
+        placeDAO = new PlaceDAO();
+        userService = new UserService();
+        activityLogDAO = new ActivityLogDAO();
     }
 
     @FXML
     public void initialize() {
-        setupTable();
         loadReservations();
-    }
-
-    private void setupTable() {
-        placeColumn.setCellValueFactory(data -> new SimpleStringProperty("Place #" + data.getValue().getPlaceId()));
-        renterColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getRenterId()));
-        datesColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                data.getValue().getStartDate() + " to " + data.getValue().getEndDate()));
-        guestsColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getGuestsCount())));
-        priceColumn.setCellValueFactory(data -> new SimpleStringProperty(String.format("$%.2f", data.getValue().getTotalPrice())));
-        statusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus().name()));
-
-        actionsColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button approveBtn = new Button("Approve");
-            private final Button rejectBtn = new Button("Reject");
-            private final HBox container = new HBox(10, approveBtn, rejectBtn);
-
-            {
-                approveBtn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-font-size: 11px;");
-                rejectBtn.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-font-size: 11px;");
-                
-                approveBtn.setOnAction(e -> handleApprove(getTableView().getItems().get(getIndex())));
-                rejectBtn.setOnAction(e -> handleReject(getTableView().getItems().get(getIndex())));
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    Booking b = getTableView().getItems().get(getIndex());
-                    if (b.getStatus() == Booking.Status.PENDING) {
-                        setGraphic(container);
-                    } else {
-                        setGraphic(null);
-                    }
-                }
-            }
-        });
-
-        reservationsTable.setItems(reservationsList);
     }
 
     private void loadReservations() {
@@ -85,15 +56,136 @@ public class OwnerReservationsController {
         try {
             List<Booking> bookings = bookingDAO.findByOwner(currentUser.getUserId().toString());
             reservationsList.setAll(bookings);
+            
+            reservationsFlowPane.getChildren().clear();
+            for (Booking booking : reservationsList) {
+                reservationsFlowPane.getChildren().add(createReservationCard(booking));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "Failed to load reservations: " + e.getMessage());
         }
     }
 
+    private VBox createReservationCard(Booking booking) {
+        VBox card = new VBox(15);
+        card.getStyleClass().add("card");
+        card.setStyle("-fx-padding: 20; -fx-background-radius: 12; -fx-pref-width: 350; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 5); -fx-background-color: white;");
+
+        // Place Title
+        String placeTitle = "Unknown Place";
+        try {
+            Place place = placeDAO.findById(booking.getPlaceId());
+            if (place != null) placeTitle = place.getTitle();
+        } catch (SQLException e) {
+            placeTitle = "Place #" + booking.getPlaceId();
+        }
+
+        Label titleLabel = new Label(placeTitle);
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
+        titleLabel.setWrapText(true);
+
+        // Renter Info Section
+        User renter = null;
+        try {
+            renter = userService.getUserById(UUID.fromString(booking.getRenterId()));
+        } catch (Exception e) {
+            System.err.println("Error fetching renter: " + e.getMessage());
+        }
+
+        HBox renterInfo = new HBox(12);
+        renterInfo.setAlignment(Pos.CENTER_LEFT);
+        renterInfo.setStyle("-fx-background-color: #F9FAFB; -fx-padding: 12; -fx-background-radius: 10; -fx-border-color: #E5E7EB; -fx-border-radius: 10;");
+
+        Circle profileCircle = new Circle(22);
+        Image avatarImage = null;
+        if (renter != null && renter.getProfilePicture() != null && !renter.getProfilePicture().isEmpty()) {
+            File file = new File("uploads/profiles/" + renter.getProfilePicture());
+            if (file.exists()) {
+                avatarImage = new Image(file.toURI().toString(), 44, 44, true, true);
+            }
+        }
+        
+        if (avatarImage == null) {
+            InputStream stream = getClass().getResourceAsStream("/com/example/pi_dev/user/default-avatar.png");
+            if (stream != null) {
+                avatarImage = new Image(stream, 44, 44, true, true);
+            }
+        }
+        
+        if (avatarImage != null) {
+            profileCircle.setFill(new ImagePattern(avatarImage));
+        } else {
+            profileCircle.setFill(javafx.scene.paint.Color.web("#D1D5DB"));
+        }
+
+        VBox renterDetails = new VBox(2);
+        Label renterNameLabel = new Label(renter != null ? renter.getFullName() : "Unknown Renter");
+        renterNameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #111827;");
+        Label renterEmailLabel = new Label(renter != null ? renter.getEmail() : "No email");
+        renterEmailLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280;");
+        Label renterPhoneLabel = new Label(renter != null ? renter.getPhoneNumber() : "No phone");
+        renterPhoneLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280;");
+        
+        renterDetails.getChildren().addAll(renterNameLabel, renterEmailLabel, renterPhoneLabel);
+        renterInfo.getChildren().addAll(profileCircle, renterDetails);
+
+        // Booking Details
+        VBox details = new VBox(8);
+        details.getChildren().addAll(
+            createDetailRow("Dates:", booking.getStartDate() + " to " + booking.getEndDate()),
+            createDetailRow("Guests:", String.valueOf(booking.getGuestsCount())),
+            createDetailRow("Total:", String.format("$%.2f", booking.getTotalPrice())),
+            createStatusLabel(booking.getStatus())
+        );
+
+        HBox actions = new HBox(10);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+        actions.setStyle("-fx-padding: 10 0 0 0;");
+
+        if (booking.getStatus() == Booking.Status.PENDING) {
+            Button approveBtn = new Button("Approve");
+            approveBtn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-padding: 8 16; -fx-background-radius: 8; -fx-font-weight: bold;");
+            approveBtn.setOnAction(e -> handleApprove(booking));
+
+            Button rejectBtn = new Button("Reject");
+            rejectBtn.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-padding: 8 16; -fx-background-radius: 8; -fx-font-weight: bold;");
+            rejectBtn.setOnAction(e -> handleReject(booking));
+
+            actions.getChildren().addAll(rejectBtn, approveBtn);
+        }
+
+        card.getChildren().addAll(titleLabel, renterInfo, details, actions);
+        return card;
+    }
+
+    private HBox createDetailRow(String label, String value) {
+        HBox row = new HBox(5);
+        Label lbl = new Label(label);
+        lbl.setStyle("-fx-font-weight: bold; -fx-text-fill: #6B7280; -fx-min-width: 60;");
+        Label val = new Label(value);
+        val.setStyle("-fx-text-fill: #374151;");
+        row.getChildren().addAll(lbl, val);
+        return row;
+    }
+
+    private Label createStatusLabel(Booking.Status status) {
+        Label lbl = new Label(status.name());
+        String color = switch (status) {
+            case PENDING -> "#F59E0B";
+            case CONFIRMED -> "#10B981";
+            case REJECTED, CANCELLED -> "#EF4444";
+            case COMPLETED -> "#6366F1";
+            default -> "#6B7280";
+        };
+        lbl.setStyle("-fx-text-fill: white; -fx-background-color: " + color + "; -fx-padding: 4 12; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
+        return lbl;
+    }
+
     private void handleApprove(Booking booking) {
         try {
             bookingDAO.updateStatus(booking.getId(), Booking.Status.CONFIRMED);
+            activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_APPROVE", "Approved booking #" + booking.getId());
             loadReservations();
         } catch (SQLException e) {
             showAlert("Error", "Failed to approve booking: " + e.getMessage());
@@ -103,6 +195,7 @@ public class OwnerReservationsController {
     private void handleReject(Booking booking) {
         try {
             bookingDAO.updateStatus(booking.getId(), Booking.Status.REJECTED);
+            activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_REJECT", "Rejected booking #" + booking.getId());
             loadReservations();
         } catch (SQLException e) {
             showAlert("Error", "Failed to reject booking: " + e.getMessage());
@@ -116,8 +209,7 @@ public class OwnerReservationsController {
 
     @FXML
     private void handleBack() {
-        // Implementation depends on how navigation is handled in the project
-        reservationsTable.getScene().getWindow().hide();
+        reservationsFlowPane.getScene().getWindow().hide();
     }
 
     private void showAlert(String title, String content) {

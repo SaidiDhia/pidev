@@ -33,9 +33,9 @@ public class HomeController extends BaseController implements Initializable {
     @FXML
     private javafx.scene.control.ToggleButton mapViewToggle;
     @FXML
-    private javafx.scene.web.WebView mapWebView;
-    @FXML
     private javafx.scene.control.ScrollPane scrollPane;
+    @FXML
+    private javafx.scene.web.WebView mapWebView;
 
     private PlaceDAO placeDAO;
     private List<Place> allPlaces;
@@ -196,7 +196,7 @@ public class HomeController extends BaseController implements Initializable {
         }
 
         // Update map if visible
-        if (mapViewToggle != null && mapViewToggle.isSelected()) {
+        if (mapWebView.isVisible()) {
             updateMap(places);
         }
     }
@@ -223,41 +223,62 @@ public class HomeController extends BaseController implements Initializable {
     }
 
     @FXML
-    private void handleMapViewToggle() {
-        boolean showMap = mapViewToggle.isSelected();
+    private void handleToggleMapView() {
+        boolean showMap = scrollPane.isVisible(); // Toggle logic
         scrollPane.setVisible(!showMap);
         scrollPane.setManaged(!showMap);
         mapWebView.setVisible(showMap);
         mapWebView.setManaged(showMap);
 
         if (showMap) {
+            // Force layout request to ensure WebView has bounds
+            if (mapWebView.getParent() != null) {
+                mapWebView.getParent().layout();
+            }
+            
             String location = mapWebView.getEngine().getLocation();
             if (location == null || location.isEmpty()) {
                 initMap();
             } else {
                 updateMap(currentFilteredPlaces != null ? currentFilteredPlaces : allPlaces);
-                // Force map resize check when shown - multiple attempts for layout stability
-                try {
-                    String resizeScript = "setTimeout(function(){ if(typeof map !== 'undefined') map.invalidateSize(); }, 100);" +
-                                         "setTimeout(function(){ if(typeof map !== 'undefined') map.invalidateSize(); }, 500);" +
-                                         "setTimeout(function(){ if(typeof map !== 'undefined') map.invalidateSize(); }, 1000);";
-                    mapWebView.getEngine().executeScript(resizeScript);
-                } catch (Exception e) {}
+                
+                // Aggressive refresh after a series of delays to handle layout shifts
+                for (int delay : new int[]{100, 500, 1000}) {
+                    javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(delay));
+                    pause.setOnFinished(e -> {
+                        try {
+                            mapWebView.getEngine().executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+                        } catch (Exception ex) {}
+                    });
+                    pause.play();
+                }
             }
         }
     }
 
     private void initMap() {
         javafx.scene.web.WebEngine webEngine = mapWebView.getEngine();
+        
+        // Console logging bridge
+        webEngine.setOnAlert(event -> System.out.println("[WebView Alert] " + event.getData()));
+        webEngine.getLoadWorker().exceptionProperty().addListener((obs, old, ex) -> {
+            if (ex != null) System.err.println("[WebView Error] " + ex.getMessage());
+        });
+
+        // Force refresh on resize
+        mapWebView.widthProperty().addListener((obs, old, newVal) -> {
+            webEngine.executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+        });
+        mapWebView.heightProperty().addListener((obs, old, newVal) -> {
+            webEngine.executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+        });
+
         java.net.URL url = getClass().getResource("/com/example/pi_dev/venue/views/place_map.html");
         if (url != null) {
             webEngine.load(url.toExternalForm());
             webEngine.getLoadWorker().stateProperty().addListener((obs, old, newValue) -> {
                 if (newValue == javafx.concurrent.Worker.State.SUCCEEDED) {
-                    // Ensure Locale is US for decimal points in JS
-                    javafx.application.Platform.runLater(() -> {
-                        updateMap(currentFilteredPlaces != null ? currentFilteredPlaces : allPlaces);
-                    });
+                    updateMap(currentFilteredPlaces != null ? currentFilteredPlaces : allPlaces);
                 }
             });
         }
@@ -268,15 +289,14 @@ public class HomeController extends BaseController implements Initializable {
         
         javafx.scene.web.WebEngine webEngine = mapWebView.getEngine();
 
-        // Use a small delay or check if the function exists to avoid "function not found" errors
-        String script = "if (typeof clearMarkers === 'function') { clearMarkers(); } " +
-                       "if (typeof initMap === 'function') { initMap(); } ";
+        String script = "if (typeof clearMarkers === 'function') { clearMarkers(); } ";
         
         for (Place p : places) {
             double lat = p.getLatitude() != 0 ? p.getLatitude() : 36.8065;
             double lon = p.getLongitude() != 0 ? p.getLongitude() : 10.1815;
             String title = p.getTitle().replace("'", "\\'");
-            script += String.format(java.util.Locale.US, "if (typeof addMarker === 'function') { addMarker(%f, %f, '%s'); } ", lat, lon, title);
+            String city = p.getCity().replace("'", "\\'");
+            script += String.format(java.util.Locale.US, "if (typeof addMarker === 'function') { addMarker(%f, %f, '%s', false, '%s'); } ", lat, lon, title, city);
         }
 
         if (!places.isEmpty()) {
@@ -291,7 +311,7 @@ public class HomeController extends BaseController implements Initializable {
             try {
                 webEngine.executeScript(finalScript);
             } catch (Exception e) {
-                System.err.println("Map script execution failed: " + e.getMessage());
+                // Ignore if script fails because page not fully ready
             }
         });
     }
@@ -305,21 +325,9 @@ public class HomeController extends BaseController implements Initializable {
                 "-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-background-radius: 12; -fx-cursor: hand;");
         card.setPrefWidth(280);
 
-        // Click event to focus map or go to details
+        // Click event to go to details
         card.setOnMouseClicked(e -> {
-            if (mapViewToggle != null && mapViewToggle.isSelected()) {
-                // Focus this place on map
-                double lat = place.getLatitude() != 0 ? place.getLatitude() : 36.8065;
-                double lon = place.getLongitude() != 0 ? place.getLongitude() : 10.1815;
-                String script = String.format(java.util.Locale.US, "if (typeof setView === 'function') { setView(%f, %f, 15); }", lat, lon);
-                try {
-                    mapWebView.getEngine().executeScript(script);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                navigateToDetails(place);
-            }
+            navigateToDetails(place);
         });
 
         // Image Loading
@@ -441,6 +449,10 @@ public class HomeController extends BaseController implements Initializable {
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
+    }
+
+    private void handleViewDetails(Place p) {
+        navigateToDetails(p);
     }
 
     private void navigateToDetails(Place place) {

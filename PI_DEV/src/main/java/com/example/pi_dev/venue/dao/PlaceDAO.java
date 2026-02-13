@@ -18,6 +18,28 @@ public class PlaceDAO {
         }
     }
 
+    public List<String> getImages(int placeId) throws SQLException {
+        List<String> images = new ArrayList<>();
+        String sql = "SELECT image_url FROM place_images WHERE place_id = ? ORDER BY sort_order";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, placeId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    images.add(rs.getString("image_url"));
+                }
+            }
+        }
+        return images;
+    }
+
+    public void clearImages(int placeId) throws SQLException {
+        String sql = "DELETE FROM place_images WHERE place_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, placeId);
+            stmt.executeUpdate();
+        }
+    }
+
     public void create(Place place) throws SQLException {
         String sql = "INSERT INTO places (host_id, title, description, price_per_day, capacity, max_guests, address, city, latitude, longitude, category, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -135,6 +157,41 @@ public class PlaceDAO {
             }
         }
         return places;
+    }
+
+    public void delete(int placeId) throws SQLException {
+        // First delete images
+        clearImages(placeId);
+        // Then delete place
+        String sql = "DELETE FROM places WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, placeId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public List<Place> findAll() throws SQLException {
+        List<Place> places = new ArrayList<>();
+        String sql = "SELECT * FROM places";
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                places.add(extractPlace(rs));
+            }
+        }
+        return places;
+    }
+
+    public Place findById(int id) throws SQLException {
+        String sql = "SELECT * FROM places WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return extractPlace(rs);
+            }
+        }
+        return null;
     }
 
     public void addImage(int placeId, String imageUrl, int sortOrder) throws SQLException {

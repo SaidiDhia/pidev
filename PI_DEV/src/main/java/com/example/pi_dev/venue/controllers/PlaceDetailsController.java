@@ -4,6 +4,7 @@ import com.example.pi_dev.venue.dao.BookingDAO;
 import com.example.pi_dev.venue.entities.Booking;
 import com.example.pi_dev.venue.entities.Place;
 import com.example.pi_dev.user.models.User;
+import com.example.pi_dev.common.dao.ActivityLogDAO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
@@ -14,6 +15,8 @@ import javafx.scene.image.ImageView;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+
+import javafx.scene.web.WebView;
 
 public class PlaceDetailsController extends BaseController {
 
@@ -27,6 +30,13 @@ public class PlaceDetailsController extends BaseController {
     private TextArea descriptionArea;
     @FXML
     private ImageView mainImageView;
+
+    @FXML
+    private javafx.scene.control.Button prevImageBtn;
+
+    @FXML
+    private javafx.scene.control.Button nextImageBtn;
+
     @FXML
     private DatePicker checkInDate;
     @FXML
@@ -37,12 +47,15 @@ public class PlaceDetailsController extends BaseController {
     private Label totalPriceLabel;
 
     @FXML
-    private javafx.scene.web.WebView mapWebView;
-
+    private WebView mapWebView;
+    
     private Place currentPlace;
     private User currentUser;
     private BookingDAO bookingDAO;
+    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
     private java.util.List<LocalDate> blockedDates = new java.util.ArrayList<>();
+    private java.util.List<String> placeImages = new java.util.ArrayList<>();
+    private int currentImageIndex = 0;
 
     public void setPlaceData(Place place, User user) {
         this.currentPlace = place;
@@ -51,37 +64,11 @@ public class PlaceDetailsController extends BaseController {
 
         titleLabel.setText(place.getTitle());
         locationLabel.setText(place.getCity() + ", " + place.getAddress());
-        priceLabel.setText("$" + place.getPricePerDay() + " / day");
+        priceLabel.setText("$" + place.getPricePerDay());
         descriptionArea.setText(place.getDescription());
 
-        // Load Image
-        if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
-            try {
-                String imageUrl = place.getImageUrl();
-                // Handle relative local paths from DB
-                if (!imageUrl.startsWith("http") && !imageUrl.startsWith("file:") && !imageUrl.startsWith("jar:")) {
-                    java.io.File file = new java.io.File(imageUrl);
-                    if (!file.exists()) {
-                        // Try with PI_DEV prefix if working dir is parent
-                        file = new java.io.File("PI_DEV/" + imageUrl);
-                    }
-                    
-                    if (file.exists()) {
-                        imageUrl = file.toURI().toString();
-                    } else {
-                        // Try as resource
-                        java.net.URL resource = getClass().getResource(imageUrl);
-                        if (resource != null) {
-                            imageUrl = resource.toExternalForm();
-                        }
-                    }
-                }
-                Image image = new Image(imageUrl, 700, 400, true, true, true);
-                mainImageView.setImage(image);
-            } catch (Exception e) {
-                System.err.println("Failed to load image: " + place.getImageUrl());
-            }
-        }
+        // Load Images
+        loadPlaceImages();
 
         // Load Blocked Dates
         try {
@@ -105,13 +92,25 @@ public class PlaceDetailsController extends BaseController {
                     @Override
                     public void updateItem(LocalDate item, boolean empty) {
                         super.updateItem(item, empty);
+                        
+                        // Disable past dates
                         if (item.isBefore(LocalDate.now())) {
                             setDisable(true);
-                            setStyle("-fx-background-color: #ffc0cb;"); // Pink for past
+                            setStyle("-fx-background-color: #f3f4f6;"); 
                         }
+                        
+                        // Disable blocked dates
                         if (blockedDates.contains(item)) {
                             setDisable(true);
-                            setStyle("-fx-background-color: #ffcccc; -fx-text-fill: gray;"); // Blocked dates
+                            setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #9ca3af;"); 
+                        }
+
+                        // For check-out, disable dates before check-in
+                        if (datePicker == checkOutDate && checkInDate.getValue() != null) {
+                            if (item.isBefore(checkInDate.getValue().plusDays(1))) {
+                                setDisable(true);
+                                setStyle("-fx-background-color: #f3f4f6;");
+                            }
                         }
                     }
                 };
@@ -120,47 +119,127 @@ public class PlaceDetailsController extends BaseController {
 
         checkInDate.setDayCellFactory(dayCellFactory);
         checkOutDate.setDayCellFactory(dayCellFactory);
+
+        // Update check-out constraints when check-in changes
+        checkInDate.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                if (checkOutDate.getValue() != null && checkOutDate.getValue().isBefore(newVal.plusDays(1))) {
+                    checkOutDate.setValue(newVal.plusDays(1));
+                }
+                // Refresh check-out cell factory to apply new constraints
+                checkOutDate.setDayCellFactory(dayCellFactory);
+            }
+            handleCalculateTotal();
+        });
+
+        checkOutDate.valueProperty().addListener((obs, oldVal, newVal) -> handleCalculateTotal());
+    }
+
+    private void loadPlaceImages() {
+        try {
+            placeImages = bookingDAO.getPlaceImages(currentPlace.getId());
+            // If no images in place_images, use the main image from places table
+            if (placeImages.isEmpty() && currentPlace.getImageUrl() != null && !currentPlace.getImageUrl().isEmpty()) {
+                placeImages.add(currentPlace.getImageUrl());
+            }
+            
+            if (!placeImages.isEmpty()) {
+                currentImageIndex = 0;
+                displayImage(placeImages.get(0));
+                
+                boolean hasMultiple = placeImages.size() > 1;
+                prevImageBtn.setVisible(hasMultiple);
+                nextImageBtn.setVisible(hasMultiple);
+            } else {
+                prevImageBtn.setVisible(false);
+                nextImageBtn.setVisible(false);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayImage(String imageUrl) {
+        try {
+            // Handle relative local paths
+            if (!imageUrl.startsWith("http") && !imageUrl.startsWith("file:") && !imageUrl.startsWith("jar:")) {
+                java.io.File file = new java.io.File(imageUrl);
+                if (!file.exists()) {
+                    file = new java.io.File("PI_DEV/" + imageUrl);
+                }
+                if (!file.exists()) {
+                    file = new java.io.File("uploads/places/" + imageUrl);
+                }
+                
+                if (file.exists()) {
+                    imageUrl = file.toURI().toString();
+                }
+            }
+            Image image = new Image(imageUrl, 700, 450, true, true, true);
+            mainImageView.setImage(image);
+        } catch (Exception e) {
+            System.err.println("Failed to load image: " + imageUrl);
+        }
+    }
+
+    @FXML
+    private void handlePrevImage() {
+        if (placeImages.size() > 1) {
+            currentImageIndex = (currentImageIndex - 1 + placeImages.size()) % placeImages.size();
+            displayImage(placeImages.get(currentImageIndex));
+        }
+    }
+
+    @FXML
+    private void handleNextImage() {
+        if (placeImages.size() > 1) {
+            currentImageIndex = (currentImageIndex + 1) % placeImages.size();
+            displayImage(placeImages.get(currentImageIndex));
+        }
     }
 
     private void loadMap() {
         if (mapWebView != null) {
             javafx.scene.web.WebEngine webEngine = mapWebView.getEngine();
+            
+            // Console logging bridge
+            webEngine.setOnAlert(event -> System.out.println("[WebView Alert] " + event.getData()));
+            webEngine.getLoadWorker().exceptionProperty().addListener((obs, old, ex) -> {
+                if (ex != null) System.err.println("[WebView Error] " + ex.getMessage());
+            });
+
+            // Force refresh on resize
+            mapWebView.widthProperty().addListener((obs, old, newVal) -> {
+                webEngine.executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+            });
+            mapWebView.heightProperty().addListener((obs, old, newVal) -> {
+                webEngine.executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+            });
+
             java.net.URL url = getClass().getResource("/com/example/pi_dev/venue/views/place_map.html");
             if (url != null) {
                 webEngine.load(url.toExternalForm());
-
-                // Wait for page to load then set coordinates
-                webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newState) -> {
-                    System.out.println("WebView State: " + newState);
+                webEngine.getLoadWorker().stateProperty().addListener((obs, old, newState) -> {
                     if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
-                        try {
-                            double finalLat = currentPlace.getLatitude();
-                            double finalLon = currentPlace.getLongitude();
-                            // If 0, use default
-                            if (finalLat == 0 && finalLon == 0) {
-                                finalLat = 36.8065;
-                                finalLon = 10.1815;
-                            }
-                            String finalTitle = currentPlace.getTitle().replace("'", "\\'");
+                        double lat = currentPlace.getLatitude() != 0 ? currentPlace.getLatitude() : 36.8065;
+                        double lon = currentPlace.getLongitude() != 0 ? currentPlace.getLongitude() : 10.1815;
+                        String title = currentPlace.getTitle().replace("'", "\\'");
+                        String city = currentPlace.getCity().replace("'", "\\'");
+                        webEngine.executeScript(String.format(java.util.Locale.US, "initMap(%f, %f, 13);", lat, lon));
+                        webEngine.executeScript(String.format(java.util.Locale.US, "addMarker(%f, %f, '%s', true, '%s');", lat, lon, title, city));
 
-                            final double mapLat = finalLat;
-                            final double mapLon = finalLon;
-
-                            javafx.application.Platform.runLater(() -> {
+                        // Series of refreshes to handle JavaFX layout timing
+                        for (int delay : new int[]{200, 500, 1000, 2000}) {
+                            javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(delay));
+                            pause.setOnFinished(e -> {
                                 try {
-                                    webEngine.executeScript(String.format(java.util.Locale.US, "initMap(%f, %f, 13);", mapLat, mapLon));
-                                    webEngine.executeScript(String.format(java.util.Locale.US, "addMarker(%f, %f, '%s');", mapLat, mapLon, finalTitle));
-                                } catch (Exception e) {
-                                    System.err.println("Details map script failed: " + e.getMessage());
-                                }
+                                    webEngine.executeScript("if(typeof forceRefresh === 'function') { forceRefresh(); }");
+                                } catch (Exception ex) {}
                             });
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            pause.play();
                         }
                     }
                 });
-            } else {
-                System.err.println("Could not find place_map.html");
             }
         }
     }
@@ -223,6 +302,8 @@ public class PlaceDetailsController extends BaseController {
                         total, Booking.Status.PENDING);
                 booking.setGuestsCount(guests);
                 bookingDAO.create(booking);
+                activityLogDAO.log(currentUser.getEmail(), "RESERVATION_CREATE", 
+                    "New reservation request for: " + currentPlace.getTitle() + " (" + start + " to " + end + ")");
                 showAlert("Success", "Booking request sent successfully!");
             } else {
                 showAlert("Unavailable", "The selected dates are already booked.");
