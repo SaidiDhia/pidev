@@ -1,10 +1,11 @@
 package com.example.pi_dev.venue.controllers;
 
-import com.example.pi_dev.venue.dao.BookingDAO;
+import com.example.pi_dev.venue.services.BookingService;
 import com.example.pi_dev.venue.entities.Booking;
 import com.example.pi_dev.venue.entities.Place;
+import com.example.pi_dev.venue.entities.Amenity;
 import com.example.pi_dev.user.models.User;
-import com.example.pi_dev.common.dao.ActivityLogDAO;
+import com.example.pi_dev.common.services.ActivityLogService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
@@ -12,6 +13,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -48,11 +53,14 @@ public class PlaceDetailsController extends BaseController {
 
     @FXML
     private WebView mapWebView;
+
+    @FXML
+    private FlowPane amenitiesFlowPane;
     
     private Place currentPlace;
     private User currentUser;
-    private BookingDAO bookingDAO;
-    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
+    private BookingService bookingService;
+    private final ActivityLogService activityLogService = new ActivityLogService();
     private java.util.List<LocalDate> blockedDates = new java.util.ArrayList<>();
     private java.util.List<String> placeImages = new java.util.ArrayList<>();
     private int currentImageIndex = 0;
@@ -60,7 +68,7 @@ public class PlaceDetailsController extends BaseController {
     public void setPlaceData(Place place, User user) {
         this.currentPlace = place;
         this.currentUser = user;
-        this.bookingDAO = new BookingDAO();
+        this.bookingService = new BookingService();
 
         titleLabel.setText(place.getTitle());
         locationLabel.setText(place.getCity() + ", " + place.getAddress());
@@ -72,7 +80,7 @@ public class PlaceDetailsController extends BaseController {
 
         // Load Blocked Dates
         try {
-            blockedDates = bookingDAO.getBookedDates(place.getId());
+            blockedDates = bookingService.getBookedDates(place.getId());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -82,6 +90,31 @@ public class PlaceDetailsController extends BaseController {
 
         // Load Map
         loadMap();
+
+        // Display Amenities
+        displayAmenities();
+    }
+
+    private void displayAmenities() {
+        amenitiesFlowPane.getChildren().clear();
+        if (currentPlace.getAmenities() != null) {
+            for (Amenity amenity : currentPlace.getAmenities()) {
+                HBox amenityBox = new HBox(10);
+                amenityBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                amenityBox.setStyle("-fx-background-color: #F3F4F6; -fx-padding: 8 15; -fx-background-radius: 20;");
+
+                // Icon (using a simple circle/label for now, could be replaced with FontAwesome if available)
+                Label iconLabel = new Label("•");
+                iconLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #4F46E5; -fx-font-weight: bold;");
+
+                Label nameLabel = new Label(amenity.getName());
+                nameLabel.getStyleClass().add("text-p");
+                nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: 500;");
+
+                amenityBox.getChildren().addAll(iconLabel, nameLabel);
+                amenitiesFlowPane.getChildren().add(amenityBox);
+            }
+        }
     }
 
     private void setupDatePickers() {
@@ -137,7 +170,7 @@ public class PlaceDetailsController extends BaseController {
 
     private void loadPlaceImages() {
         try {
-            placeImages = bookingDAO.getPlaceImages(currentPlace.getId());
+            placeImages = bookingService.getPlaceImages(currentPlace.getId());
             // If no images in place_images, use the main image from places table
             if (placeImages.isEmpty() && currentPlace.getImageUrl() != null && !currentPlace.getImageUrl().isEmpty()) {
                 placeImages.add(currentPlace.getImageUrl());
@@ -294,15 +327,15 @@ public class PlaceDetailsController extends BaseController {
         }
 
         try {
-            if (bookingDAO.isAvailable(currentPlace.getId(), java.sql.Date.valueOf(start),
+            if (bookingService.isAvailable(currentPlace.getId(), java.sql.Date.valueOf(start),
                     java.sql.Date.valueOf(end))) {
                 double total = ChronoUnit.DAYS.between(start, end) * currentPlace.getPricePerDay();
                 // User ID is UUID, converted to String for Booking entity
                 Booking booking = new Booking(0, currentPlace.getId(), currentUser.getUserId().toString(), start, end,
                         total, Booking.Status.PENDING);
                 booking.setGuestsCount(guests);
-                bookingDAO.create(booking);
-                activityLogDAO.log(currentUser.getEmail(), "RESERVATION_CREATE", 
+                bookingService.create(booking);
+                activityLogService.log(currentUser.getEmail(), "RESERVATION_CREATE", 
                     "New reservation request for: " + currentPlace.getTitle() + " (" + start + " to " + end + ")");
                 showAlert("Success", "Booking request sent successfully!");
             } else {

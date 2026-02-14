@@ -17,9 +17,6 @@
             height: 100% !important;
             overflow: hidden;
             background-color: #f8f9fa;
-            /* Disable user selection to prevent interference with clicks */
-            user-select: none;
-            -webkit-user-select: none;
         }
         #map {
             position: absolute;
@@ -30,8 +27,6 @@
             width: 100% !important;
             height: 100% !important;
             z-index: 1;
-            /* Ensure it captures all pointer events */
-            pointer-events: auto !important;
         }
         /* Inline Leaflet Positioning Fixes */
         .leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-tile-container, .leaflet-pane > svg, .leaflet-pane > canvas, .leaflet-zoom-box, .leaflet-image-layer, .leaflet-layer {
@@ -146,8 +141,7 @@
                     zoomAnimation: false,
                     markerZoomAnimation: false,
                     inertia: false,
-                    transform3DLimit: 0,
-                    tap: false // CRITICAL: Disable Leaflet tap handling for JavaFX WebView
+                    transform3DLimit: 0
                 }).setView([lat, lon], zoom);
 
                 var tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -175,14 +169,6 @@
                     } else {
                         console.warn("[MAP] javaApp not found in window");
                     }
-                });
-
-                // Add direct listener to the map container as a fallback
-                container.addEventListener('mousedown', function(e) {
-                    console.log("[MAP CONTAINER] mousedown detected");
-                });
-                container.addEventListener('click', function(e) {
-                    console.log("[MAP CONTAINER] click detected");
                 });
 
                 // Proactive refresh on move/zoom to ensure tiles don't disappear in WebView
@@ -216,7 +202,7 @@
 
         function forceRefresh() {
             if (map) {
-                map.invalidateSize({ animate: false });
+                map.invalidateSize();
                 // Aggressive fix: Trigger a simulated resize event
                 window.dispatchEvent(new Event('resize'));
             }

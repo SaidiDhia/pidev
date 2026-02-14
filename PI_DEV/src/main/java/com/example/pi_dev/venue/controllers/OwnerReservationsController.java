@@ -1,13 +1,13 @@
 package com.example.pi_dev.venue.controllers;
 
-import com.example.pi_dev.venue.dao.BookingDAO;
+import com.example.pi_dev.venue.services.BookingService;
 import com.example.pi_dev.venue.entities.Booking;
 import com.example.pi_dev.venue.entities.Place;
-import com.example.pi_dev.venue.dao.PlaceDAO;
+import com.example.pi_dev.venue.services.PlaceService;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
-import com.example.pi_dev.common.dao.ActivityLogDAO;
+import com.example.pi_dev.common.services.ActivityLogService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,17 +31,17 @@ public class OwnerReservationsController {
 
     @FXML private FlowPane reservationsFlowPane;
 
-    private BookingDAO bookingDAO;
-    private PlaceDAO placeDAO;
+    private BookingService bookingService;
+    private PlaceService placeService;
     private UserService userService;
-    private ActivityLogDAO activityLogDAO;
+    private ActivityLogService activityLogService;
     private ObservableList<Booking> reservationsList = FXCollections.observableArrayList();
 
     public OwnerReservationsController() {
-        bookingDAO = new BookingDAO();
-        placeDAO = new PlaceDAO();
+        bookingService = new BookingService();
+        placeService = new PlaceService();
         userService = new UserService();
-        activityLogDAO = new ActivityLogDAO();
+        activityLogService = new ActivityLogService();
     }
 
     @FXML
@@ -54,7 +54,7 @@ public class OwnerReservationsController {
         if (currentUser == null) return;
 
         try {
-            List<Booking> bookings = bookingDAO.findByOwner(currentUser.getUserId().toString());
+            List<Booking> bookings = bookingService.findByOwner(currentUser.getUserId().toString());
             reservationsList.setAll(bookings);
             
             reservationsFlowPane.getChildren().clear();
@@ -75,7 +75,7 @@ public class OwnerReservationsController {
         // Place Title
         String placeTitle = "Unknown Place";
         try {
-            Place place = placeDAO.findById(booking.getPlaceId());
+            Place place = placeService.findById(booking.getPlaceId());
             if (place != null) placeTitle = place.getTitle();
         } catch (SQLException e) {
             placeTitle = "Place #" + booking.getPlaceId();
@@ -184,8 +184,20 @@ public class OwnerReservationsController {
 
     private void handleApprove(Booking booking) {
         try {
-            bookingDAO.updateStatus(booking.getId(), Booking.Status.CONFIRMED);
-            activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_APPROVE", "Approved booking #" + booking.getId());
+            bookingService.updateStatus(booking.getId(), Booking.Status.CONFIRMED);
+            
+            String placeName = "Unknown Place";
+            try {
+                Place place = placeService.findById(booking.getPlaceId());
+                if (place != null) placeName = place.getTitle();
+            } catch (SQLException e) {
+                // Keep default
+            }
+            
+            String logMsg = String.format("Approved booking of %s from %s to %s", 
+                placeName, booking.getStartDate(), booking.getEndDate());
+                
+            activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_APPROVE", logMsg);
             loadReservations();
         } catch (SQLException e) {
             showAlert("Error", "Failed to approve booking: " + e.getMessage());
@@ -194,8 +206,20 @@ public class OwnerReservationsController {
 
     private void handleReject(Booking booking) {
         try {
-            bookingDAO.updateStatus(booking.getId(), Booking.Status.REJECTED);
-            activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_REJECT", "Rejected booking #" + booking.getId());
+            bookingService.updateStatus(booking.getId(), Booking.Status.REJECTED);
+            
+            String placeName = "Unknown Place";
+            try {
+                Place place = placeService.findById(booking.getPlaceId());
+                if (place != null) placeName = place.getTitle();
+            } catch (SQLException e) {
+                // Keep default
+            }
+            
+            String logMsg = String.format("Rejected booking of %s from %s to %s", 
+                placeName, booking.getStartDate(), booking.getEndDate());
+                
+            activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_REJECT", logMsg);
             loadReservations();
         } catch (SQLException e) {
             showAlert("Error", "Failed to reject booking: " + e.getMessage());

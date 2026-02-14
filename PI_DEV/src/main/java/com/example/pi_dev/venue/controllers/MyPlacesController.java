@@ -1,6 +1,6 @@
 package com.example.pi_dev.venue.controllers;
 
-import com.example.pi_dev.venue.dao.PlaceDAO;
+import com.example.pi_dev.venue.services.PlaceService;
 import com.example.pi_dev.venue.entities.Place;
 import com.example.pi_dev.user.utils.UserSession;
 import javafx.fxml.FXML;
@@ -23,11 +23,11 @@ public class MyPlacesController implements Initializable {
     @FXML
     private FlowPane placesContainer;
 
-    private PlaceDAO placeDAO;
+    private PlaceService placeService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        placeDAO = new PlaceDAO();
+        placeService = new PlaceService();
         loadMyPlaces();
     }
 
@@ -40,7 +40,7 @@ public class MyPlacesController implements Initializable {
         String hostId = UserSession.getInstance().getCurrentUser().getUserId().toString();
 
         try {
-            List<Place> myPlaces = placeDAO.findByHost(hostId);
+            List<Place> myPlaces = placeService.findByHost(hostId);
             displayPlaces(myPlaces);
         } catch (SQLException e) {
             e.printStackTrace();

@@ -4,7 +4,7 @@ import com.example.pi_dev.user.enums.RoleEnum;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
-import com.example.pi_dev.common.dao.ActivityLogDAO;
+import com.example.pi_dev.common.services.ActivityLogService;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,7 +36,7 @@ public class UserFormController {
     @FXML private Label errorLabel;
 
     private UserService userService;
-    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
+    private final ActivityLogService activityLogService = new ActivityLogService();
     private User user;
     private boolean isEditMode = false;
     private Runnable onSaveCallback;
@@ -160,17 +160,17 @@ public class UserFormController {
 
             if (isEditMode) {
                 userService.updateUser(user); 
-                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "USER_UPDATE", "Updated user: " + user.getEmail());
+                activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "USER_UPDATE", "Updated user: " + user.getEmail());
                 if (!password.isEmpty()) {
                      userService.adminUpdatePassword(user.getUserId(), password);
-                     activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "USER_PASSWORD_RESET", "Reset password for user: " + user.getEmail());
+                     activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "USER_PASSWORD_RESET", "Reset password for user: " + user.getEmail());
                 }
             } else {
                 user.setUserId(UUID.randomUUID());
                 user.setPasswordHash(password); // Register will hash it
                 user.setCreatedAt(LocalDateTime.now());
                 userService.register(user);
-                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "USER_CREATE", "Created new user: " + user.getEmail());
+                activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "USER_CREATE", "Created new user: " + user.getEmail());
             }
 
             if (onSaveCallback != null) {

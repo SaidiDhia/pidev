@@ -4,7 +4,7 @@ import com.example.pi_dev.user.enums.RoleEnum;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
-import com.example.pi_dev.common.dao.ActivityLogDAO;
+import com.example.pi_dev.common.services.ActivityLogService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -58,7 +58,7 @@ public class SettingsController {
     private Label tfaStatusLabel;
 
     private final UserService userService = new UserService();
-    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
+    private final ActivityLogService activityLogService = new ActivityLogService();
     private User currentUser;
 
     @FXML
@@ -118,7 +118,7 @@ public class SettingsController {
 
                 currentUser.setProfilePicture(fileName);
                 userService.updateUser(currentUser);
-                activityLogDAO.log(currentUser.getEmail(), "PROFILE_PIC_UPDATE", "Updated profile picture");
+                activityLogService.log(currentUser.getEmail(), "PROFILE_PIC_UPDATE", "Updated profile picture");
                 profileImageView.setImage(new Image(destFile.toURI().toString()));
                 System.out.println("Profile picture updated!");
             } catch (IOException e) {
@@ -146,7 +146,7 @@ public class SettingsController {
             
             try {
                 userService.updateUser(currentUser);
-                activityLogDAO.log(currentUser.getEmail(), "PROFILE_UPDATE", "Updated personal information");
+                activityLogService.log(currentUser.getEmail(), "PROFILE_UPDATE", "Updated personal information");
                 System.out.println("Profile updated!");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -181,7 +181,7 @@ public class SettingsController {
         boolean success = userService.changePassword(currentUser.getUserId(), currentPass, newPass);
         
         if (success) {
-            activityLogDAO.log(currentUser.getEmail(), "PASSWORD_CHANGE", "User changed their password");
+            activityLogService.log(currentUser.getEmail(), "PASSWORD_CHANGE", "User changed their password");
             passwordErrorLabel.setText("Password updated successfully! 2FA disabled.");
             passwordErrorLabel.setStyle("-fx-text-fill: green;");
             currentPasswordField.clear();
@@ -216,7 +216,7 @@ public class SettingsController {
         if (currentUser != null) {
             currentUser.setTfaMethod(null);
             userService.updateUser(currentUser);
-            activityLogDAO.log(currentUser.getEmail(), "2FA_DISABLE", "Disabled two-factor authentication");
+            activityLogService.log(currentUser.getEmail(), "2FA_DISABLE", "Disabled two-factor authentication");
             updateTfaStatus();
             System.out.println("2FA Disabled");
         }
@@ -245,6 +245,8 @@ public class SettingsController {
 
     @FXML
     void handleLogout(ActionEvent event) {
+        String email = currentUser != null ? currentUser.getEmail() : "Unknown";
+        activityLogService.log(email, "SIGNOUT", "User logged out");
         UserSession.getInstance().logout();
         navigateTo("/com/example/pi_dev/user/login.fxml", event);
     }

@@ -1,15 +1,16 @@
-package com.example.pi_dev.venue.dao;
+package com.example.pi_dev.venue.services;
 
 import com.example.pi_dev.venue.entities.Place;
+import com.example.pi_dev.venue.entities.Amenity;
 import com.example.pi_dev.user.database.UserDatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlaceDAO {
+public class PlaceService {
     private Connection conn;
 
-    public PlaceDAO() {
+    public PlaceService() {
         try {
             this.conn = UserDatabaseConnection.getInstance().getConnection();
         } catch (SQLException e) {
@@ -67,6 +68,23 @@ public class PlaceDAO {
             if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
                 saveImage(place.getId(), place.getImageUrl());
             }
+
+            // Save amenities
+            if (place.getAmenities() != null && !place.getAmenities().isEmpty()) {
+                saveAmenities(place.getId(), place.getAmenities());
+            }
+        }
+    }
+
+    public void saveAmenities(int placeId, List<Amenity> amenities) throws SQLException {
+        String sql = "INSERT INTO place_amenities (place_id, amenity_id) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (Amenity amenity : amenities) {
+                stmt.setInt(1, placeId);
+                stmt.setInt(2, amenity.getId());
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
         }
     }
 
@@ -142,6 +160,16 @@ public class PlaceDAO {
                     delStmt.executeUpdate();
                 }
                 saveImage(place.getId(), place.getImageUrl());
+            }
+
+            // Update amenities
+            String deleteAmenitiesSql = "DELETE FROM place_amenities WHERE place_id = ?";
+            try (PreparedStatement delStmt = conn.prepareStatement(deleteAmenitiesSql)) {
+                delStmt.setInt(1, place.getId());
+                delStmt.executeUpdate();
+            }
+            if (place.getAmenities() != null && !place.getAmenities().isEmpty()) {
+                saveAmenities(place.getId(), place.getAmenities());
             }
         }
     }
@@ -227,6 +255,21 @@ public class PlaceDAO {
             ResultSet imgRs = stmt.executeQuery();
             if (imgRs.next()) {
                 place.setImageUrl(imgRs.getString("image_url"));
+            }
+        }
+
+        // Fetch amenities
+        String amenitySql = "SELECT a.* FROM amenities a " +
+                "JOIN place_amenities pa ON a.id = pa.amenity_id " +
+                "WHERE pa.place_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(amenitySql)) {
+            stmt.setInt(1, place.getId());
+            ResultSet amRs = stmt.executeQuery();
+            while (amRs.next()) {
+                place.getAmenities().add(new Amenity(
+                        amRs.getInt("id"),
+                        amRs.getString("name"),
+                        amRs.getString("icon_class")));
             }
         }
 

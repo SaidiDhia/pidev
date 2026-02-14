@@ -222,3 +222,27 @@
     -fx-border-color: #4F46E5;
 }
 
+/* Password Strength Bar */
+.strength-bar {
+    -fx-indeterminate-bar-length: 0;
+    -fx-background-color: #E5E7EB;
+    -fx-background-radius: 999;
+    -fx-padding: 1 0;
+}
+
+.strength-bar .bar {
+    -fx-background-radius: 999;
+    -fx-background-color: -fx-accent;
+}
+
+.strength-bar:very-weak { -fx-accent: #EF4444; }
+.strength-bar:weak { -fx-accent: #F97316; }
+.strength-bar:medium { -fx-accent: #F59E0B; }
+.strength-bar:good { -fx-accent: #84CC16; }
+.strength-bar:strong { -fx-accent: #10B981; }
+
+.strength-bar .track {
+    -fx-background-radius: 999;
+    -fx-background-color: #E5E7EB;
+}
+

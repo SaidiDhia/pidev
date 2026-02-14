@@ -1,6 +1,6 @@
 package com.example.pi_dev.venue.controllers;
 
-import com.example.pi_dev.venue.dao.PlaceDAO;
+import com.example.pi_dev.venue.services.PlaceService;
 import com.example.pi_dev.venue.entities.Place;
 import com.example.pi_dev.user.utils.UserSession;
 import com.example.pi_dev.user.enums.RoleEnum;
@@ -34,12 +34,12 @@ public class AdminController implements Initializable {
     @FXML
     private TableColumn<Place, Void> actionColumn;
 
-    private PlaceDAO placeDAO;
+    private PlaceService placeService;
     private ObservableList<Place> pendingPlaces;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        placeDAO = new PlaceDAO();
+        placeService = new PlaceService();
         pendingPlaces = FXCollections.observableArrayList();
 
         // Security Check
@@ -99,7 +99,7 @@ public class AdminController implements Initializable {
 
     private void loadPendingPlaces() {
         try {
-            pendingPlaces.setAll(placeDAO.findPending());
+            pendingPlaces.setAll(placeService.findPending());
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "Failed to load pending places.");
@@ -108,7 +108,7 @@ public class AdminController implements Initializable {
 
     private void handleApprove(Place place) {
         try {
-            placeDAO.updateStatus(place.getId(), Place.Status.APPROVED);
+            placeService.updateStatus(place.getId(), Place.Status.APPROVED);
             pendingPlaces.remove(place);
             showAlert("Success", "Place approved successfully.");
         } catch (SQLException e) {
@@ -119,7 +119,7 @@ public class AdminController implements Initializable {
 
     private void handleDeny(Place place) {
         try {
-            placeDAO.updateStatus(place.getId(), Place.Status.DENIED);
+            placeService.updateStatus(place.getId(), Place.Status.DENIED);
             pendingPlaces.remove(place);
             showAlert("Success", "Place denied.");
         } catch (SQLException e) {

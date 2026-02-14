@@ -1,4 +1,4 @@
-package com.example.pi_dev.venue.dao;
+package com.example.pi_dev.venue.services;
 
 import com.example.pi_dev.venue.entities.Booking;
 import com.example.pi_dev.user.database.UserDatabaseConnection;
@@ -6,10 +6,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookingDAO {
+public class BookingService {
     private Connection conn;
 
-    public BookingDAO() {
+    public BookingService() {
         try {
             this.conn = UserDatabaseConnection.getInstance().getConnection();
         } catch (SQLException e) {

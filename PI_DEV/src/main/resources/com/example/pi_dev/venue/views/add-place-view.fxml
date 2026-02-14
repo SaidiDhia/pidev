@@ -75,6 +75,11 @@
                                     <TextField fx:id="categoryField" promptText="e.g. Apartment, House, Villa" styleClass="text-input" />
                                 </VBox>
 
+                                <VBox spacing="8.0">
+                                    <Label styleClass="text-p" text="Amenities" style="-fx-font-weight: bold;"/>
+                                    <javafx.scene.layout.FlowPane fx:id="amenitiesFlowPane" hgap="15.0" vgap="10.0" style="-fx-padding: 10; -fx-background-color: #F3F4F6; -fx-background-radius: 8;" />
+                                </VBox>
+
                                 <VBox spacing="15.0">
                                     <Label styleClass="text-p" text="Photos" style="-fx-font-weight: bold;"/>
                                     <HBox spacing="15" alignment="CENTER_LEFT">

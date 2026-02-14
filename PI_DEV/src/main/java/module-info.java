@@ -47,7 +47,10 @@ module com.example.pi_dev {
     // package
 
     exports com.example.pi_dev.venue.entities;
-    exports com.example.pi_dev.venue.dao;
+    exports com.example.pi_dev.venue.services;
+    exports com.example.pi_dev.common.services;
+
+    opens com.example.pi_dev.venue.entities to javafx.base;
 
     exports com.example.pi_dev;
 

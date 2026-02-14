@@ -72,6 +72,16 @@
                               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                            </padding>
                         </VBox>
+
+                        <VBox spacing="15.0" styleClass="card">
+                           <children>
+                              <Label styleClass="text-h2" text="Amenities" />
+                              <javafx.scene.layout.FlowPane fx:id="amenitiesFlowPane" hgap="20.0" vgap="15.0" style="-fx-padding: 10;" />
+                           </children>
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </VBox>
                      </children>
                   </VBox>
                   

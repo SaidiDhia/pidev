@@ -136,9 +136,9 @@ public class SchemaInitializer {
                         if (rs.next() && rs.getInt(1) == 0) {
                                 // Insert a dummy host
                                 // UUID: 123e4567-e89b-12d3-a456-426614174000
-                                String verifyHost = "INSERT INTO users (user_id, email, password_hash, first_name, last_name, role, is_verified) "
+                                String verifyHost = "INSERT INTO users (user_id, email, password_hash, full_name, role, is_active) "
                                                 +
-                                                "VALUES ('123e4567-e89b-12d3-a456-426614174000', 'host@wonderlust.com', 'hashedpassword', 'Host', 'User', 'HOST', true)";
+                                                "VALUES ('123e4567-e89b-12d3-a456-426614174000', 'host@wonderlust.com', 'hashedpassword', 'Host User', 'HOST', true)";
                                 stmt.executeUpdate(verifyHost);
                                 System.out.println("Seeded dummy host user.");
                         }
@@ -194,7 +194,18 @@ public class SchemaInitializer {
                                                 stmt.executeUpdate(sql);
                                         }
 
-                                        System.out.println("Seeded dummy places and images.");
+                                        // Seed Amenities for dummy places
+                                        String[] placeAmenitiesSql = {
+                                                        "INSERT IGNORE INTO place_amenities (place_id, amenity_id) SELECT p.id, a.id FROM places p, amenities a WHERE p.title = 'Cozy Mountain Cabin' AND a.name IN ('WiFi', 'Parking', 'Air Conditioning')",
+                                                        "INSERT IGNORE INTO place_amenities (place_id, amenity_id) SELECT p.id, a.id FROM places p, amenities a WHERE p.title = 'Modern Beachfront Villa' AND a.name IN ('WiFi', 'Pool', 'Air Conditioning', 'Kitchen')",
+                                                        "INSERT IGNORE INTO place_amenities (place_id, amenity_id) SELECT p.id, a.id FROM places p, amenities a WHERE p.title = 'Downtown Loft' AND a.name IN ('WiFi', 'Air Conditioning', 'Kitchen')"
+                                        };
+
+                                        for (String sql : placeAmenitiesSql) {
+                                                stmt.executeUpdate(sql);
+                                        }
+
+                                        System.out.println("Seeded dummy places, images, and amenities.");
                                 }
                         }
 

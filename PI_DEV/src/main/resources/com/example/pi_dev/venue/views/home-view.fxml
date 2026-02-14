@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
@@ -47,6 +48,18 @@
                         <Button fx:id="adminButton" mnemonicParsing="false" onAction="#handleAdminDashboard" styleClass="btn, btn-secondary" text="Dashboard" visible="false" managed="false" />
                         <Button fx:id="signInButton" mnemonicParsing="false" onAction="#handleSignIn" styleClass="btn, btn-primary" text="Sign In" />
                         <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#handleSettings" styleClass="btn, btn-secondary" text="Settings" />
+                        
+                        <HBox fx:id="userProfileBox" alignment="CENTER" spacing="10.0" visible="false" managed="false">
+                           <children>
+                              <VBox alignment="CENTER_RIGHT">
+                                 <children>
+                                    <Label fx:id="userNameLabel" styleClass="text-p" style="-fx-font-weight: bold;" />
+                                    <Label fx:id="userRoleLabel" style="-fx-font-size: 10px; -fx-text-fill: #6B7280;" />
+                                 </children>
+                              </VBox>
+                              <Circle fx:id="userProfileCircle" radius="18.0" fill="#F3F4F6" stroke="#E5E7EB" />
+                           </children>
+                        </HBox>
                      </children>
                   </HBox>
                </children>
@@ -55,7 +68,7 @@
       </VBox>
    </top>
    <center>
-      <StackPane VBox.vgrow="ALWAYS" BorderPane.alignment="CENTER">
+      <StackPane fx:id="mainContentArea" VBox.vgrow="ALWAYS" BorderPane.alignment="CENTER">
          <children>
             <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;">
                <content>

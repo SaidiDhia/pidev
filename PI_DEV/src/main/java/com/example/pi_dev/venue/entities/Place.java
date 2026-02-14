@@ -1,5 +1,8 @@
 package com.example.pi_dev.venue.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Place {
     private int id;
     private String hostId;
@@ -15,6 +18,7 @@ public class Place {
     private String category;
     private Status status;
     private String imageUrl; // Main image for preview
+    private List<Amenity> amenities = new ArrayList<>();
 
     public enum Status {
         PENDING, APPROVED, DENIED
@@ -150,5 +154,13 @@ public class Place {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public List<Amenity> getAmenities() {
+        return amenities;
+    }
+
+    public void setAmenities(List<Amenity> amenities) {
+        this.amenities = amenities;
     }
 }

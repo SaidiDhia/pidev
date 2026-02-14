@@ -1,6 +1,6 @@
 package com.example.pi_dev.venue.controllers;
 
-import com.example.pi_dev.venue.dao.PlaceDAO;
+import com.example.pi_dev.venue.services.PlaceService;
 import com.example.pi_dev.venue.entities.Place;
 import com.example.pi_dev.user.models.User;
 import javafx.fxml.FXML;
@@ -22,6 +22,8 @@ import java.util.ResourceBundle;
 public class HomeController extends BaseController implements Initializable {
 
     @FXML
+    private javafx.scene.layout.StackPane mainContentArea;
+    @FXML
     private TextField searchField;
     @FXML
     private FlowPane placesContainer;
@@ -31,19 +33,35 @@ public class HomeController extends BaseController implements Initializable {
     private Button settingsButton;
 
     @FXML
+    private javafx.scene.layout.HBox userProfileBox;
+    @FXML
+    private Label userNameLabel;
+    @FXML
+    private Label userRoleLabel;
+    @FXML
+    private javafx.scene.shape.Circle userProfileCircle;
+
+    @FXML
     private javafx.scene.control.ToggleButton mapViewToggle;
     @FXML
     private javafx.scene.control.ScrollPane scrollPane;
     @FXML
     private javafx.scene.web.WebView mapWebView;
 
-    private PlaceDAO placeDAO;
+    private PlaceService placeService;
     private List<Place> allPlaces;
     private List<Place> currentFilteredPlaces;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        placeDAO = new PlaceDAO();
+        placeService = new PlaceService();
+
+        // Set this controller in user data for overlay communication
+        javafx.application.Platform.runLater(() -> {
+            if (searchField.getScene() != null) {
+                searchField.getScene().setUserData(this);
+            }
+        });
 
         // Update UI based on Login State
         updateAuthState();
@@ -138,6 +156,42 @@ public class HomeController extends BaseController implements Initializable {
             signInButton.setVisible(!isLoggedIn);
             signInButton.setManaged(!isLoggedIn);
         }
+        
+        if (userProfileBox != null) {
+            userProfileBox.setVisible(isLoggedIn);
+            userProfileBox.setManaged(isLoggedIn);
+            
+            if (isLoggedIn) {
+                User currentUser = com.example.pi_dev.user.utils.UserSession.getInstance().getCurrentUser();
+                userNameLabel.setText(currentUser.getFullName());
+                userRoleLabel.setText(currentUser.getRole().name());
+                
+                // Load Profile Picture
+                String photoPath = currentUser.getProfilePicture();
+                Image image = null;
+                if (photoPath != null && !photoPath.isEmpty()) {
+                    java.io.File file = new java.io.File("uploads/profiles/" + photoPath);
+                    if (!file.exists()) {
+                        file = new java.io.File("PI_DEV/uploads/profiles/" + photoPath);
+                    }
+                    if (file.exists()) {
+                        image = new Image(file.toURI().toString());
+                    }
+                }
+                
+                if (image == null) {
+                    java.io.InputStream stream = getClass().getResourceAsStream("/com/example/pi_dev/user/default-avatar.png");
+                    if (stream != null) {
+                        image = new Image(stream);
+                    }
+                }
+                
+                if (image != null) {
+                    userProfileCircle.setFill(new javafx.scene.paint.ImagePattern(image));
+                }
+            }
+        }
+
         if (settingsButton != null) {
             settingsButton.setVisible(isLoggedIn);
             settingsButton.setManaged(isLoggedIn);
@@ -169,14 +223,20 @@ public class HomeController extends BaseController implements Initializable {
         }
 
         if (bookingRequestsButton != null) {
-            bookingRequestsButton.setVisible(isLoggedIn);
-            bookingRequestsButton.setManaged(isLoggedIn);
+            boolean isHostOrAdmin = false;
+            if (isLoggedIn) {
+                User currentUser = com.example.pi_dev.user.utils.UserSession.getInstance().getCurrentUser();
+                isHostOrAdmin = currentUser.getRole() == com.example.pi_dev.user.enums.RoleEnum.HOST || 
+                                currentUser.getRole() == com.example.pi_dev.user.enums.RoleEnum.ADMIN;
+            }
+            bookingRequestsButton.setVisible(isHostOrAdmin);
+            bookingRequestsButton.setManaged(isHostOrAdmin);
         }
     }
 
     private void loadPlaces() {
         try {
-            allPlaces = placeDAO.findAllApproved();
+            allPlaces = placeService.findAllApproved();
             displayPlaces(allPlaces);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -395,7 +455,30 @@ public class HomeController extends BaseController implements Initializable {
 
     @FXML
     private void handleSignIn() {
-        navigateToLogin(searchField);
+        showOverlay("/com/example/pi_dev/user/login.fxml");
+    }
+
+    private void showOverlay(String fxmlPath) {
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
+            javafx.scene.Parent overlay = loader.load();
+            
+            // Add background dimming/blur effect if desired
+            overlay.setStyle("-fx-background-color: rgba(249, 250, 251, 0.98);"); // Nearly opaque background
+            
+            // If it's the login controller, we might need to pass this HomeController to it 
+            // but for now let's just add it to the stack
+            mainContentArea.getChildren().add(overlay);
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeOverlay() {
+        if (mainContentArea.getChildren().size() > 1) {
+            mainContentArea.getChildren().remove(mainContentArea.getChildren().size() - 1);
+        }
+        refresh();
     }
 
     @FXML
@@ -423,8 +506,8 @@ public class HomeController extends BaseController implements Initializable {
     @FXML
     private void handleBecomeHost() {
         if (!com.example.pi_dev.user.utils.UserSession.getInstance().isLoggedIn()) {
-            // Redirect to login if not logged in
-            navigateToLogin(searchField);
+            // Redirect to login overlay if not logged in
+            showOverlay("/com/example/pi_dev/user/login.fxml");
             return;
         }
 

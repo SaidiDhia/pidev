@@ -1,10 +1,12 @@
 package com.example.pi_dev.venue.controllers;
 
-import com.example.pi_dev.venue.dao.PlaceDAO;
+import com.example.pi_dev.venue.services.PlaceService;
+import com.example.pi_dev.venue.services.AmenityService;
 import com.example.pi_dev.venue.entities.Place;
+import com.example.pi_dev.venue.entities.Amenity;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.utils.UserSession;
-import com.example.pi_dev.common.dao.ActivityLogDAO;
+import com.example.pi_dev.common.services.ActivityLogService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -19,6 +21,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.control.CheckBox;
 import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
@@ -56,12 +60,16 @@ public class AddPlaceController {
     private Label imagePathLabel;
     @FXML
     private javafx.scene.web.WebView mapWebView;
+    @FXML
+    private FlowPane amenitiesFlowPane;
     
-    private PlaceDAO placeDAO;
-    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
+    private PlaceService placeService;
+    private AmenityService amenityService;
+    private final ActivityLogService activityLogService = new ActivityLogService();
     private Place editingPlace;
     private List<File> selectedFiles = new ArrayList<>();
     private List<String> existingImageUrls = new ArrayList<>();
+    private List<CheckBox> amenityCheckBoxes = new ArrayList<>();
     
     // Bridge for JS communication
     public class JavaBridge {
@@ -75,13 +83,35 @@ public class AddPlaceController {
     }
 
     public AddPlaceController() {
-        placeDAO = new PlaceDAO();
+        placeService = new PlaceService();
+        amenityService = new AmenityService();
     }
     
     @FXML
     public void initialize() {
         if (mapWebView != null) {
              initMap();
+        }
+        loadAmenities();
+    }
+
+    private void loadAmenities() {
+        try {
+            List<Amenity> allAmenities = amenityService.findAll();
+            amenitiesFlowPane.getChildren().clear();
+            amenityCheckBoxes.clear();
+
+            for (Amenity amenity : allAmenities) {
+                CheckBox cb = new CheckBox(amenity.getName());
+                cb.setUserData(amenity);
+                cb.getStyleClass().add("text-p");
+                cb.setStyle("-fx-font-size: 14px;");
+                
+                amenityCheckBoxes.add(cb);
+                amenitiesFlowPane.getChildren().add(cb);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
     
@@ -146,8 +176,18 @@ public class AddPlaceController {
         latitudeField.setText(String.valueOf(place.getLatitude()));
         longitudeField.setText(String.valueOf(place.getLongitude()));
         
+        // Pre-select amenities
+        if (place.getAmenities() != null) {
+            for (CheckBox cb : amenityCheckBoxes) {
+                Amenity amenity = (Amenity) cb.getUserData();
+                boolean hasAmenity = place.getAmenities().stream()
+                        .anyMatch(a -> a.getId() == amenity.getId());
+                cb.setSelected(hasAmenity);
+            }
+        }
+
         try {
-            existingImageUrls = placeDAO.getImages(place.getId());
+            existingImageUrls = placeService.getImages(place.getId());
             refreshImagePreviews();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -241,18 +281,27 @@ public class AddPlaceController {
         place.setHostId(UserSession.getInstance().getCurrentUser().getUserId().toString());
         place.setStatus(Place.Status.PENDING);
 
+        // Collect selected amenities
+        List<Amenity> selectedAmenities = new ArrayList<>();
+        for (CheckBox cb : amenityCheckBoxes) {
+            if (cb.isSelected()) {
+                selectedAmenities.add((Amenity) cb.getUserData());
+            }
+        }
+        place.setAmenities(selectedAmenities);
+
         try {
             if (editingPlace == null) {
-                placeDAO.create(place);
-                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_CREATE", "Created new place: " + place.getTitle());
+                placeService.create(place);
+                activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_CREATE", "Created new place: " + place.getTitle());
             } else {
-                placeDAO.update(place);
-                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_UPDATE", "Updated place: " + place.getTitle());
+                placeService.update(place);
+                activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_UPDATE", "Updated place: " + place.getTitle());
                 
                 // Handle multiple images for update: clear and re-add all current + new
-                placeDAO.clearImages(place.getId());
+                placeService.clearImages(place.getId());
                 for (String url : existingImageUrls) {
-                    placeDAO.saveImage(place.getId(), url);
+                    placeService.saveImage(place.getId(), url);
                 }
             }
 
@@ -265,7 +314,7 @@ public class AddPlaceController {
                 File destFile = new File(destDir, fileName);
                 try {
                     Files.copy(selectedFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    placeDAO.saveImage(place.getId(), destFile.getPath());
+                    placeService.saveImage(place.getId(), destFile.getPath());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

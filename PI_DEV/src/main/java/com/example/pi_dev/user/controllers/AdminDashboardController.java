@@ -4,11 +4,12 @@ import com.example.pi_dev.user.enums.RoleEnum;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
-import com.example.pi_dev.venue.dao.PlaceDAO;
+import com.example.pi_dev.venue.services.PlaceService;
 import com.example.pi_dev.venue.entities.Place;
+import com.example.pi_dev.venue.entities.Amenity;
 import com.example.pi_dev.venue.entities.Booking;
-import com.example.pi_dev.venue.dao.BookingDAO;
-import com.example.pi_dev.common.dao.ActivityLogDAO;
+import com.example.pi_dev.venue.services.BookingService;
+import com.example.pi_dev.common.services.ActivityLogService;
 import com.example.pi_dev.common.models.ActivityLog;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -36,6 +37,8 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public class AdminDashboardController {
@@ -58,16 +61,12 @@ public class AdminDashboardController {
     @FXML private FlowPane allPlacesFlowPane;
 
     @FXML private FlowPane reservationsFlowPane;
-    @FXML private TableView<ActivityLog> activityLogTable;
-    @FXML private TableColumn<ActivityLog, String> colTimestamp;
-    @FXML private TableColumn<ActivityLog, String> colUser;
-    @FXML private TableColumn<ActivityLog, String> colAction;
-    @FXML private TableColumn<ActivityLog, String> colDetails;
+    @FXML private VBox activityLogContainer;
 
     private final UserService userService = new UserService();
-    private final PlaceDAO placeDAO = new PlaceDAO();
-    private final BookingDAO bookingDAO = new BookingDAO();
-    private final ActivityLogDAO activityLogDAO = new ActivityLogDAO();
+    private final PlaceService placeService = new PlaceService();
+    private final BookingService bookingService = new BookingService();
+    private final ActivityLogService activityLogService = new ActivityLogService();
     
     private ObservableList<User> masterData = FXCollections.observableArrayList();
     private FilteredList<User> filteredData;
@@ -83,30 +82,141 @@ public class AdminDashboardController {
         
         loadVenueData();
 
-        setupActivityLogTable();
         loadActivityLogs();
         loadReservationsAsCards();
     }
 
-    private void setupActivityLogTable() {
-        colTimestamp.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTimestamp().toString()));
-        colUser.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getUserEmail()));
-        colAction.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAction()));
-        colDetails.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDetails()));
-        activityLogTable.setItems(activityLogs);
-    }
-
-    private void loadActivityLogs() {
+    @FXML
+    public void loadActivityLogs() {
         try {
-            activityLogs.setAll(activityLogDAO.findAll());
+            System.out.println("AdminDashboardController: Manually requesting log refresh...");
+            List<ActivityLog> logs = activityLogService.findAll();
+            System.out.println("AdminDashboardController: Received " + logs.size() + " logs from Service");
+            
+            activityLogContainer.getChildren().clear();
+            for (ActivityLog log : logs) {
+                activityLogContainer.getChildren().add(createNotificationCard(log));
+            }
         } catch (Exception e) {
+            System.err.println("Error loading activity logs in controller: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    private VBox createNotificationCard(ActivityLog log) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("card");
+        card.setStyle("-fx-padding: 15; -fx-background-radius: 12; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 8, 0, 0, 3);");
+
+        HBox mainLayout = new HBox(15);
+        mainLayout.setAlignment(Pos.CENTER_LEFT);
+
+        // Fetch User Info
+        User user = null;
+        if (log.getUserEmail() != null && !log.getUserEmail().equals("System")) {
+            user = userService.getUserByEmail(log.getUserEmail());
+        }
+
+        // Profile Picture
+        Circle profileCircle = new Circle(22);
+        Image avatarImage = null;
+        if (user != null && user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
+            File file = new File("uploads/profiles/" + user.getProfilePicture());
+            if (file.exists()) {
+                avatarImage = new Image(file.toURI().toString(), 44, 44, true, true);
+            }
+        }
+        if (avatarImage == null) {
+            java.io.InputStream stream = getClass().getResourceAsStream("/com/example/pi_dev/user/default-avatar.png");
+            if (stream != null) {
+                avatarImage = new Image(stream, 44, 44, true, true);
+            }
+        }
+        
+        if (avatarImage != null) {
+            profileCircle.setFill(new ImagePattern(avatarImage));
+        } else {
+            profileCircle.setFill(javafx.scene.paint.Color.web("#D1D5DB"));
+        }
+
+        VBox contentBox = new VBox(5);
+        HBox.setHgrow(contentBox, javafx.scene.layout.Priority.ALWAYS);
+
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        // Icon based on action
+        String iconColor;
+        String actionType = log.getAction() != null ? log.getAction() : "UNKNOWN";
+        
+        iconColor = switch (actionType) {
+            case "SIGNIN", "SIGNUP" -> "#4F46E5"; // Indigo
+            case "SIGNOUT" -> "#6B7280"; // Gray
+            case "BOOKING_CREATE", "BOOKING_CONFIRM" -> "#10B981"; // Green
+            case "BOOKING_CANCEL", "BOOKING_REJECT" -> "#EF4444"; // Red
+            case "PLACE_CREATE", "PLACE_UPDATE" -> "#F59E0B"; // Amber
+            case "USER_DELETE", "PLACE_DELETE" -> "#B91C1C"; // Dark Red
+            default -> "#3B82F6"; // Blue
+        };
+
+        Rectangle iconRect = new Rectangle(8, 8);
+        iconRect.setArcWidth(3);
+        iconRect.setArcHeight(3);
+        iconRect.setFill(javafx.scene.paint.Color.web(iconColor));
+
+        Label actionLabel = new Label(actionType);
+        actionLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: " + iconColor + "; -fx-font-size: 10px;");
+        
+        HBox actionBadge = new HBox(4, iconRect, actionLabel);
+        actionBadge.setAlignment(Pos.CENTER_LEFT);
+        actionBadge.setStyle("-fx-background-color: " + iconColor + "15; -fx-padding: 2 6; -fx-background-radius: 4;");
+
+        Label timeLabel = new Label(log.getTimestamp() != null ? log.getTimestamp().toString().replace("T", " ").substring(0, 19) : "N/A");
+        timeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #9CA3AF;");
+        
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        header.getChildren().addAll(actionBadge, spacer, timeLabel);
+
+        // Formatted Phrase
+        String phrase = formatLogPhrase(log, user);
+        Label phraseLabel = new Label(phrase);
+        phraseLabel.setWrapText(true);
+        phraseLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #374151; -fx-font-weight: 600;");
+
+        String userName = (user != null) ? user.getFullName() : (log.getUserEmail() != null ? log.getUserEmail() : "System");
+        Label userLabel = new Label(userName);
+        userLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+
+        contentBox.getChildren().addAll(header, phraseLabel, userLabel);
+        mainLayout.getChildren().addAll(profileCircle, contentBox);
+        
+        card.getChildren().add(mainLayout);
+        return card;
+    }
+
+    private String formatLogPhrase(ActivityLog log, User user) {
+        String action = log.getAction();
+        String name = (user != null) ? user.getFullName() : (log.getUserEmail() != null ? log.getUserEmail() : "System");
+        String details = log.getDetails() != null ? log.getDetails() : "";
+
+        return switch (action) {
+            case "SIGNIN" -> String.format("%s successfully logged into the platform.", name);
+            case "SIGNUP" -> String.format("A new account was created for %s.", name);
+            case "SIGNOUT" -> String.format("%s logged out.", name);
+            case "PLACE_CREATE" -> String.format("%s submitted a new venue listing: %s", name, details);
+            case "BOOKING_CREATE" -> String.format("%s made a new reservation request: %s", name, details);
+            case "BOOKING_CONFIRM" -> String.format("Reservation was confirmed: %s", details);
+            case "BOOKING_REJECT" -> String.format("Reservation was rejected: %s", details);
+            case "USER_DELETE" -> String.format("User account %s was deleted from the system.", details);
+            default -> String.format("%s: %s", action, details);
+        };
+    }
+
     private void loadReservationsAsCards() {
         try {
-            java.util.List<Booking> allBookings = bookingDAO.findAll();
+            List<Booking> allBookings = bookingService.findAll();
             reservationsFlowPane.getChildren().clear();
             for (Booking booking : allBookings) {
                 reservationsFlowPane.getChildren().add(createReservationCard(booking));
@@ -126,7 +236,7 @@ public class AdminDashboardController {
         User renter = userService.getUserById(java.util.UUID.fromString(booking.getRenterId()));
         Place place = null;
         try {
-            place = placeDAO.findById(booking.getPlaceId());
+            place = placeService.findById(booking.getPlaceId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -207,8 +317,8 @@ public class AdminDashboardController {
 
     private void loadVenueData() {
         try {
-            pendingPlaces.setAll(placeDAO.findPending());
-            allPlaces.setAll(placeDAO.findAll());
+            pendingPlaces.setAll(placeService.findPending());
+            allPlaces.setAll(placeService.findAll());
 
             venueRequestsFlowPane.getChildren().clear();
             for (Place place : pendingPlaces) {
@@ -240,9 +350,26 @@ public class AdminDashboardController {
         
         Image placeImage = null;
         if (place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
-            File file = new File("uploads/places/" + place.getImageUrl());
-            if (file.exists()) {
-                placeImage = new Image(file.toURI().toString(), 380, 180, false, true);
+            String imageUrl = place.getImageUrl();
+            if (!imageUrl.startsWith("http") && !imageUrl.startsWith("file:") && !imageUrl.startsWith("jar:")) {
+                File file = new File(imageUrl);
+                if (!file.exists()) {
+                    // Try with PI_DEV prefix
+                    file = new File("PI_DEV/" + imageUrl);
+                }
+                if (!file.exists() && !imageUrl.contains("uploads/places")) {
+                    file = new File("uploads/places/" + imageUrl);
+                }
+                if (!file.exists() && !imageUrl.contains("uploads/places")) {
+                    file = new File("PI_DEV/uploads/places/" + imageUrl);
+                }
+                
+                if (file.exists()) {
+                    placeImage = new Image(file.toURI().toString(), 380, 180, false, true);
+                }
+            } else {
+                // It's a URL
+                placeImage = new Image(imageUrl, 380, 180, false, true);
             }
         }
         if (placeImage == null) {
@@ -298,9 +425,25 @@ public class AdminDashboardController {
         Circle profileCircle = new Circle(22);
         Image avatarImage = null;
         if (host != null && host.getProfilePicture() != null && !host.getProfilePicture().isEmpty()) {
-            File file = new File("uploads/profiles/" + host.getProfilePicture());
-            if (file.exists()) {
-                avatarImage = new Image(file.toURI().toString(), 44, 44, true, true);
+            String photoPath = host.getProfilePicture();
+            if (!photoPath.startsWith("http") && !photoPath.startsWith("file:") && !photoPath.startsWith("jar:")) {
+                File file = new File(photoPath);
+                if (!file.exists()) {
+                    // Try with PI_DEV prefix
+                    file = new File("PI_DEV/" + photoPath);
+                }
+                if (!file.exists() && !photoPath.contains("uploads/profiles")) {
+                    file = new File("uploads/profiles/" + photoPath);
+                }
+                if (!file.exists() && !photoPath.contains("uploads/profiles")) {
+                    file = new File("PI_DEV/uploads/profiles/" + photoPath);
+                }
+                
+                if (file.exists()) {
+                    avatarImage = new Image(file.toURI().toString(), 44, 44, true, true);
+                }
+            } else {
+                avatarImage = new Image(photoPath, 44, 44, true, true);
             }
         }
         if (avatarImage == null) {
@@ -349,6 +492,21 @@ public class AdminDashboardController {
 
         details.getChildren().addAll(locationRow, priceRow, capacityRow);
 
+        // Amenities Section
+        VBox amenitiesSection = new VBox(5);
+        if (place.getAmenities() != null && !place.getAmenities().isEmpty()) {
+            Label amenitiesTitle = new Label("Amenities:");
+            amenitiesTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #374151;");
+            
+            FlowPane amenitiesFlow = new FlowPane(8, 8);
+            for (Amenity amenity : place.getAmenities()) {
+                Label amLabel = new Label(amenity.getName());
+                amLabel.setStyle("-fx-background-color: #F3F4F6; -fx-padding: 3 8; -fx-background-radius: 4; -fx-font-size: 11px;");
+                amenitiesFlow.getChildren().add(amLabel);
+            }
+            amenitiesSection.getChildren().addAll(amenitiesTitle, amenitiesFlow);
+        }
+
         HBox actions = new HBox(12);
         actions.setAlignment(Pos.CENTER_RIGHT);
         actions.setStyle("-fx-padding: 10 0 0 0;");
@@ -370,7 +528,7 @@ public class AdminDashboardController {
             actions.getChildren().add(deleteBtn);
         }
 
-        content.getChildren().addAll(titleRow, hostInfo, descLabel, details, actions);
+        content.getChildren().addAll(titleRow, hostInfo, descLabel, details, amenitiesSection, actions);
         card.getChildren().addAll(imageContainer, content);
         return card;
     }
@@ -384,9 +542,9 @@ public class AdminDashboardController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                placeDAO.delete(place.getId());
+                placeService.delete(place.getId());
                 loadVenueData();
-                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_DELETE", "Deleted place: " + place.getTitle());
+                activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_DELETE", "Deleted place: " + place.getTitle());
             } catch (Exception e) {
                 e.printStackTrace();
                 showAlert("Error", "Failed to delete place.");
@@ -396,10 +554,10 @@ public class AdminDashboardController {
 
     private void handleApprovePlace(Place place) {
         try {
-            placeDAO.updateStatus(place.getId(), Place.Status.APPROVED);
+            placeService.updateStatus(place.getId(), Place.Status.APPROVED);
             loadVenueData();
             showAlert("Success", "Place approved successfully.");
-            activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_APPROVE", "Approved place: " + place.getTitle());
+            activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_APPROVE", "Approved place: " + place.getTitle());
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Failed to approve place.");
@@ -408,10 +566,10 @@ public class AdminDashboardController {
 
     private void handleDenyPlace(Place place) {
         try {
-            placeDAO.updateStatus(place.getId(), Place.Status.DENIED);
+            placeService.updateStatus(place.getId(), Place.Status.DENIED);
             loadVenueData();
             showAlert("Success", "Place denied.");
-            activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_DENY", "Denied place: " + place.getTitle());
+            activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "PLACE_DENY", "Denied place: " + place.getTitle());
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Failed to deny place.");
@@ -560,8 +718,9 @@ public class AdminDashboardController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            userService.deleteUser(user.getUserId());
-            loadData();
+           userService.deleteUser(user.getUserId());
+                activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "USER_DELETE", "Deleted user: " + user.getEmail());
+                loadData();
         }
     }
 
@@ -613,6 +772,10 @@ public class AdminDashboardController {
 
     @FXML
     void handleLogout(ActionEvent event) {
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            activityLogService.log(currentUser.getEmail(), "SIGNOUT", "Admin logged out");
+        }
         UserSession.getInstance().logout();
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));

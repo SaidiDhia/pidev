@@ -1,6 +1,8 @@
 package com.example.pi_dev.venue.controllers;
 
-import com.example.pi_dev.venue.dao.BookingDAO;
+import com.example.pi_dev.venue.services.BookingService;
+import com.example.pi_dev.venue.services.PlaceService;
+import com.example.pi_dev.common.services.ActivityLogService;
 import com.example.pi_dev.venue.entities.Booking;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.utils.UserSession;
@@ -24,13 +26,13 @@ public class UserReservationsController {
 
     @FXML private FlowPane reservationsFlowPane;
 
-    private BookingDAO bookingDAO;
-    private com.example.pi_dev.common.dao.ActivityLogDAO activityLogDAO;
+    private BookingService bookingService;
+    private ActivityLogService activityLogService;
     private ObservableList<Booking> reservationsList = FXCollections.observableArrayList();
 
     public UserReservationsController() {
-        bookingDAO = new BookingDAO();
-        activityLogDAO = new com.example.pi_dev.common.dao.ActivityLogDAO();
+        bookingService = new BookingService();
+        activityLogService = new ActivityLogService();
     }
 
     @FXML
@@ -43,7 +45,7 @@ public class UserReservationsController {
         if (currentUser == null) return;
 
         try {
-            List<Booking> bookings = bookingDAO.findByRenter(currentUser.getUserId().toString());
+            List<Booking> bookings = bookingService.findByRenter(currentUser.getUserId().toString());
             reservationsList.setAll(bookings);
             
             reservationsFlowPane.getChildren().clear();
@@ -63,8 +65,8 @@ public class UserReservationsController {
 
         String placeTitle = "Unknown Place";
         try {
-            com.example.pi_dev.venue.dao.PlaceDAO placeDAO = new com.example.pi_dev.venue.dao.PlaceDAO();
-            com.example.pi_dev.venue.entities.Place place = placeDAO.findById(booking.getPlaceId());
+            PlaceService placeService = new PlaceService();
+            com.example.pi_dev.venue.entities.Place place = placeService.findById(booking.getPlaceId());
             if (place != null) placeTitle = place.getTitle();
         } catch (Exception e) {
             placeTitle = "Place #" + booking.getPlaceId();
@@ -168,16 +170,23 @@ public class UserReservationsController {
         result.ifPresent(updatedBooking -> {
             try {
                 // Recalculate price if dates changed
-                com.example.pi_dev.venue.dao.PlaceDAO placeDAO = new com.example.pi_dev.venue.dao.PlaceDAO();
-                com.example.pi_dev.venue.entities.Place place = placeDAO.findById(updatedBooking.getPlaceId());
+                PlaceService placeService = new PlaceService();
+                com.example.pi_dev.venue.entities.Place place = placeService.findById(updatedBooking.getPlaceId());
                 if (place != null) {
                     long days = java.time.temporal.ChronoUnit.DAYS.between(startDatePicker.getValue(), endDatePicker.getValue());
                     if (days <= 0) days = 1;
                     updatedBooking.setTotalPrice(place.getPricePerDay() * days);
                 }
 
-                bookingDAO.update(updatedBooking);
-                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_UPDATE", "Updated booking #" + updatedBooking.getId());
+                bookingService.update(updatedBooking);
+                
+                String placeName = "Unknown Place";
+                if (place != null) placeName = place.getTitle();
+                
+                String logMsg = String.format("Updated booking of %s from %s to %s", 
+                    placeName, updatedBooking.getStartDate(), updatedBooking.getEndDate());
+                
+                activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_UPDATE", logMsg);
                 loadReservations();
             } catch (SQLException e) {
                 showAlert("Error", "Failed to update booking: " + e.getMessage());
@@ -194,8 +203,20 @@ public class UserReservationsController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                bookingDAO.delete(booking.getId());
-                activityLogDAO.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_CANCEL", "Cancelled booking #" + booking.getId());
+                String placeName = "Unknown Place";
+                try {
+                    PlaceService placeService = new PlaceService();
+                    com.example.pi_dev.venue.entities.Place place = placeService.findById(booking.getPlaceId());
+                    if (place != null) placeName = place.getTitle();
+                } catch (SQLException e) {
+                    // Keep default
+                }
+
+                String logMsg = String.format("Cancelled booking of %s from %s to %s", 
+                    placeName, booking.getStartDate(), booking.getEndDate());
+
+                bookingService.delete(booking.getId());
+                activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "BOOKING_CANCEL", logMsg);
                 loadReservations();
             } catch (SQLException e) {
                 showAlert("Error", "Failed to cancel booking: " + e.getMessage());
