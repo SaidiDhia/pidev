@@ -5,13 +5,13 @@ import java.util.UUID;
 
 public class PasswordResetToken {
     private UUID tokenId;
-    private UUID userId;
+    private long userId;
     private String token;
     private LocalDateTime expiresAt;
 
     public PasswordResetToken() {}
 
-    public PasswordResetToken(UUID tokenId, UUID userId, String token, LocalDateTime expiresAt) {
+    public PasswordResetToken(UUID tokenId, long userId, String token, LocalDateTime expiresAt) {
         this.tokenId = tokenId;
         this.userId = userId;
         this.token = token;
@@ -21,8 +21,8 @@ public class PasswordResetToken {
     public UUID getTokenId() { return tokenId; }
     public void setTokenId(UUID tokenId) { this.tokenId = tokenId; }
 
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
+    public long getUserId() { return userId; }
+    public void setUserId(long userId) { this.userId = userId; }
 
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }

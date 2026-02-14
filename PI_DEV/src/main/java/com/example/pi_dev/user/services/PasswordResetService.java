@@ -23,7 +23,7 @@ public class PasswordResetService {
         // For now, I'll do a quick DB check or assume valid if calling from UserService
         // But better to do it here.
         
-        String userId = getUserIdByEmail(email);
+        Long userId = getUserIdByEmail(email);
         if (userId == null) {
             System.out.println("User not found for password reset: " + email);
             return;
@@ -42,9 +42,9 @@ public class PasswordResetService {
     }
 
     // Returns the userId if successful, null otherwise
-    public String resetPassword(String token, String newPasswordHash) {
+    public Long resetPassword(String token, String newPasswordHash) {
         // 1. Validate Token
-        String userId = getUserIdByToken(token);
+        Long userId = getUserIdByToken(token);
         if (userId == null) {
             System.out.println("Invalid or expired token.");
             return null;
@@ -58,23 +58,23 @@ public class PasswordResetService {
         return userId;
     }
 
-    private String getUserIdByEmail(String email) {
+    private Long getUserIdByEmail(String email) {
         String sql = "SELECT user_id FROM users WHERE email = ?";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getString("user_id");
+            if (rs.next()) return rs.getLong("user_id");
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private void saveResetToken(String userId, String token, LocalDateTime expiresAt) {
+    private void saveResetToken(Long userId, String token, LocalDateTime expiresAt) {
         String sql = "INSERT INTO password_reset_tokens (token_id, user_id, token, expires_at) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setString(1, UUID.randomUUID().toString());
-            ps.setString(2, userId);
+            ps.setLong(2, userId);
             ps.setString(3, token);
             ps.setTimestamp(4, Timestamp.valueOf(expiresAt));
             ps.executeUpdate();
@@ -83,7 +83,7 @@ public class PasswordResetService {
         }
     }
 
-    private String getUserIdByToken(String token) {
+    private Long getUserIdByToken(String token) {
         String sql = "SELECT user_id, expires_at FROM password_reset_tokens WHERE token = ?";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setString(1, token);
@@ -91,7 +91,7 @@ public class PasswordResetService {
             if (rs.next()) {
                 Timestamp expiresAt = rs.getTimestamp("expires_at");
                 if (expiresAt != null && expiresAt.toLocalDateTime().isAfter(LocalDateTime.now())) {
-                    return rs.getString("user_id");
+                    return rs.getLong("user_id");
                 } else {
                     System.out.println("Token expired: " + token);
                 }
@@ -104,11 +104,11 @@ public class PasswordResetService {
         return null;
     }
 
-    private void updateUserPassword(String userId, String passwordHash) {
+    private void updateUserPassword(Long userId, String passwordHash) {
         String sql = "UPDATE users SET password_hash = ? WHERE user_id = ?";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setString(1, passwordHash);
-            ps.setString(2, userId);
+            ps.setLong(2, userId);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

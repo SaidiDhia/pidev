@@ -4,10 +4,9 @@ import com.example.pi_dev.user.enums.RoleEnum;
 import com.example.pi_dev.user.enums.TFAMethod;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class User {
-    private UUID userId;
+    private long userId;
     private String email;
     private String passwordHash;
     private String fullName;
@@ -20,7 +19,7 @@ public class User {
 
     public User() {}
 
-    public User(UUID userId, String email, String passwordHash, String fullName, String phoneNumber, Boolean isActive, RoleEnum role, TFAMethod tfaMethod, LocalDateTime createdAt, String profilePicture) {
+    public User(long userId, String email, String passwordHash, String fullName, String phoneNumber, Boolean isActive, RoleEnum role, TFAMethod tfaMethod, LocalDateTime createdAt, String profilePicture) {
         this.userId = userId;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -34,8 +33,8 @@ public class User {
     }
 
     // Getters and Setters
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
+    public long getUserId() { return userId; }
+    public void setUserId(long userId) { this.userId = userId; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

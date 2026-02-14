@@ -278,7 +278,7 @@ public class AddPlaceController {
         place.setCategory(categoryField.getText());
         place.setLatitude(Double.parseDouble(latitudeField.getText()));
         place.setLongitude(Double.parseDouble(longitudeField.getText()));
-        place.setHostId(UserSession.getInstance().getCurrentUser().getUserId().toString());
+        place.setHostId(UserSession.getInstance().getCurrentUser().getUserId());
         place.setStatus(Place.Status.PENDING);
 
         // Collect selected amenities

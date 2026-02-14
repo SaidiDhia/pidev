@@ -44,7 +44,7 @@ public class PlaceService {
     public void create(Place place) throws SQLException {
         String sql = "INSERT INTO places (host_id, title, description, price_per_day, capacity, max_guests, address, city, latitude, longitude, category, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, place.getHostId());
+            stmt.setLong(1, place.getHostId());
             stmt.setString(2, place.getTitle());
             stmt.setString(3, place.getDescription());
             stmt.setDouble(4, place.getPricePerDay());
@@ -174,11 +174,11 @@ public class PlaceService {
         }
     }
 
-    public List<Place> findByHost(String hostId) throws SQLException {
+    public List<Place> findByHost(long hostId) throws SQLException {
         List<Place> places = new ArrayList<>();
         String sql = "SELECT * FROM places WHERE host_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, hostId);
+            stmt.setLong(1, hostId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 places.add(extractPlace(rs));
@@ -235,7 +235,7 @@ public class PlaceService {
     private Place extractPlace(ResultSet rs) throws SQLException {
         Place place = new Place(
                 rs.getInt("id"),
-                rs.getString("host_id"),
+                rs.getLong("host_id"),
                 rs.getString("title"),
                 rs.getString("description"),
                 rs.getDouble("price_per_day"),

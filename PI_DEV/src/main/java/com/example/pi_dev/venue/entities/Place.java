@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Place {
     private int id;
-    private String hostId;
+    private long hostId;
     private String title;
     private String description;
     private double pricePerDay;
@@ -27,7 +27,7 @@ public class Place {
     public Place() {
     }
 
-    public Place(int id, String hostId, String title, String description, double pricePerDay, int capacity,
+    public Place(int id, long hostId, String title, String description, double pricePerDay, int capacity,
             String address, String city, double latitude, double longitude, String category, Status status) {
         this.id = id;
         this.hostId = hostId;
@@ -52,11 +52,11 @@ public class Place {
         this.id = id;
     }
 
-    public String getHostId() {
+    public long getHostId() {
         return hostId;
     }
 
-    public void setHostId(String hostId) {
+    public void setHostId(long hostId) {
         this.hostId = hostId;
     }
 

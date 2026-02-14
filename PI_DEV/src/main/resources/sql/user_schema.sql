@@ -1,6 +1,6 @@
 -- User Table
 CREATE TABLE IF NOT EXISTS users (
-    user_id VARCHAR(36) PRIMARY KEY,
+    user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- Password Reset Token Table
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
     token_id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL,
+    user_id BIGINT NOT NULL,
     token VARCHAR(255) UNIQUE NOT NULL,
     expires_at DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 
 -- TFA Secret Table
 CREATE TABLE IF NOT EXISTS tfa_secrets (
-    user_id VARCHAR(36) PRIMARY KEY,
+    user_id BIGINT PRIMARY KEY,
     secret_key VARCHAR(255) NOT NULL,
     qr_code TEXT,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE

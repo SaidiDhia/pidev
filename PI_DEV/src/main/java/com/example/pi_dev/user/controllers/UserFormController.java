@@ -166,7 +166,6 @@ public class UserFormController {
                      activityLogService.log(UserSession.getInstance().getCurrentUser().getEmail(), "USER_PASSWORD_RESET", "Reset password for user: " + user.getEmail());
                 }
             } else {
-                user.setUserId(UUID.randomUUID());
                 user.setPasswordHash(password); // Register will hash it
                 user.setCreatedAt(LocalDateTime.now());
                 userService.register(user);

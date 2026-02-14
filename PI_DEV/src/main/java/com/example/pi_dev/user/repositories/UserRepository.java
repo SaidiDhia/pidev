@@ -14,28 +14,30 @@ import java.util.UUID;
 public class UserRepository {
 
     public void create(User user) throws SQLException {
-        String sql = "INSERT INTO users (user_id, email, password_hash, full_name, phone_number, is_active, role, tfa_method, created_at, profile_picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
-            ps.setString(1, user.getUserId().toString());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPasswordHash());
-            ps.setString(4, user.getFullName());
-            ps.setString(5, user.getPhoneNumber());
-            ps.setBoolean(6, user.getIsActive());
-            ps.setString(7, user.getRole().name());
-            ps.setString(8, user.getTfaMethod() != null ? user.getTfaMethod().name() : null);
-            ps.setTimestamp(9, Timestamp.valueOf(user.getCreatedAt()));
-            ps.setString(10, user.getProfilePicture());
-
+        String sql = "INSERT INTO users (email, password_hash, full_name, phone_number, is_active, role, tfa_method, created_at, profile_picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getPasswordHash());
+            ps.setString(3, user.getFullName());
+            ps.setString(4, user.getPhoneNumber());
+            ps.setBoolean(5, user.getIsActive());
+            ps.setString(6, user.getRole().name());
+            ps.setString(7, user.getTfaMethod() != null ? user.getTfaMethod().name() : null);
+            ps.setTimestamp(8, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setString(9, user.getProfilePicture());
             ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    user.setUserId(rs.getLong(1));
+                }
+            }
         }
     }
 
-    public Optional<User> findById(UUID userId) throws SQLException {
+    public Optional<User> findById(long userId) throws SQLException {
         String sql = "SELECT * FROM users WHERE user_id = ?";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
-            ps.setString(1, userId.toString());
+            ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return Optional.of(mapResultSetToUser(rs));
@@ -79,35 +81,35 @@ public class UserRepository {
             ps.setString(6, user.getRole().name());
             ps.setString(7, user.getTfaMethod() != null ? user.getTfaMethod().name() : null);
             ps.setString(8, user.getProfilePicture());
-            ps.setString(9, user.getUserId().toString());
+            ps.setLong(9, user.getUserId());
 
             ps.executeUpdate();
         }
     }
 
-    public void delete(UUID userId) throws SQLException {
+    public void delete(long userId) throws SQLException {
         String sql = "DELETE FROM users WHERE user_id = ?";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
-            ps.setString(1, userId.toString());
+            ps.setLong(1, userId);
             ps.executeUpdate();
         }
     }
 
     // TFA Methods
-    public void saveTfaSecret(UUID userId, String secretKey) throws SQLException {
+    public void saveTfaSecret(long userId, String secretKey) throws SQLException {
         String sql = "INSERT INTO tfa_secrets (user_id, secret_key) VALUES (?, ?) ON DUPLICATE KEY UPDATE secret_key = ?";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
-            ps.setString(1, userId.toString());
+            ps.setLong(1, userId);
             ps.setString(2, secretKey);
             ps.setString(3, secretKey);
             ps.executeUpdate();
         }
     }
 
-    public String getTfaSecret(UUID userId) throws SQLException {
+    public String getTfaSecret(long userId) throws SQLException {
         String sql = "SELECT secret_key FROM tfa_secrets WHERE user_id = ?";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
-            ps.setString(1, userId.toString());
+            ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getString("secret_key");
@@ -118,7 +120,7 @@ public class UserRepository {
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         return new User(
-                UUID.fromString(rs.getString("user_id")),
+                rs.getLong("user_id"),
                 rs.getString("email"),
                 rs.getString("password_hash"),
                 rs.getString("full_name"),

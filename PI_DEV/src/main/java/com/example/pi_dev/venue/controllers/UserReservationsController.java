@@ -45,7 +45,7 @@ public class UserReservationsController {
         if (currentUser == null) return;
 
         try {
-            List<Booking> bookings = bookingService.findByRenter(currentUser.getUserId().toString());
+            List<Booking> bookings = bookingService.findByRenter(currentUser.getUserId());
             reservationsList.setAll(bookings);
             
             reservationsFlowPane.getChildren().clear();

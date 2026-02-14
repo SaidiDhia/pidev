@@ -13,7 +13,7 @@ public class SchemaInitializer {
 
                                 "CREATE TABLE IF NOT EXISTS places (" +
                                                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                                                "host_id VARCHAR(36) NOT NULL, " +
+                                                "host_id BIGINT NOT NULL, " +
                                                 "title VARCHAR(255) NOT NULL, " +
                                                 "description TEXT, " +
                                                 "price_per_day DECIMAL(10, 2) NOT NULL, " +
@@ -50,7 +50,7 @@ public class SchemaInitializer {
                                 "CREATE TABLE IF NOT EXISTS bookings (" +
                                                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                                                 "place_id INT NOT NULL, " +
-                                                "renter_id VARCHAR(36) NOT NULL, " +
+                                                "renter_id BIGINT NOT NULL, " +
                                                 "start_date DATE NOT NULL, " +
                                                 "end_date DATE NOT NULL, " +
                                                 "total_price DECIMAL(10, 2) NOT NULL, " +
@@ -73,7 +73,7 @@ public class SchemaInitializer {
                                 "CREATE TABLE IF NOT EXISTS admin_actions (" +
                                                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                                                 "place_id INT NOT NULL, " +
-                                                "admin_id VARCHAR(36) NOT NULL, " +
+                                                "admin_id BIGINT NOT NULL, " +
                                                 "action ENUM('APPROVE', 'DENY', 'REVOKE') NOT NULL, " +
                                                 "reason TEXT, " +
                                                 "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
@@ -134,11 +134,9 @@ public class SchemaInitializer {
                         String checkUsers = "SELECT count(*) FROM users";
                         java.sql.ResultSet rs = stmt.executeQuery(checkUsers);
                         if (rs.next() && rs.getInt(1) == 0) {
-                                // Insert a dummy host
-                                // UUID: 123e4567-e89b-12d3-a456-426614174000
-                                String verifyHost = "INSERT INTO users (user_id, email, password_hash, full_name, role, is_active) "
-                                                +
-                                                "VALUES ('123e4567-e89b-12d3-a456-426614174000', 'host@wonderlust.com', 'hashedpassword', 'Host User', 'HOST', true)";
+                                // Insert a dummy host with auto-incremented ID
+                                String verifyHost = "INSERT INTO users (email, password_hash, full_name, role, is_active) " +
+                                                "VALUES ('host@wonderlust.com', 'hashedpassword', 'Host User', 'HOST', true)";
                                 stmt.executeUpdate(verifyHost);
                                 System.out.println("Seeded dummy host user.");
                         }
@@ -156,27 +154,21 @@ public class SchemaInitializer {
 
                                 String getHostId = "SELECT user_id FROM users LIMIT 1";
                                 rs = stmt.executeQuery(getHostId);
-                                String hostId = "";
+                                long hostId = 0L;
                                 if (rs.next()) {
-                                        hostId = rs.getString(1);
+                                        hostId = rs.getLong(1);
                                 }
 
-                                if (!hostId.isEmpty()) {
+                                if (hostId != 0L) {
                                         String[] placesSql = {
-                                                        "INSERT INTO places (host_id, title, description, price_per_day, capacity, address, city, latitude, longitude, category, status) VALUES "
-                                                                        +
-                                                                        "('" + hostId
-                                                                        + "', 'Cozy Mountain Cabin', 'A beautiful cabin in the woods with a fireplace and stunning views.', 120.00, 4, '123 Pine Rd', 'Aspen', 39.1911, -106.8175, 'Cabins', 'APPROVED')",
+                                                        "INSERT INTO places (host_id, title, description, price_per_day, capacity, address, city, latitude, longitude, category, status) VALUES " +
+                                                                        "(" + hostId + ", 'Cozy Mountain Cabin', 'A beautiful cabin in the woods with a fireplace and stunning views.', 120.00, 4, '123 Pine Rd', 'Aspen', 39.1911, -106.8175, 'Cabins', 'APPROVED')",
 
-                                                        "INSERT INTO places (host_id, title, description, price_per_day, capacity, address, city, latitude, longitude, category, status) VALUES "
-                                                                        +
-                                                                        "('" + hostId
-                                                                        + "', 'Modern Beachfront Villa', 'Luxury villa right on the sand. Private pool and direct beach access.', 450.00, 8, '456 Ocean Dr', 'Miami', 25.7617, -80.1918, 'Beachfront', 'APPROVED')",
+                                                        "INSERT INTO places (host_id, title, description, price_per_day, capacity, address, city, latitude, longitude, category, status) VALUES " +
+                                                                        "(" + hostId + ", 'Modern Beachfront Villa', 'Luxury villa right on the sand. Private pool and direct beach access.', 450.00, 8, '456 Ocean Dr', 'Miami', 25.7617, -80.1918, 'Beachfront', 'APPROVED')",
 
-                                                        "INSERT INTO places (host_id, title, description, price_per_day, capacity, address, city, latitude, longitude, category, status) VALUES "
-                                                                        +
-                                                                        "('" + hostId
-                                                                        + "', 'Downtown Loft', 'Trendy loft in the heart of the city. Walking distance to everything.', 85.00, 2, '789 Main St', 'New York', 40.7128, -74.0060, 'Apartment', 'APPROVED')"
+                                                        "INSERT INTO places (host_id, title, description, price_per_day, capacity, address, city, latitude, longitude, category, status) VALUES " +
+                                                                        "(" + hostId + ", 'Downtown Loft', 'Trendy loft in the heart of the city. Walking distance to everything.', 85.00, 2, '789 Main St', 'New York', 40.7128, -74.0060, 'Apartment', 'APPROVED')"
                                         };
 
                                         for (String sql : placesSql) {
