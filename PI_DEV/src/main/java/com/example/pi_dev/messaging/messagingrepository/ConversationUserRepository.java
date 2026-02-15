@@ -6,6 +6,7 @@ import com.example.pi_dev.messaging.messagingdatabase.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
 public class ConversationUserRepository {
 
@@ -24,5 +25,25 @@ public class ConversationUserRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    public String findUserIdByEmail(String email) throws SQLException {
+
+        String sql = "SELECT user_id FROM users WHERE email = ?";
+
+        try (PreparedStatement ps =
+                     DatabaseConnection.getInstance()
+                             .getConnection()
+                             .prepareStatement(sql)) {
+
+            ps.setString(1, email);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("user_id");
+            }
+        }
+
+        return null;
     }
 }

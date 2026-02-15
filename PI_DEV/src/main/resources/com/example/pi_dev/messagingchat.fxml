@@ -19,6 +19,8 @@
             <ListView fx:id="conversationList" prefWidth="200"/>
 
         </VBox>
+        <!-- Add this after the "+ New Chat" button or in a separate panel -->
+
     </left>
 
     <!-- CENTER: messages -->

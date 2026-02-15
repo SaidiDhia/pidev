@@ -11,34 +11,37 @@ import java.util.List;
 public class ConversationRepository {
 
     public long create(Conversation c) throws SQLException {
-        String sql = "INSERT INTO conversation (type, created_at) VALUES (?, NOW())";
+        // Using text block for better readability (Java 13+)
+        String sql = """
+        INSERT INTO conversation (name, type, created_at)
+        VALUES (?, ?, NOW())
+    """;
 
         Connection conn = DatabaseConnection.getInstance().getConnection();
 
-        try {
-            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        // Using try-with-resources to automatically close PreparedStatement
+        try (PreparedStatement stmt =
+                     conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, c.getType());
+            // Set both parameters: name and type
+            stmt.setString(1, c.getName());    // First ? = name
+            stmt.setString(2, c.getType());    // Second ? = type
+
             stmt.executeUpdate();
 
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                long id = rs.getLong(1);
-                rs.close();
-                stmt.close();
-                return id;
+            // Get the generated ID
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
             }
-
-            rs.close();
-            stmt.close();
-
         } catch (SQLException e) {
             e.printStackTrace();
+            throw e; // Re-throw to let caller handle it
         }
 
-        return -1;
+        return -1; // Return -1 if no ID was generated
     }
-
 
         /*public List<Conversation> findAll() throws SQLException {
             List<Conversation> list = new ArrayList<>();
@@ -97,22 +100,76 @@ public class ConversationRepository {
         }
 
         //new method hethia bch nzidha bch najjem nda5el users lel conversation
-        public void addUserToConversation(long conversationId, long userId)
-                    throws SQLException {
+        public void addUserToConversation(long conversationId, String userId)
+                throws SQLException {
 
-                String sql = """
-            INSERT INTO conversation_user (conversation_id, user_id)
-            VALUES (?, ?)
-        """;
+            String sql = """
+        INSERT INTO conversation_user (conversation_id, user_id)
+        VALUES (?, ?)
+    """;
 
-                try (PreparedStatement ps =
-                             DatabaseConnection.getInstance()
-                                     .getConnection()
-                                     .prepareStatement(sql)) {
+            try (PreparedStatement ps =
+                         DatabaseConnection.getInstance()
+                                 .getConnection()
+                                 .prepareStatement(sql)) {
 
-                    ps.setLong(1, conversationId);
-                    ps.setLong(2, userId);
-                    ps.executeUpdate();
-                }
+                ps.setLong(1, conversationId);
+                ps.setString(2, userId);   // IMPORTANT
+                ps.executeUpdate();
             }
+        }
+    public void updateName(long id, String newName) throws SQLException {
+
+        String sql = "UPDATE conversation SET name = ? WHERE id = ?";
+
+        try (PreparedStatement ps =
+                     DatabaseConnection.getInstance()
+                             .getConnection()
+                             .prepareStatement(sql)) {
+
+            ps.setString(1, newName);
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        }
+    }
+    public void delete(long id) throws SQLException {
+
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+
+        try {
+            conn.setAutoCommit(false);
+
+            // 1️⃣ delete messages
+            try (PreparedStatement ps =
+                         conn.prepareStatement("DELETE FROM message WHERE conversation_id = ?")) {
+
+                ps.setLong(1, id);
+                ps.executeUpdate();
+            }
+
+            // 2️⃣ delete participants
+            try (PreparedStatement ps =
+                         conn.prepareStatement("DELETE FROM conversation_user WHERE conversation_id = ?")) {
+
+                ps.setLong(1, id);
+                ps.executeUpdate();
+            }
+
+            // 3️⃣ delete conversation
+            try (PreparedStatement ps =
+                         conn.prepareStatement("DELETE FROM conversation WHERE id = ?")) {
+
+                ps.setLong(1, id);
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
 }
