@@ -12,11 +12,14 @@ module com.example.pi_dev {
     //requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.sql;
-    requires java.base;  // Contient java.util
+    requires java.base;
+    requires org.testng;  // Contient java.util
 
     opens com.example.pi_dev to javafx.fxml;
     opens com.example.pi_dev.messaging.messagecontroller to javafx.fxml;
     opens com.example.pi_dev.messaging.messagingmodel to javafx.base;
     exports com.example.pi_dev;
+    exports com.example.pi_dev.messaging.messagingrepository;
+    opens com.example.pi_dev.messaging.messagingrepository to javafx.fxml;
 
 }

@@ -99,25 +99,8 @@ public class ConversationRepository {
             return list;
         }
 
-        //new method hethia bch nzidha bch najjem nda5el users lel conversation
-        public void addUserToConversation(long conversationId, String userId)
-                throws SQLException {
 
-            String sql = """
-        INSERT INTO conversation_user (conversation_id, user_id)
-        VALUES (?, ?)
-    """;
 
-            try (PreparedStatement ps =
-                         DatabaseConnection.getInstance()
-                                 .getConnection()
-                                 .prepareStatement(sql)) {
-
-                ps.setLong(1, conversationId);
-                ps.setString(2, userId);   // IMPORTANT
-                ps.executeUpdate();
-            }
-        }
     public void updateName(long id, String newName) throws SQLException {
 
         String sql = "UPDATE conversation SET name = ? WHERE id = ?";
