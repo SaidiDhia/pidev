@@ -12,7 +12,7 @@ public class MessagingMain extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         DatabaseConnection.getInstance();
-        Session.login(1L); //na77iha ta nwalli ena the other guy lanci ta tefhem
+        Session.login("123e4567-e89b-12d3-a456-426614174000"); //na77iha ta nwalli ena the other guy lanci ta tefhem
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/example/pi_dev/messagingchat.fxml")
         );

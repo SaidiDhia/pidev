@@ -6,20 +6,20 @@ public class Message {
 
     private long id;
     private long conversationId;
-    private long senderId;
+    private String senderId;
     private String content;
     private LocalDateTime createdAt;
 
     public Message() {}
 
-    public Message(long id, long conversationId, long senderId, String content, LocalDateTime createdAt) {
+    public Message(long id, long conversationId, String senderId, String content, LocalDateTime createdAt) {
         this.id = id;
         this.conversationId = conversationId;
         this.senderId = senderId;
         this.content = content;
         this.createdAt = createdAt;
     }
-    public Message(long conversationId, long senderId, String content) {
+    public Message(long conversationId, String senderId, String content) {
         this.conversationId = conversationId;
         this.senderId = senderId;
         this.content = content;
@@ -32,8 +32,8 @@ public class Message {
     public long getConversationId() { return conversationId; }
     public void setConversationId(long conversationId) { this.conversationId = conversationId; }
 
-    public long getSenderId() { return senderId; }
-    public void setSenderId(long senderId) { this.senderId = senderId; }
+    public String getSenderId() { return senderId; }
+    public void setSenderId(String senderId) { this.senderId=senderId;}
 
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }

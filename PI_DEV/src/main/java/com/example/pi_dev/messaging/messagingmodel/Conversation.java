@@ -9,6 +9,8 @@ public class Conversation {
     private String contextType;   // EVENT / POST / STORE
     private long contextId;
     private LocalDateTime createdAt;
+    private String name;
+
 
     public Conversation() {}
 
@@ -36,10 +38,15 @@ public class Conversation {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
     @Override
     public String toString() {
         return type + " - " + contextType + " #" + contextId;
     }
+
 
 
 }

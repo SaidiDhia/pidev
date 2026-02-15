@@ -19,33 +19,33 @@ public class MessageRepository {
                      DatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
 
             ps.setLong(1, m.getConversationId());
-            ps.setLong(2, m.getSenderId());
+            ps.setString(2, m.getSenderId());
             ps.setString(3, m.getContent());
             ps.executeUpdate();
         }
     }
 
-    public List<Message> findByConversation(long conversationId) throws SQLException {
-        List<Message> list = new ArrayList<>();
+    public List<Message> findByConversation(long conversationId, String userId) throws SQLException {
+        List<Message> list = new ArrayList<>();  // ← ADD THIS LINE
 
         String sql = """
-            SELECT id, conversation_id, sender_id, content, created_at
-            FROM message
-            WHERE conversation_id = ?
-            ORDER BY created_at
-        """;
+        SELECT m.*
+        FROM message m
+        JOIN conversation_user cu ON cu.conversation_id = m.conversation_id
+        WHERE m.conversation_id = ? AND cu.user_id = ?
+        ORDER BY m.created_at
+    """;
 
-        try (PreparedStatement ps =
-                     DatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
-
+        try (PreparedStatement ps = DatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setLong(1, conversationId);
+            ps.setString(2, userId);  // ← Fix: you were using ? but setLong(2) was missing
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 list.add(new Message(
                         rs.getLong("id"),
                         rs.getLong("conversation_id"),
-                        rs.getLong("sender_id"),
+                        rs.getString("sender_id"),
                         rs.getString("content"),
                         rs.getTimestamp("created_at").toLocalDateTime()
                 ));
@@ -53,7 +53,8 @@ public class MessageRepository {
         }
         return list;
     }
-    public void delete(long messageId, long userId) throws SQLException {
+
+    public void delete(long messageId, String userId) throws SQLException {
         String sql = """
         DELETE FROM message
         WHERE id = ? AND sender_id = ?
@@ -65,11 +66,11 @@ public class MessageRepository {
                 .prepareStatement(sql)) {
 
             ps.setLong(1, messageId);
-            ps.setLong(2, userId);
+            ps.setString(2, userId);
             ps.executeUpdate();
         }
     }
-    public void update(long messageId, long userId, String newContent)
+    public void update(long messageId, String userId, String newContent)
             throws SQLException {
 
         String sql = """
@@ -85,7 +86,7 @@ public class MessageRepository {
 
             ps.setString(1, newContent);
             ps.setLong(2, messageId);
-            ps.setLong(3, userId);
+            ps.setString(3, userId);
             ps.executeUpdate();
         }
     }

@@ -2,15 +2,15 @@ package com.example.pi_dev.messaging.messagingsession;
 
 public class Session {
 
-    private static long currentUserId;
+    private static String currentUserId;
 
     private Session() {}
 
-    public static void login(long userId) {
+    public static void login(String userId) {
         currentUserId = userId;
     }
 
-    public static long getCurrentUserId() {
+    public static String getCurrentUserId() {
         return currentUserId;
     }
 }
