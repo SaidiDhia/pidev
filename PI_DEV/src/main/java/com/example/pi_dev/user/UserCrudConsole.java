@@ -7,6 +7,7 @@ import com.example.pi_dev.user.services.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class UserCrudConsole {
 
@@ -91,10 +92,10 @@ public class UserCrudConsole {
         if (users == null || users.isEmpty()) {
             System.out.println("No users found.");
         } else {
-        System.out.printf("%-12s | %-25s | %-15s | %-10s | %-8s%n", "ID", "Email", "Name", "Role", "Active");
+            System.out.printf("%-36s | %-25s | %-15s | %-10s | %-8s%n", "ID", "Email", "Name", "Role", "Active");
             System.out.println("------------------------------------------------------------------------------------------------------------");
             for (User user : users) {
-                System.out.printf("%-12d | %-25s | %-15s | %-10s | %-8s%n", 
+                System.out.printf("%-36s | %-25s | %-15s | %-10s | %-8s%n", 
                         user.getUserId(), 
                         user.getEmail(), 
                         user.getFullName(), 
@@ -107,7 +108,7 @@ public class UserCrudConsole {
     private static void addUser() {
         System.out.println("\n--- Add User ---");
         User newUser = new User();
-        // userId auto-generated
+        newUser.setUserId(UUID.randomUUID());
         
         System.out.print("Full Name: ");
         newUser.setFullName(scanner.nextLine());
@@ -146,7 +147,7 @@ public class UserCrudConsole {
         String idStr = scanner.nextLine();
         
         try {
-            long userId = Long.parseLong(idStr);
+            UUID userId = UUID.fromString(idStr);
             User user = userService.getUserById(userId);
             
             if (user == null) {
@@ -182,8 +183,8 @@ public class UserCrudConsole {
             userService.updateUser(user);
             System.out.println("User updated successfully.");
 
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID format.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid UUID format.");
         }
     }
 
@@ -200,7 +201,7 @@ public class UserCrudConsole {
         String idStr = scanner.nextLine();
         
         try {
-            long userId = Long.parseLong(idStr);
+            UUID userId = UUID.fromString(idStr);
             
             // Optional: Check if user exists first
             User userToDelete = userService.getUserById(userId);
@@ -219,8 +220,8 @@ public class UserCrudConsole {
                 System.out.println("Deletion cancelled.");
             }
             
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID format.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid UUID format.");
         }
     }
 }

@@ -22,7 +22,7 @@ public class BookingService {
         String sql = "INSERT INTO bookings (place_id, renter_id, start_date, end_date, total_price, guests_count, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, booking.getPlaceId());
-            stmt.setLong(2, booking.getRenterId());
+            stmt.setString(2, booking.getRenterId());
             stmt.setDate(3, Date.valueOf(booking.getStartDate()));
             stmt.setDate(4, Date.valueOf(booking.getEndDate()));
             stmt.setDouble(5, booking.getTotalPrice());
@@ -37,11 +37,11 @@ public class BookingService {
         }
     }
 
-    public List<Booking> findByRenter(long renterId) throws SQLException {
+    public List<Booking> findByRenter(String renterId) throws SQLException {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT * FROM bookings WHERE renter_id = ? ORDER BY created_at DESC";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, renterId);
+            stmt.setString(1, renterId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 bookings.add(extractBooking(rs));
@@ -50,11 +50,11 @@ public class BookingService {
         return bookings;
     }
 
-    public List<Booking> findByOwner(long ownerId) throws SQLException {
+    public List<Booking> findByOwner(String ownerId) throws SQLException {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT b.* FROM bookings b JOIN places p ON b.place_id = p.id WHERE p.host_id = ? ORDER BY b.created_at DESC";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, ownerId);
+            stmt.setString(1, ownerId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 bookings.add(extractBooking(rs));
@@ -159,7 +159,7 @@ public class BookingService {
         Booking booking = new Booking(
             rs.getInt("id"),
             rs.getInt("place_id"),
-            rs.getLong("renter_id"),
+            rs.getString("renter_id"),
             rs.getDate("start_date").toLocalDate(),
             rs.getDate("end_date").toLocalDate(),
             rs.getDouble("total_price"),

@@ -64,7 +64,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUserById(long userId) {
+    public User getUserById(UUID userId) {
         try {
             return userRepository.findById(userId).orElse(null);
         } catch (SQLException e) {
@@ -102,7 +102,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void deleteUser(long userId) {
+    public void deleteUser(UUID userId) {
         try {
             userRepository.delete(userId);
         } catch (SQLException e) {
@@ -113,7 +113,7 @@ public class UserService implements IUserService {
     // --- Two-Factor Authentication Methods ---
 
     // 1. QR / Authenticator App
-    public byte[] setupTwoFactorQR(long userId) throws IOException, WriterException, SQLException {
+    public byte[] setupTwoFactorQR(UUID userId) throws IOException, WriterException, SQLException {
         // Generate new secret for QR setup
         String secretKey = twoFactorService.generateSecretKey();
         userRepository.saveTfaSecret(userId, secretKey);
@@ -125,14 +125,14 @@ public class UserService implements IUserService {
     }
     
     // 2. Email 2FA
-    public void setupTwoFactorEmail(long userId) throws SQLException {
+    public void setupTwoFactorEmail(UUID userId) throws SQLException {
         // For email setup, we just verify we can send an email. 
         // We might not need to store a "secret" yet, but let's store a marker or temp code.
         // Actually, let's just send a code immediately to verify they own the email.
         sendTwoFactorCodeEmail(userId);
     }
 
-    public void sendTwoFactorCodeEmail(long userId) throws SQLException {
+    public void sendTwoFactorCodeEmail(UUID userId) throws SQLException {
         // Generate 6-digit code
         int code = 100000 + new java.util.Random().nextInt(900000);
         long expiry = System.currentTimeMillis() + (5 * 60 * 1000); // 5 mins
@@ -149,7 +149,7 @@ public class UserService implements IUserService {
     }
     
     // 3. Face 2FA
-    public void setupTwoFactorFace(long userId, byte[] imageBytes) throws SQLException {
+    public void setupTwoFactorFace(UUID userId, byte[] imageBytes) throws SQLException {
         // Save image to disk (simulate)
         try {
             String fileName = "face_" + userId + ".png";
@@ -168,7 +168,7 @@ public class UserService implements IUserService {
     }
 
     // Verify Method (Dispatches based on User's TFA Method)
-    public boolean verifyTwoFactor(long userId, int code) {
+    public boolean verifyTwoFactor(UUID userId, int code) {
         try {
             User user = getUserById(userId);
             if (user == null || user.getTfaMethod() == null) return true; // Should not happen if 2FA required
@@ -202,7 +202,7 @@ public class UserService implements IUserService {
         }
     }
     
-    public boolean verifyTwoFactorFace(long userId, byte[] capturedImage) {
+    public boolean verifyTwoFactorFace(UUID userId, byte[] capturedImage) {
         try {
             String storedSecret = userRepository.getTfaSecret(userId);
             if (storedSecret == null || !storedSecret.startsWith("FACE:")) return false;
@@ -218,7 +218,7 @@ public class UserService implements IUserService {
     }
 
     // Helper to finalize enablement
-    public void finalizeTwoFactorSetup(long userId, TFAMethod method) {
+    public void finalizeTwoFactorSetup(UUID userId, TFAMethod method) {
         try {
             User user = getUserById(userId);
             if (user != null) {
@@ -231,7 +231,7 @@ public class UserService implements IUserService {
     }
 
     // Old method for backward compatibility (renamed logic)
-    public byte[] enableTwoFactor(long userId) throws IOException, WriterException, SQLException {
+    public byte[] enableTwoFactor(UUID userId) throws IOException, WriterException, SQLException {
         return setupTwoFactorQR(userId);
     }
 
@@ -244,16 +244,18 @@ public class UserService implements IUserService {
     public boolean resetPassword(String token, String newPassword) {
         String hashedPassword = hashPassword(newPassword);
         
-        Long userIdVal = passwordResetService.resetPassword(token, hashedPassword);
+        // Use the modified resetPassword which returns the userId
+        String userIdStr = passwordResetService.resetPassword(token, hashedPassword);
         
-        if (userIdVal != null) {
+        if (userIdStr != null) {
             // Success! Now disable 2FA
             try {
-                User user = getUserById(userIdVal);
+                UUID userId = UUID.fromString(userIdStr);
+                User user = getUserById(userId);
                 if (user != null) {
                     user.setTfaMethod(null); // Disable 2FA
                     updateUser(user);
-                    System.out.println("2FA disabled for user " + userIdVal + " after password reset.");
+                    System.out.println("2FA disabled for user " + userId + " after password reset.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -264,7 +266,7 @@ public class UserService implements IUserService {
         return false;
     }
 
-    public boolean changePassword(long userId, String oldPassword, String newPassword) {
+    public boolean changePassword(UUID userId, String oldPassword, String newPassword) {
         User user = getUserById(userId);
         if (user != null) {
             if (verifyPassword(oldPassword, user.getPasswordHash())) {
@@ -286,7 +288,7 @@ public class UserService implements IUserService {
         return false;
     }
 
-    public void adminUpdatePassword(long userId, String newPassword) {
+    public void adminUpdatePassword(UUID userId, String newPassword) {
         User user = getUserById(userId);
         if (user != null) {
             user.setPasswordHash(hashPassword(newPassword));

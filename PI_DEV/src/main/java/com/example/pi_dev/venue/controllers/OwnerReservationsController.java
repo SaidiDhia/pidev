@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.FlowPane;
@@ -53,7 +54,7 @@ public class OwnerReservationsController {
         if (currentUser == null) return;
 
         try {
-            List<Booking> bookings = bookingService.findByOwner(currentUser.getUserId());
+            List<Booking> bookings = bookingService.findByOwner(currentUser.getUserId().toString());
             reservationsList.setAll(bookings);
             
             reservationsFlowPane.getChildren().clear();
@@ -87,7 +88,7 @@ public class OwnerReservationsController {
         // Renter Info Section
         User renter = null;
         try {
-            renter = userService.getUserById(booking.getRenterId());
+            renter = userService.getUserById(UUID.fromString(booking.getRenterId()));
         } catch (Exception e) {
             System.err.println("Error fetching renter: " + e.getMessage());
         }

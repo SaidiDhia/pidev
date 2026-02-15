@@ -11,14 +11,14 @@ import java.util.UUID;
 public interface IUserService {
     User register(User user);
     String login(String email, String password); // Returns JWT
-    User getUserById(long userId);
+    User getUserById(UUID userId);
     List<User> getAllUsers();
     void updateUser(User user);
-    void deleteUser(long userId);
+    void deleteUser(UUID userId);
 
     // Two-Factor Authentication
-    byte[] enableTwoFactor(long userId) throws IOException, WriterException, SQLException;
-    boolean verifyTwoFactor(long userId, int code);
+    byte[] enableTwoFactor(UUID userId) throws IOException, WriterException, SQLException;
+    boolean verifyTwoFactor(UUID userId, int code);
 
     // Password Reset
     void initiatePasswordReset(String email);

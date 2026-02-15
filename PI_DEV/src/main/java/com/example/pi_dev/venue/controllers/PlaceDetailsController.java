@@ -330,7 +330,8 @@ public class PlaceDetailsController extends BaseController {
             if (bookingService.isAvailable(currentPlace.getId(), java.sql.Date.valueOf(start),
                     java.sql.Date.valueOf(end))) {
                 double total = ChronoUnit.DAYS.between(start, end) * currentPlace.getPricePerDay();
-                Booking booking = new Booking(0, currentPlace.getId(), currentUser.getUserId(), start, end,
+                // User ID is UUID, converted to String for Booking entity
+                Booking booking = new Booking(0, currentPlace.getId(), currentUser.getUserId().toString(), start, end,
                         total, Booking.Status.PENDING);
                 booking.setGuestsCount(guests);
                 bookingService.create(booking);

@@ -10,6 +10,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class JwtUtil {
 
@@ -24,7 +25,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(String.valueOf(user.getUserId()))
+                .setSubject(user.getUserId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SECRET_KEY)
@@ -33,7 +34,7 @@ public class JwtUtil {
 
     public static boolean validateToken(String token, User user) {
         final String userId = extractUserId(token);
-        return (userId.equals(String.valueOf(user.getUserId())) && !isTokenExpired(token));
+        return (userId.equals(user.getUserId().toString()) && !isTokenExpired(token));
     }
 
     public static String extractUserId(String token) {

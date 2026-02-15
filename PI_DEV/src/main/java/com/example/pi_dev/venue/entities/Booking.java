@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class Booking {
     private int id;
     private int placeId;
-    private long renterId;
+    private String renterId;
     private LocalDate startDate;
     private LocalDate endDate;
     private double totalPrice;
@@ -19,7 +19,7 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(int id, int placeId, long renterId, LocalDate startDate, LocalDate endDate, double totalPrice,
+    public Booking(int id, int placeId, String renterId, LocalDate startDate, LocalDate endDate, double totalPrice,
             Status status) {
         this.id = id;
         this.placeId = placeId;
@@ -46,11 +46,11 @@ public class Booking {
         this.placeId = placeId;
     }
 
-    public long getRenterId() {
+    public String getRenterId() {
         return renterId;
     }
 
-    public void setRenterId(long renterId) {
+    public void setRenterId(String renterId) {
         this.renterId = renterId;
     }
 

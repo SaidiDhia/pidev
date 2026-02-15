@@ -5,6 +5,7 @@ import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class UserMain {
     public static void main(String[] args) {
@@ -12,6 +13,7 @@ public class UserMain {
 
         // 1. Register a new user
         User newUser = new User();
+        newUser.setUserId(UUID.randomUUID());
         newUser.setEmail("test@example.com");
         newUser.setPasswordHash("password123"); // Will be hashed by service
         newUser.setFullName("Test User");

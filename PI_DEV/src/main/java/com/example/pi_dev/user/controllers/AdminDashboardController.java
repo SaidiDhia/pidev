@@ -233,7 +233,7 @@ public class AdminDashboardController {
         card.setStyle("-fx-padding: 20; -fx-background-radius: 12; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
 
         // Fetch User and Place details
-        User renter = userService.getUserById(booking.getRenterId());
+        User renter = userService.getUserById(java.util.UUID.fromString(booking.getRenterId()));
         Place place = null;
         try {
             place = placeService.findById(booking.getPlaceId());
@@ -411,7 +411,7 @@ public class AdminDashboardController {
         // Fetch Host details
         User host = null;
         try {
-            host = userService.getUserById(place.getHostId());
+            host = userService.getUserById(java.util.UUID.fromString(place.getHostId()));
         } catch (Exception e) {
             System.err.println("Error fetching host: " + e.getMessage());
         }

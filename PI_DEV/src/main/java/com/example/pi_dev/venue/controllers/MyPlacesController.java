@@ -37,7 +37,7 @@ public class MyPlacesController implements Initializable {
             return;
         }
 
-        long hostId = UserSession.getInstance().getCurrentUser().getUserId();
+        String hostId = UserSession.getInstance().getCurrentUser().getUserId().toString();
 
         try {
             List<Place> myPlaces = placeService.findByHost(hostId);
