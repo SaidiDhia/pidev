@@ -20,7 +20,7 @@ public class MainTest {
 
         Message m = new Message();
         m.setConversationId(1);
-        m.setSenderId(1);
+        //m.setSenderId(1);
         m.setContent("Hello from JavaFX!");
 
         mr.create(m);

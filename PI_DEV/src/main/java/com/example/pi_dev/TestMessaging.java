@@ -5,7 +5,7 @@ import com.example.pi_dev.messaging.messagingmodel.Message;
 import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
 
 import java.sql.SQLException;
-
+/*
 public class TestMessaging {
 
     public static void main(String[] args) throws SQLException {
@@ -20,4 +20,4 @@ public class TestMessaging {
         repo.create(msg);
         System.out.println("Message inserted successfully!");
     }
-}
+}*/

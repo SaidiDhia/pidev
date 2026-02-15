@@ -3,6 +3,7 @@ package com.example.pi_dev.messaging.messagecontroller;
 import com.example.pi_dev.messaging.messagingmodel.Conversation;
 import com.example.pi_dev.messaging.messagingmodel.Message;
 import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
+import com.example.pi_dev.messaging.messagingrepository.ConversationUserRepository;
 import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
 
 import com.example.pi_dev.messaging.messagingsession.Session;
@@ -193,7 +194,8 @@ public class ChatController {
     private void loadConversations() {
         try {
             conversationList.getItems().setAll(
-                    conversationRepo.findAll()
+                    //kenet finall taw be session ne5dmo
+                    conversationRepo.findByUser(Session.getCurrentUserId())
             );
         } catch (SQLException e) {
             showError(e.getMessage());
@@ -205,7 +207,9 @@ public class ChatController {
 
         try {
             messageList.getItems().setAll(
-                    messageRepo.findByConversation(selectedConversation.getId())
+                    //hethy kent tverifi bel conversation id bark taw wallet tverifi luser connected zeda
+                    messageRepo.findByConversation(selectedConversation.getId(),
+                            Session.getCurrentUserId())
             );
             messageList.scrollTo(messageList.getItems().size() - 1);//added this line to force scroll down
         } catch (SQLException e) {
@@ -239,8 +243,25 @@ public class ChatController {
         alert.setContentText(msg);
         alert.showAndWait();
     }
-    //added this on 2/2 after the UI I added in chatfxml
+    private ConversationUserRepository conversationUserRepo = new ConversationUserRepository();
     @FXML
+    private void handleCreateConversation() throws SQLException {
+
+        String otherUserId = "987fcdeb-1234-5678-9abc-def012345678" ; // temporary for testing
+
+        Conversation c = new Conversation();
+        c.setType("Private Chat");
+
+        long conversationId = conversationRepo.create(c);
+
+        conversationUserRepo.addUserToConversation(conversationId, Session.getCurrentUserId());
+        conversationUserRepo.addUserToConversation(conversationId, otherUserId);
+
+        System.out.println("Conversation created with ID: " + conversationId);
+    }
+
+    //added this on 2/2 after the UI I added in chatfxml
+    /*@FXML
     private void createConversation() {
         try {
             Conversation c = new Conversation();
@@ -248,12 +269,26 @@ public class ChatController {
             c.setContextType("POST");
             c.setContextId(0);
 
-            conversationRepo.create(c);
+            long conversationId = conversationRepo.create(c);
+
+            // Add current user
+            conversationRepo.addUserToConversation(
+                    conversationId,
+                    Session.getCurrentUserId()
+            );
+
+            // Add second user (for now hardcoded for testing)
+            conversationRepo.addUserToConversation(
+                    conversationId,
+                    3L   // example other user
+            );
+
             loadConversations();
+
         } catch (SQLException e) {
             showError(e.getMessage());
         }
-    }
+    }*/
 
     //okay wa9t lapp tlanci testaaml e sheet ta css li mawjoud fel main donc kima 3malt fe react
     //bedhabt 7abbit naalm mode sombre donc zedt variable marbout b boutton w ylanci external form w ye9lb loun

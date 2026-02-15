@@ -14,8 +14,11 @@
 
     <!-- LEFT: conversations -->
     <left>
-        <Button text="New Conversation" onAction="#createConversation"/>
-        <ListView fx:id="conversationList" prefWidth="200"/>
+        <VBox spacing="10">
+            <Button text="+ New Chat" onAction="#handleCreateConversation"/>
+            <ListView fx:id="conversationList" prefWidth="200"/>
+
+        </VBox>
     </left>
 
     <!-- CENTER: messages -->
