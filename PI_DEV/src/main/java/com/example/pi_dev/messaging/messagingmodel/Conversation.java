@@ -10,6 +10,8 @@ public class Conversation {
     private long contextId;
     private LocalDateTime createdAt;
 
+    private String user1Id;
+    private String user2Id;
     public Conversation() {}
 
     public Conversation(long id, String type, String contextType, long contextId, LocalDateTime createdAt) {
@@ -36,10 +38,17 @@ public class Conversation {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
+    public String getUser1Id() { return user1Id; }
+    public void setUser1Id(String user1Id) { this.user1Id = user1Id; }
+
+    public String getUser2Id() { return user2Id; }
+    public void setUser2Id(String user2Id) { this.user2Id = user2Id; }
+
     @Override
     public String toString() {
         return type + " - " + contextType + " #" + contextId;
     }
+
 
 
 }

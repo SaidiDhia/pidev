@@ -5,18 +5,16 @@ import com.example.pi_dev.messaging.messagingmodel.Message;
 import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
 import com.example.pi_dev.messaging.messagingrepository.ConversationUserRepository;
 import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
-
 import com.example.pi_dev.messaging.messagingsession.Session;
+
 import javafx.fxml.FXML;
-import javafx.geometry.Side; //hethy le side button
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 
 import java.sql.SQLException;
 
@@ -26,28 +24,31 @@ public class ChatController {
     private ListView<Conversation> conversationList;
     @FXML
     private ListView<Message> messageList;
-
     @FXML
     private TextField messageInput;
+    @FXML
+    private Button themeBtn;
 
     private final ConversationRepository conversationRepo = new ConversationRepository();
     private final MessageRepository messageRepo = new MessageRepository();
+    private final ConversationUserRepository conversationUserRepo = new ConversationUserRepository();
 
     private Conversation selectedConversation;
+    private boolean darkMode = false;
 
     @FXML
     public void initialize() {
+
         loadConversations();
-        conversationList.setFixedCellSize(50);//same
-        messageList.setFixedCellSize(-1); //addec these as an ui improvement on 2/2 also
-        //Zeyda zeda When no conversation selected:
-        messageList.setPlaceholder(
-                new Label("Select a conversation to start chatting")
-        );
-        //zeyeda 5taer 9ale9 When no messages:
-        messageList.setPlaceholder(
-                new Label("No messages yet 👋")
-        );
+
+        // UI improvements - consistent sizing
+        conversationList.setFixedCellSize(50);
+        messageList.setFixedCellSize(-1);
+
+        // Placeholder when no conversation is selected
+        messageList.setPlaceholder(new Label("Select a conversation to start chatting"));
+        // Placeholder when conversation has no messages
+        // messageList.setPlaceholder(new Label("No messages yet 👋")); // Note: only last placeholder will apply
 
         conversationList.getSelectionModel()
                 .selectedItemProperty()
@@ -55,7 +56,8 @@ public class ChatController {
                     selectedConversation = newVal;
                     loadMessages();
                 });
-        //I added this later after the message oine it contains the convos and alows me to add css
+
+        // Custom cell factory for conversations with better styling
         conversationList.setCellFactory(list -> new ListCell<>() {
             @Override
             protected void updateItem(Conversation c, boolean empty) {
@@ -79,6 +81,7 @@ public class ChatController {
             }
         });
 
+        // Custom cell factory for messages with edit/delete functionality
         messageList.setCellFactory(list -> new ListCell<>() {
 
             @Override
@@ -90,29 +93,34 @@ public class ChatController {
                     setGraphic(null);
                     return;
                 }
-                Button menuBtn = new Button("⋮");//add the button change or delete
+
+                System.out.println("Message sender: " + msg.getSenderId()); // Debug output
+
+                String currentUser = Session.getCurrentUserId();
+                boolean isMine = msg.getSenderId().equals(currentUser);
+
+                // Three dots menu button for edit/delete
+                Button menuBtn = new Button("⋮");
                 menuBtn.getStyleClass().add("menu-button");
 
-                //this is the actual menue and buttons it contains
+                // Context menu with edit and delete options
                 ContextMenu menu = new ContextMenu();
-
                 MenuItem edit = new MenuItem("Edit");
                 MenuItem delete = new MenuItem("Delete");
-
                 menu.getItems().addAll(edit, delete);
                 menuBtn.setOnAction(e -> menu.show(menuBtn, Side.BOTTOM, 0, 0));
 
-                //the option to delete lezemha persmission 5ater hethy 5demha hard delete donc ahaya persission
-                boolean isMine = msg.getSenderId() == Session.getCurrentUserId();
+                // Only show menu button for user's own messages (permission check)
                 menuBtn.setVisible(isMine);
 
-                // Header: username + time
+                // Header with username and time
                 Label header = new Label(
                         "User " + msg.getSenderId() + " • " +
                                 msg.getCreatedAt().toLocalTime().withNano(0)
                 );
                 header.getStyleClass().add("message-header");
-                //hethia function ta delete w lklem li feha houa lUI ta pop up message de confirmation
+
+                // Delete functionality with confirmation dialog
                 delete.setOnAction(e -> {
                     Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
                     confirm.setTitle("Delete message");
@@ -124,7 +132,7 @@ public class ChatController {
                             try {
                                 messageRepo.delete(
                                         msg.getId(),
-                                        Session.getCurrentUserId()
+                                        currentUser
                                 );
                                 loadMessages();
                             } catch (SQLException ex) {
@@ -134,7 +142,7 @@ public class ChatController {
                     });
                 });
 
-                //function ta update
+                // Edit functionality with input dialog
                 edit.setOnAction(e -> {
                     TextInputDialog dialog = new TextInputDialog(msg.getContent());
                     dialog.setHeaderText("Edit message");
@@ -143,7 +151,7 @@ public class ChatController {
                         try {
                             messageRepo.update(
                                     msg.getId(),
-                                    Session.getCurrentUserId(),
+                                    currentUser,
                                     newText
                             );
                             loadMessages();
@@ -153,7 +161,7 @@ public class ChatController {
                     });
                 });
 
-                // Message content just zina hetha
+                // Message content with styling
                 Label content = new Label(msg.getContent());
                 content.setWrapText(true);
                 content.setMaxWidth(300);
@@ -162,39 +170,42 @@ public class ChatController {
                 VBox bubble = new VBox(header, content);
                 bubble.setSpacing(3);
 
-                // container that holds bubble + menu button
-                HBox messageRow = new HBox(bubble, menuBtn);
-                if (msg.getSenderId() == Session.getCurrentUserId()) {
-                    messageRow = new HBox(menuBtn, bubble); // menu on LEFT
+                // Container that holds bubble + menu button
+                // Layout differs based on whether message is from current user
+                HBox messageRow;
+
+                if (isMine) {
+                    // For own messages: menu on LEFT, bubble on RIGHT
+                    messageRow = new HBox(menuBtn, bubble);
                     messageRow.setAlignment(Pos.CENTER_RIGHT);
                     bubble.getStyleClass().add("mine");
                 } else {
-                    messageRow = new HBox(bubble, menuBtn); // menu on RIGHT
+                    // For others' messages: bubble on LEFT, menu on RIGHT
+                    messageRow = new HBox(bubble, menuBtn);
                     messageRow.setAlignment(Pos.CENTER_LEFT);
                     bubble.getStyleClass().add("theirs");
                 }
 
                 messageRow.setSpacing(6);
-                //hetha llmenue li zedneh zina zeda bch yemchy fih e css
+
+                // Final container with proper padding and alignment
                 HBox container = new HBox(messageRow);
                 container.setPadding(new Insets(5));
                 container.setAlignment(
-                        msg.getSenderId() == Session.getCurrentUserId()
-                                ? Pos.CENTER_RIGHT
-                                : Pos.CENTER_LEFT
+                        isMine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT
                 );
 
                 setGraphic(container);
             }
         });
-        messageInput.setOnAction(e -> sendMessage()); // added this so when I press entrer it works
 
+        // Pressing Enter in message input sends the message
+        messageInput.setOnAction(e -> sendMessage());
     }
 
     private void loadConversations() {
         try {
             conversationList.getItems().setAll(
-                    //kenet finall taw be session ne5dmo
                     conversationRepo.findByUser(Session.getCurrentUserId())
             );
         } catch (SQLException e) {
@@ -207,11 +218,13 @@ public class ChatController {
 
         try {
             messageList.getItems().setAll(
-                    //hethy kent tverifi bel conversation id bark taw wallet tverifi luser connected zeda
-                    messageRepo.findByConversation(selectedConversation.getId(),
-                            Session.getCurrentUserId())
+                    messageRepo.findByConversation(
+                            selectedConversation.getId(),
+                            Session.getCurrentUserId()
+                    )
             );
-            messageList.scrollTo(messageList.getItems().size() - 1);//added this line to force scroll down
+            // Auto-scroll to the latest message
+            messageList.scrollTo(messageList.getItems().size() - 1);
         } catch (SQLException e) {
             showError(e.getMessage());
         }
@@ -219,6 +232,7 @@ public class ChatController {
 
     @FXML
     private void sendMessage() {
+
         if (selectedConversation == null || messageInput.getText().isBlank())
             return;
 
@@ -235,19 +249,13 @@ public class ChatController {
         } catch (SQLException e) {
             showError(e.getMessage());
         }
+        System.out.println("Current session user: " + Session.getCurrentUserId()); // Debug output
     }
 
-    private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText("Database Error");
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
-    private ConversationUserRepository conversationUserRepo = new ConversationUserRepository();
     @FXML
     private void handleCreateConversation() throws SQLException {
 
-        String otherUserId = "987fcdeb-1234-5678-9abc-def012345678" ; // temporary for testing
+        String otherUserId = "987fcdeb-1234-5678-9abc-def012345678"; // temporary for testing
 
         Conversation c = new Conversation();
         c.setType("Private Chat");
@@ -257,58 +265,25 @@ public class ChatController {
         conversationUserRepo.addUserToConversation(conversationId, Session.getCurrentUserId());
         conversationUserRepo.addUserToConversation(conversationId, otherUserId);
 
-        System.out.println("Conversation created with ID: " + conversationId);
+        System.out.println("Conversation created with ID: " + conversationId); // Debug output
+        loadConversations();
     }
-
-    //added this on 2/2 after the UI I added in chatfxml
-    /*@FXML
-    private void createConversation() {
-        try {
-            Conversation c = new Conversation();
-            c.setType("PERSONAL");
-            c.setContextType("POST");
-            c.setContextId(0);
-
-            long conversationId = conversationRepo.create(c);
-
-            // Add current user
-            conversationRepo.addUserToConversation(
-                    conversationId,
-                    Session.getCurrentUserId()
-            );
-
-            // Add second user (for now hardcoded for testing)
-            conversationRepo.addUserToConversation(
-                    conversationId,
-                    3L   // example other user
-            );
-
-            loadConversations();
-
-        } catch (SQLException e) {
-            showError(e.getMessage());
-        }
-    }*/
-
-    //okay wa9t lapp tlanci testaaml e sheet ta css li mawjoud fel main donc kima 3malt fe react
-    //bedhabt 7abbit naalm mode sombre donc zedt variable marbout b boutton w ylanci external form w ye9lb loun
-    @FXML
-    private Button themeBtn;
-    private boolean darkMode = false;
 
     @FXML
     private void toggleTheme() {
         Scene scene = themeBtn.getScene();
 
-        //hethy bch me yekrachich ylanci ania li y7eb mellouel jdid
+        // Clear existing stylesheets to avoid conflicts
         scene.getStylesheets().clear();
 
         if (darkMode) {
+            // Switch to light mode
             scene.getStylesheets().add(
                     getClass().getResource("/com/example/pi_dev/messagingchat.css").toExternalForm()
             );
             themeBtn.setText("🌙");
         } else {
+            // Switch to dark mode
             scene.getStylesheets().add(
                     getClass().getResource("/com/example/pi_dev/messagingchat-dark.css").toExternalForm()
             );
@@ -318,7 +293,10 @@ public class ChatController {
         darkMode = !darkMode;
     }
 
-
-
-
+    private void showError(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Database Error");
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
 }
