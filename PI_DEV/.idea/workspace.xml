@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/activity_debug.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/UserMain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/common/models/ActivityLog.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/common/services/ActivityLogService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/UserCrudConsole.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/UserMain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/AdminDashboardController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/ForgotPasswordController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/LoginController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SettingsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SignupController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/TwoFactorController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/UserFormController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/enums/RoleEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/enums/TFAMethod.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/PasswordResetToken.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/TFASecret.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/repositories/UserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/EmailService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/IUserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/PasswordResetService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/TwoFactorService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/utils/JwtUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/utils/UserSession.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/VenueMain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/AddPlaceController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/AdminController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/BaseController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/HomeController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/MyPlacesController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/OwnerReservationsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/PlaceDetailsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/controllers/UserReservationsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Amenity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Booking.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/entities/Place.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/services/AmenityService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/services/BookingService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/services/PlaceService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/venue/utils/SchemaInitializer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/2fa.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/admin_dashboard.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/forgot_password.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/login.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/settings.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/signup.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/style.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/user_form.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/add-place-view.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/admin-view.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/home-view.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/map.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/my-places-view.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/owner-reservations.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place-details-view.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/place_map.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/venue/views/user-reservations.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/sql/user_schema.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/places/96fceb5e-cd32-4d67-9a75-084cb3df674c_RobloxScreenShot20260130_141946058.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/places/aa7b5f6c-465b-491c-b5c9-c6d73c883049_RobloxScreenShot20260130_141946058.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/profiles/0a606f92-a348-41ac-9a8d-48a8edeff494_Capture d'écran 2026-01-30 141950.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/profiles/2e39d263-3d94-4492-ba0e-b3b8813f4d01_Capture d'écran 2026-01-30 141950.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/profiles/6118e4c9-05ec-41e3-847c-2da127c6eebe_Capture d'écran 2026-01-30 141950.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/profiles/6756141f-b617-44ae-803a-09186da7c853_Capture d'écran 2026-01-30 141950.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/venues/836509aa-b252-4a38-ab67-1b7c5691df90.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uploads/venues/c02b3e63-ca90-47c3-acee-859d52dc5b3c.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingdatabase/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingdatabase/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="FxmlFile" />
+        <option value="Class" />
+        <option value="CSS File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;SaidiDhia&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/SaidiDhia/pidev.git&quot;,
+    &quot;accountId&quot;: &quot;06d5cee7-d1fe-4df7-8f93-7ba9aef44fb2&quot;
+  }
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="391RXd12ibBINJNj4qMEELosiT4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.HelloApplication.executor": "Run",
+    "Application.Main.executor": "Run",
+    "Application.MainTest.executor": "Run",
+    "Application.MessagingMain.executor": "Run",
+    "Application.TestDB.executor": "Run",
+    "Application.TestMessaging.executor": "Run",
+    "Application.UserMain.executor": "Run",
+    "Application.VenueMain.executor": "Run",
+    "Application.com.example.pi_dev.user.UserMain.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "Merging feature/messaging",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/jacer/Desktop/pi_dev/YASMINE/PI_DEV",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "project.propCompiler",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\resources\com\example\pi_dev" />
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\java\com\example\pi_dev" />
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\database" />
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src" />
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\controller" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.VenueMain">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.Main" />
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.UserMain" />
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VenueMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.venue.VenueMain" />
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.venue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="com.example.pi_dev.user.UserMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.user.UserMain" />
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.user.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.VenueMain" />
+        <item itemvalue="Application.UserMain" />
+        <item itemvalue="Application.com.example.pi_dev.user.UserMain" />
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="" />
+      <created>1769861632594</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1769861632594</updated>
+      <workItem from="1769861633756" duration="98000" />
+      <workItem from="1769861742127" duration="6779000" />
+      <workItem from="1769877743632" duration="3518000" />
+      <workItem from="1769948408028" duration="311000" />
+      <workItem from="1769948735247" duration="4852000" />
+      <workItem from="1769980270748" duration="3280000" />
+      <workItem from="1770029788378" duration="16155000" />
+      <workItem from="1770117176181" duration="95000" />
+      <workItem from="1770161061032" duration="302000" />
+      <workItem from="1770563698814" duration="2521000" />
+      <workItem from="1770566315192" duration="6091000" />
+      <workItem from="1770744572936" duration="5176000" />
+      <workItem from="1770825730261" duration="6504000" />
+      <workItem from="1770992750314" duration="23685000" />
+      <workItem from="1771108141389" duration="1775000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="feature/messaging" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
