@@ -183,9 +183,22 @@
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.VenueMain">
+  <component name="RunManager" selected="Application.MessagingMain">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.Main" />
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MessagingMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.MessagingMain" />
       <module name="PI_DEV" />
       <extension name="coverage">
         <pattern>
@@ -238,6 +251,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.MessagingMain" />
         <item itemvalue="Application.VenueMain" />
         <item itemvalue="Application.UserMain" />
         <item itemvalue="Application.com.example.pi_dev.user.UserMain" />
