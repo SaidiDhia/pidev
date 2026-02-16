@@ -16,7 +16,7 @@ public class UserDatabaseConnection {
 
     private static final String URL = "jdbc:mysql://localhost:3306/wonderlust_db?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true";
     private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "saididhia";
 
     private UserDatabaseConnection() throws SQLException {
         try {
