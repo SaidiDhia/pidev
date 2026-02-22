@@ -6,21 +6,19 @@ import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
 import com.example.pi_dev.messaging.messagingrepository.ConversationUserRepository;
 import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
 import com.example.pi_dev.messaging.messagingrepository.UserRepository;
+import com.example.pi_dev.messaging.messagingservice.AudioRecorderService;
 import com.example.pi_dev.messaging.messagingservice.FileUploadService;
+import com.example.pi_dev.messaging.messagingservice.GeminiService;
 import com.example.pi_dev.messaging.messagingsession.Session;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -30,8 +28,9 @@ import javafx.stage.FileChooser;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,6 +38,8 @@ import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.sound.sampled.LineUnavailableException;
 
 /**
  * Controller class for the chat interface.
@@ -49,168 +50,148 @@ public class ChatController {
     // ==================== FXML UI Components ====================
 
     // Header Components
-    @FXML private Button themeBtn;                            // Button to toggle between light/dark theme
+    @FXML private Button themeBtn;
 
     // Chat Tab Components
-    @FXML private ListView<Conversation> conversationList;    // Left panel: list of user's conversations
-    @FXML private ListView<Message> messageList;              // Right panel: messages in selected conversation
-    @FXML private TextField messageInput;                      // Input field for typing new messages
-    @FXML private Label conversationTitleLabel;                // Title of selected conversation
-    @FXML private Button updateConversationBtn;                // Button to trigger update
-    @FXML private Button deleteConversationBtn;                // Button to trigger delete
-    @FXML private TextField conversationSearchField;           // Search field for conversations
+    @FXML private ListView<Conversation> conversationList;
+    @FXML private ListView<Message> messageList;
+    @FXML private TextField messageInput;
+    @FXML private Label conversationTitleLabel;
+    @FXML private Button updateConversationBtn;
+    @FXML private Button deleteConversationBtn;
+    @FXML private TextField conversationSearchField;
 
     // Contacts Tab Components
-    @FXML private Tab contactsTab;                             // Contacts tab
-    @FXML private ScrollPane contactsScrollPane;               // Scroll pane for contacts
-    @FXML private FlowPane contactsFlow;                       // Flow pane for contact cards
+    @FXML private Tab contactsTab;
+    @FXML private ScrollPane contactsScrollPane;
+    @FXML private FlowPane contactsFlow;
     @FXML private Tab archivedTab;
     @FXML private ListView<Conversation> archivedConversationList;
     @FXML private Button unarchiveAllBtn;
 
     @FXML private Button attachImageBtn;
-    private final FileUploadService uploadService = new FileUploadService();
-
-    private ObservableList<Conversation> archivedConversations = FXCollections.observableArrayList();
-    // ==================== Repositories (Data Access Layer) ====================
     @FXML private MenuButton attachMenuBtn;
-    private final ConversationRepository conversationRepo = new ConversationRepository();        // Handles conversation DB operations
-    private final MessageRepository messageRepo = new MessageRepository();                      // Handles message DB operations
-    private final ConversationUserRepository conversationUserRepo = new ConversationUserRepository(); // Handles conversation-user relationships
+
+    // Voice recording fields
+    @FXML private Button voiceRecordBtn;
+    @FXML private HBox recordingIndicator;
+    @FXML private Label recordingTimeLabel;
+    @FXML private Button stopRecordingBtn;
+    @FXML private Button cancelRecordingBtn;
+
+    // Smart Reply button
+    @FXML private Button smartReplyBtn;
+
+    // Services
+    private final FileUploadService uploadService = new FileUploadService();
+    private final GeminiService geminiService = new GeminiService();
+    private AudioRecorderService audioRecorderService;
+    private Timeline recordingTimer;
+    private int recordingSeconds = 0;
+
+    // Repositories
+    private final ConversationRepository conversationRepo = new ConversationRepository();
+    private final MessageRepository messageRepo = new MessageRepository();
+    private final ConversationUserRepository conversationUserRepo = new ConversationUserRepository();
     private final UserRepository userRepo = new UserRepository();
 
-    // ==================== State Variables ====================
+    // State Variables
+    private Conversation selectedConversation;
+    private boolean darkMode = false;
+    private ObservableList<Conversation> conversations = FXCollections.observableArrayList();
+    private ObservableList<Conversation> archivedConversations = FXCollections.observableArrayList();
 
-    private Conversation selectedConversation;  // Currently selected conversation
-    private boolean darkMode = false;            // Current theme state (false = light mode, true = dark mode)
-    private ObservableList<Conversation> conversations = FXCollections.observableArrayList();  // Observable list for conversations
     private void setupImageHandling() {
         if (attachImageBtn != null) {
             attachImageBtn.setOnAction(e -> handleAttachImage());
         }
     }
+
     /**
      * Initializes the controller after FXML loading.
-     * Sets up UI components, listeners, and cell factories.
      */
     @FXML
     public void initialize() {
-
-        // Load initial conversation list for the current user
         loadConversations();
-
-        // Set up conversation list with observable list
         conversationList.setItems(conversations);
+        conversationList.setFixedCellSize(60);
+        messageList.setFixedCellSize(-1);
 
-        // UI improvements: set fixed cell sizes for consistent appearance
-        conversationList.setFixedCellSize(60);   // Increased height for better touch target
-        messageList.setFixedCellSize(-1);         // Dynamic height for message items (wraps content)
-
-        // Apply CSS classes to existing components
         messageList.getStyleClass().add("message-list");
-        conversationSearchField.getStyleClass().add("search-field");
+        if (conversationSearchField != null) {
+            conversationSearchField.getStyleClass().add("search-field");
+        }
 
-        // Set placeholder with CSS class
         Label placeholderLabel = new Label("Select a conversation to start chatting");
         placeholderLabel.getStyleClass().add("placeholder-text");
         messageList.setPlaceholder(placeholderLabel);
 
-        // Set up search functionality
         if (conversationSearchField != null) {
             conversationSearchField.textProperty().addListener((obs, oldVal, newVal) -> {
                 filterConversations(newVal);
             });
         }
 
-        /**
-         * Listener for conversation selection changes.
-         * When user clicks a different conversation:
-         * 1. Update title label
-         * 2. Load its messages
-         * 3. Show/hide update/delete buttons
-         */
+        audioRecorderService = new AudioRecorderService();
+        recordingIndicator.setVisible(false);
+        recordingIndicator.setManaged(false);
+
+        // Conversation selection listener
         conversationList.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((obs, oldVal, newVal) -> {
                     selectedConversation = newVal;
-
                     if (newVal != null) {
-                        // Update conversation title label
                         if (conversationTitleLabel != null) {
                             conversationTitleLabel.setText(newVal.getName() != null ?
                                     newVal.getName() : "Conversation " + newVal.getId());
                             conversationTitleLabel.getStyleClass().add("conversation-title");
                         }
-
-                        // Show update/delete buttons
                         if (updateConversationBtn != null) {
                             updateConversationBtn.setVisible(true);
-                            updateConversationBtn.getStyleClass().add("button-secondary");
                         }
                         if (deleteConversationBtn != null) {
                             deleteConversationBtn.setVisible(true);
-                            deleteConversationBtn.getStyleClass().add("button-danger");
                         }
                     } else {
-                        // Hide buttons when no conversation selected
-                        if (updateConversationBtn != null) {
-                            updateConversationBtn.setVisible(false);
-                        }
-                        if (deleteConversationBtn != null) {
-                            deleteConversationBtn.setVisible(false);
-                        }
+                        if (updateConversationBtn != null) updateConversationBtn.setVisible(false);
+                        if (deleteConversationBtn != null) deleteConversationBtn.setVisible(false);
                         if (conversationTitleLabel != null) {
                             conversationTitleLabel.setText("Select a conversation");
                         }
                     }
-
-                    loadMessages();  // Load messages for newly selected conversation
+                    loadMessages();
                 });
 
-        /**
-         * Custom cell factory for conversation list items.
-         * Displays conversation name (or ID as fallback) and type with proper styling.
-         * Includes 3-dot menu for rename, pin, archive, mute, and manage participants.
-         */
+        // Conversation cell factory
         conversationList.setCellFactory(list -> new ListCell<>() {
             @Override
             protected void updateItem(Conversation c, boolean empty) {
                 super.updateItem(c, empty);
-
-                // Handle empty cells
                 if (empty || c == null) {
                     setGraphic(null);
                     return;
                 }
 
-                // Conversation title - use name if available, otherwise fallback to ID
-                Label title = new Label(
-                        c.getName() != null ? c.getName() : "Conversation " + c.getId()
-                );
+                Label title = new Label(c.getName() != null ? c.getName() : "Conversation " + c.getId());
                 title.getStyleClass().add("conv-title");
 
-                // Conversation type subtitle (PERSONAL/GROUP)
                 Label subtitle = new Label(c.getType());
                 subtitle.getStyleClass().add("conv-subtitle");
 
-                // Last message preview (optional)
                 Label lastMsg = new Label("Click to view messages");
                 lastMsg.getStyleClass().add("last-message-preview");
 
-                // Vertical layout for conversation text
                 VBox textBox = new VBox(title, subtitle, lastMsg);
                 textBox.setSpacing(2);
 
-                // ========== Three-dots menu button for conversation actions ==========
                 Button menuBtn = new Button("⋮");
                 menuBtn.getStyleClass().add("menu-button");
 
-                // Create context menu with all options (DELETE OPTION REMOVED)
                 ContextMenu menu = new ContextMenu();
                 MenuItem rename = new MenuItem("Rename");
                 MenuItem manageParticipants = new MenuItem("Manage Participants");
 
-                // Add Pin/Unpin option
                 MenuItem pinItem = new MenuItem(c.isPinned() ? "Unpin" : "Pin");
                 pinItem.setOnAction(e -> {
                     try {
@@ -224,17 +205,15 @@ public class ChatController {
                     }
                 });
 
-                // Add Archive/Unarchive option
                 MenuItem archiveItem = new MenuItem(c.isArchived() ? "Unarchive" : "Archive");
-                // In the archive menu item:
                 archiveItem.setOnAction(e -> {
                     try {
                         boolean newArchiveState = !c.isArchived();
                         conversationRepo.updateArchiveStatus(c.getId(), Session.getCurrentUserId(), newArchiveState);
                         c.setArchived(newArchiveState);
-                        loadConversations(); // Refresh main list
+                        loadConversations();
                         if (archivedTab != null) {
-                            loadArchivedConversations(); // Refresh archived list
+                            loadArchivedConversations();
                         }
                         showInfo(newArchiveState ? "Conversation archived!" : "Conversation unarchived!");
                     } catch (SQLException ex) {
@@ -242,8 +221,6 @@ public class ChatController {
                     }
                 });
 
-
-                // Add Mute/Unmute option
                 MenuItem muteItem = new MenuItem(c.isMuteNotifications() ? "Unmute" : "Mute");
                 muteItem.setOnAction(e -> {
                     try {
@@ -256,13 +233,9 @@ public class ChatController {
                     }
                 });
 
-                // Add separator for organization
                 SeparatorMenuItem separator = new SeparatorMenuItem();
-
-                // Add items to menu in logical order - WITHOUT DELETE OPTION
                 menu.getItems().addAll(rename, pinItem, archiveItem, muteItem, separator, manageParticipants);
 
-                // Add action for manage participants
                 manageParticipants.setOnAction(e -> {
                     if (c.getType().equals("GROUP")) {
                         handleManageParticipants();
@@ -271,17 +244,13 @@ public class ChatController {
                     }
                 });
 
-                // Show menu when button is clicked
                 menuBtn.setOnAction(e -> menu.show(menuBtn, Side.BOTTOM, 0, 0));
 
-                // ========== Rename action ==========
                 rename.setOnAction(e -> {
                     TextInputDialog dialog = new TextInputDialog(c.getName());
                     dialog.setTitle("Rename Conversation");
                     dialog.setHeaderText("Enter new name for conversation");
                     dialog.setContentText("Name:");
-
-                    // Style dialog
                     DialogPane dialogPane = dialog.getDialogPane();
                     dialogPane.getStyleClass().add("dialog-pane");
 
@@ -296,82 +265,101 @@ public class ChatController {
                     });
                 });
 
-                // Horizontal layout: [text content] [menu button]
                 HBox row = new HBox(textBox, menuBtn);
                 row.setSpacing(10);
                 row.setAlignment(Pos.CENTER_LEFT);
                 row.setPadding(new Insets(5));
                 HBox.setHgrow(textBox, Priority.ALWAYS);
-
                 setGraphic(row);
             }
         });
 
-        /**
-         * REPLACED: Custom cell factory for message list items with image support.
-         * Now displays images, videos, audio, and files properly.
-         */
-        /**
-         * REPLACED: Custom cell factory for message list items with image support.
-         * Now displays images, videos, audio, and files properly.
-         */
+        // Message cell factory with all features
         messageList.setCellFactory(list -> new ListCell<>() {
-
             @Override
             protected void updateItem(Message msg, boolean empty) {
                 super.updateItem(msg, empty);
 
-                // Handle empty cells
                 if (empty || msg == null) {
                     setGraphic(null);
                     return;
                 }
 
-                // Determine if this message was sent by the current user
                 String currentUser = Session.getCurrentUserId();
                 boolean isMine = msg.getSenderId().equals(currentUser);
 
-                // ========== Get sender's full name ==========
-                String senderName = "User " + msg.getSenderId(); // default
+                // Get sender's full name
+                String senderName = "User " + msg.getSenderId();
                 try {
                     String fullName = userRepo.getUserFullName(msg.getSenderId());
                     if (fullName != null && !fullName.isEmpty()) {
                         senderName = fullName;
                     }
                 } catch (SQLException e) {
-                    // Ignore, use default
+                    // Ignore
                 }
 
-                // ========== Three-dots menu button for message actions ==========
+                // Menu button
                 Button menuBtn = new Button("⋮");
                 menuBtn.getStyleClass().add("menu-button");
 
-                // Create context menu with edit/delete options
                 ContextMenu menu = new ContextMenu();
                 MenuItem edit = new MenuItem("Edit");
                 MenuItem delete = new MenuItem("Delete");
-                menu.getItems().addAll(edit, delete);
+                MenuItem translate = new MenuItem("🌐 Translate");
 
-                // Show menu when button is clicked
+                menu.getItems().add(translate);
+
+                if (msg.isText()) {
+                    if (isMine) {
+                        // For my messages: show Edit + Delete + Translate
+                        menu.getItems().addAll(edit, delete);
+                    } else {
+                        // For their messages: ONLY show Translate (no Edit/Delete)
+                        // Already added translate above, so nothing else needed
+                    }
+                } else {
+                    if (isMine) {
+                        // For my media: show Delete only
+                        menu.getItems().add(delete);
+                    }
+                    // For their media: only Translate (already added)
+                }
+
+                translate.setOnAction(e -> translateMessage(msg));
+
                 menuBtn.setOnAction(e -> menu.show(menuBtn, Side.BOTTOM, 0, 0));
+                menuBtn.setVisible(true);
 
-                // Only show menu button for user's own messages
-                menuBtn.setVisible(isMine);
+                edit.setOnAction(e -> {
+                    if (!msg.isText()) return;
 
-                // ========== Message header with sender info and timestamp ==========
-                Label header = new Label(
-                        senderName + " • " +
-                                msg.getCreatedAt().toLocalTime().withNano(0)
-                );
+                    TextInputDialog dialog = new TextInputDialog(msg.getContent());
+                    dialog.setTitle("Edit Message");
+                    dialog.setHeaderText("Edit your message");
+                    dialog.setContentText("New content:");
+                    DialogPane dialogPane = dialog.getDialogPane();
+                    dialogPane.getStyleClass().add("dialog-pane");
+
+                    dialog.showAndWait().ifPresent(newText -> {
+                        try {
+                            messageRepo.update(msg.getId(), currentUser, newText);
+                            loadMessages();
+                        } catch (SQLException ex) {
+                            showError(ex.getMessage());
+                        }
+                    });
+                });
+
+                Label header = new Label(senderName + " • " +
+                        msg.getCreatedAt().toLocalTime().withNano(0));
                 header.getStyleClass().add("message-header");
 
-                // ========== Delete action with confirmation dialog ==========
                 delete.setOnAction(e -> {
                     Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
                     confirm.setTitle("Delete message");
                     confirm.setHeaderText("Are you sure?");
                     confirm.setContentText("This action cannot be undone.");
-
                     DialogPane dialogPane = confirm.getDialogPane();
                     dialogPane.getStyleClass().add("dialog-pane");
 
@@ -387,34 +375,10 @@ public class ChatController {
                     });
                 });
 
-                // ========== Edit action with input dialog ==========
-                edit.setOnAction(e -> {
-                    TextInputDialog dialog = new TextInputDialog(msg.getContent());
-                    dialog.setTitle("Edit Message");
-                    dialog.setHeaderText("Edit your message");
-                    dialog.setContentText("New content:");
-
-                    DialogPane dialogPane = dialog.getDialogPane();
-                    dialogPane.getStyleClass().add("dialog-pane");
-
-                    dialog.showAndWait().ifPresent(newText -> {
-                        try {
-                            messageRepo.update(msg.getId(), currentUser, newText);
-                            loadMessages();
-                        } catch (SQLException ex) {
-                            showError(ex.getMessage());
-                        }
-                    });
-                });
-
-                // ========== Create message bubble with content based on type ==========
                 VBox bubble = new VBox(5);
                 bubble.setMaxWidth(350);
-
-                // Add header to bubble
                 bubble.getChildren().add(header);
 
-                // ========== Display content based on message type ==========
                 if (msg.isImage()) {
                     displayImageMessage(msg, bubble);
                 } else if (msg.isVideo()) {
@@ -424,11 +388,9 @@ public class ChatController {
                 } else if (msg.isFile()) {
                     displayFileMessage(msg, bubble);
                 } else {
-                    // Text message
                     displayTextMessage(msg, bubble);
                 }
 
-                // Add appropriate style class based on sender
                 if (isMine) {
                     bubble.getStyleClass().add("mine");
                     bubble.setStyle("-fx-background-color: #dcf8c6; -fx-background-radius: 15 15 2 15; -fx-padding: 8;");
@@ -437,29 +399,16 @@ public class ChatController {
                     bubble.setStyle("-fx-background-color: white; -fx-background-radius: 15 15 15 2; -fx-padding: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 15 15 15 2;");
                 }
 
-                // ========== Layout based on message sender ==========
-                HBox messageRow;
-                if (isMine) {
-                    messageRow = new HBox(menuBtn, bubble);
-                    messageRow.setAlignment(Pos.CENTER_RIGHT);
-                } else {
-                    messageRow = new HBox(bubble, menuBtn);
-                    messageRow.setAlignment(Pos.CENTER_LEFT);
-                }
+                HBox messageRow = isMine ? new HBox(menuBtn, bubble) : new HBox(bubble, menuBtn);
+                messageRow.setAlignment(isMine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
                 messageRow.setSpacing(6);
 
-                // Final container with padding
                 HBox container = new HBox(messageRow);
                 container.setPadding(new Insets(5));
                 container.setAlignment(isMine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-                HBox.setHgrow(messageRow, Priority.NEVER);
-
                 setGraphic(container);
             }
 
-            /**
-             * Display a text message
-             */
             private void displayTextMessage(Message msg, VBox bubble) {
                 Text text = new Text(msg.getContent());
                 text.setStyle("-fx-fill: #333;");
@@ -468,39 +417,25 @@ public class ChatController {
                 bubble.getChildren().add(textFlow);
             }
 
-            /**
-             * Display an image message with actual image
-             */
             private void displayImageMessage(Message msg, VBox bubble) {
                 try {
                     String fileUrl = msg.getFileUrl();
                     if (fileUrl != null) {
-                        // Load image from file
                         File imageFile = new File(fileUrl);
                         if (imageFile.exists()) {
                             Image image = new Image(imageFile.toURI().toString());
                             ImageView imageView = new ImageView(image);
-
-                            // Scale image to fit
                             imageView.setFitWidth(250);
                             imageView.setPreserveRatio(true);
-                            imageView.setStyle("-fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);");
-
-                            // Add click handler to enlarge
+                            imageView.setStyle("-fx-cursor: hand;");
                             imageView.setOnMouseClicked(e -> showFullImage(fileUrl));
-
                             bubble.getChildren().add(imageView);
 
-                            // Add image info
                             if (msg.getFileName() != null || msg.getFileSize() > 0) {
                                 Label info = new Label();
                                 String infoText = "📷 ";
-                                if (msg.getFileName() != null) {
-                                    infoText += msg.getFileName();
-                                }
-                                if (msg.getFileSize() > 0) {
-                                    infoText += " • " + formatFileSize(msg.getFileSize());
-                                }
+                                if (msg.getFileName() != null) infoText += msg.getFileName();
+                                if (msg.getFileSize() > 0) infoText += " • " + formatFileSize(msg.getFileSize());
                                 info.setText(infoText);
                                 info.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
                                 bubble.getChildren().add(info);
@@ -508,168 +443,82 @@ public class ChatController {
                         } else {
                             showErrorPlaceholder(bubble, "Image file not found");
                         }
-                    } else {
-                        showErrorPlaceholder(bubble, "No image URL");
                     }
                 } catch (Exception e) {
                     showErrorPlaceholder(bubble, "Failed to load image");
-                    e.printStackTrace();
                 }
             }
 
-            /**
-             * Display a video message with thumbnail/player
-             */
-            /**
-             * Display a video message with thumbnail/player (clickable)
-             */
             private void displayVideoMessage(Message msg, VBox bubble) {
                 try {
                     String fileUrl = msg.getFileUrl();
-                    if (fileUrl != null) {
-                        File videoFile = new File(fileUrl);
-                        if (videoFile.exists()) {
-                            // Create a video thumbnail (placeholder)
-                            Label videoThumbnail = new Label("🎥");
-                            videoThumbnail.setStyle("-fx-font-size: 48px; -fx-text-fill: #2d7a2d;");
-                            videoThumbnail.setPrefSize(200, 120);
-                            videoThumbnail.setAlignment(Pos.CENTER);
-                            videoThumbnail.setStyle("-fx-background-color: #f0f0f0; -fx-background-radius: 8; -fx-font-size: 48px; -fx-text-fill: #2d7a2d;");
+                    if (fileUrl != null && new File(fileUrl).exists()) {
+                        Label videoThumbnail = new Label("🎥");
+                        videoThumbnail.setStyle("-fx-font-size: 48px; -fx-text-fill: #2d7a2d; -fx-background-color: #f0f0f0; -fx-background-radius: 8; -fx-padding: 20;");
+                        videoThumbnail.setPrefSize(200, 120);
+                        videoThumbnail.setAlignment(Pos.CENTER);
+                        videoThumbnail.setStyle(videoThumbnail.getStyle() + "-fx-cursor: hand;");
+                        videoThumbnail.setOnMouseClicked(e -> openFile(fileUrl));
+                        bubble.getChildren().add(videoThumbnail);
 
-                            // Add play button overlay
-                            Label playButton = new Label("▶");
-                            playButton.setStyle("-fx-font-size: 24px; -fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-background-radius: 20; -fx-padding: 5 15;");
-
-                            StackPane videoStack = new StackPane(videoThumbnail, playButton);
-                            videoStack.setStyle("-fx-cursor: hand;");
-                            videoStack.setOnMouseClicked(e -> openFile(fileUrl));
-
-                            bubble.getChildren().add(videoStack);
-
-                            // Video info
-                            VBox infoBox = new VBox(2);
-                            Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Video");
-                            fileName.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
-
-                            String infoText = "";
-                            if (msg.getDuration() != null && msg.getDuration() > 0) {
-                                infoText += formatDuration(msg.getDuration());
-                            }
-                            if (msg.getFileSize() > 0) {
-                                if (!infoText.isEmpty()) infoText += " • ";
-                                infoText += formatFileSize(msg.getFileSize());
-                            }
-                            Label fileInfo = new Label(infoText);
-                            fileInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
-
-                            infoBox.getChildren().addAll(fileName, fileInfo);
-                            bubble.getChildren().add(infoBox);
-                        } else {
-                            showErrorPlaceholder(bubble, "Video file not found");
+                        VBox infoBox = new VBox(2);
+                        Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Video");
+                        fileName.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+                        String infoText = "";
+                        if (msg.getDuration() != null && msg.getDuration() > 0) infoText += formatDuration(msg.getDuration());
+                        if (msg.getFileSize() > 0) {
+                            if (!infoText.isEmpty()) infoText += " • ";
+                            infoText += formatFileSize(msg.getFileSize());
                         }
+                        Label fileInfo = new Label(infoText);
+                        fileInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+                        infoBox.getChildren().addAll(fileName, fileInfo);
+                        bubble.getChildren().add(infoBox);
+                    } else {
+                        showErrorPlaceholder(bubble, "Video file not found");
                     }
                 } catch (Exception e) {
                     showErrorPlaceholder(bubble, "Failed to load video");
                 }
             }
 
-            /**
-             * Display an audio message with player controls
-             */
-            /**
-             * Display an audio message with player controls (clickable)
-             */
             private void displayAudioMessage(Message msg, VBox bubble) {
                 try {
                     String fileUrl = msg.getFileUrl();
-                    if (fileUrl != null) {
-                        File audioFile = new File(fileUrl);
-                        if (audioFile.exists()) {
-                            HBox audioBox = new HBox(10);
-                            audioBox.setAlignment(Pos.CENTER_LEFT);
-                            audioBox.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 20; -fx-padding: 8; -fx-cursor: hand;");
-                            audioBox.setOnMouseClicked(e -> openFile(fileUrl));
+                    if (fileUrl != null && new File(fileUrl).exists()) {
+                        HBox audioBox = new HBox(10);
+                        audioBox.setAlignment(Pos.CENTER_LEFT);
+                        audioBox.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 20; -fx-padding: 8; -fx-cursor: hand;");
+                        audioBox.setOnMouseClicked(e -> openFile(fileUrl));
 
-                            // Play button
-                            Label playIcon = new Label("▶");
-                            playIcon.setStyle("-fx-font-size: 20px; -fx-text-fill: #2d7a2d; -fx-min-width: 30;");
+                        Label playIcon = new Label("▶");
+                        playIcon.setStyle("-fx-font-size: 20px; -fx-text-fill: #2d7a2d; -fx-min-width: 30;");
 
-                            // Audio info
-                            VBox infoBox = new VBox(2);
-                            Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Audio");
-                            fileName.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
+                        VBox infoBox = new VBox(2);
+                        Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Audio");
+                        fileName.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
 
-                            String duration = "";
-                            if (msg.getDuration() != null && msg.getDuration() > 0) {
-                                duration = formatDuration(msg.getDuration());
-                            } else {
-                                duration = formatFileSize(msg.getFileSize());
-                            }
-                            Label durationLabel = new Label(duration);
-                            durationLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
-
-                            infoBox.getChildren().addAll(fileName, durationLabel);
-
-                            audioBox.getChildren().addAll(playIcon, infoBox);
-                            HBox.setHgrow(infoBox, Priority.ALWAYS);
-
-                            bubble.getChildren().add(audioBox);
+                        String duration = "";
+                        if (msg.getDuration() != null && msg.getDuration() > 0) {
+                            duration = formatDuration(msg.getDuration());
                         } else {
-                            showErrorPlaceholder(bubble, "Audio file not found");
+                            duration = formatFileSize(msg.getFileSize());
                         }
+                        Label durationLabel = new Label(duration);
+                        durationLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+
+                        infoBox.getChildren().addAll(fileName, durationLabel);
+                        audioBox.getChildren().addAll(playIcon, infoBox);
+                        HBox.setHgrow(infoBox, Priority.ALWAYS);
+                        bubble.getChildren().add(audioBox);
+                    } else {
+                        showErrorPlaceholder(bubble, "Audio file not found");
                     }
                 } catch (Exception e) {
                     showErrorPlaceholder(bubble, "Failed to load audio");
                 }
             }
 
-            /**
-             * Play media file (opens with default system player or embedded player)
-             */
-            private void playMedia(String filePath, String type) {
-                try {
-                    File file = new File(filePath);
-                    if (file.exists()) {
-                        // Open with default system application
-                        Desktop.getDesktop().open(file);
-                    } else {
-                        showError("File not found: " + filePath);
-                    }
-                } catch (IOException e) {
-                    showError("Cannot open file: " + e.getMessage());
-                }
-            }
-
-            /**
-             * Format duration in seconds to MM:SS format
-             */
-            private String formatDuration(int seconds) {
-                int minutes = seconds / 60;
-                int secs = seconds % 60;
-                return String.format("%d:%02d", minutes, secs);
-            }
-            /**
-             * Open a file with the default system application
-             */
-            private void openFile(String filePath) {
-                try {
-                    File file = new File(filePath);
-                    if (!file.exists()) {
-                        showError("File not found: " + filePath);
-                        return;
-                    }
-
-                    // Open with default system application
-                    Desktop.getDesktop().open(file);
-
-                } catch (IOException e) {
-                    showError("Cannot open file: " + e.getMessage());
-                }
-            }
-
-            /**
-             * Display a file attachment (clickable)
-             */
             private void displayFileMessage(Message msg, VBox bubble) {
                 HBox fileBox = new HBox(8);
                 fileBox.setAlignment(Pos.CENTER_LEFT);
@@ -682,61 +531,47 @@ public class ChatController {
                 VBox fileInfo = new VBox(2);
                 Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Unknown file");
                 fileName.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2d7a2d;");
-
                 Label fileSize = new Label(formatFileSize(msg.getFileSize()));
                 fileSize.setStyle("-fx-font-size: 11px; -fx-text-fill: #666;");
 
                 fileInfo.getChildren().addAll(fileName, fileSize);
                 fileBox.getChildren().addAll(iconLabel, fileInfo);
                 HBox.setHgrow(fileInfo, Priority.ALWAYS);
-
                 bubble.getChildren().add(fileBox);
             }
-            /**
-             * Download/save file to user's chosen location
-             */
-            private void downloadFile(File sourceFile) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Save File");
-                fileChooser.setInitialFileName(sourceFile.getName());
 
-                File destination = fileChooser.showSaveDialog(themeBtn.getScene().getWindow());
-
-                if (destination != null) {
-                    try {
-                        Files.copy(sourceFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        showInfo("File downloaded successfully!");
-                    } catch (IOException e) {
-                        showError("Failed to download file: " + e.getMessage());
+            private void openFile(String filePath) {
+                try {
+                    File file = new File(filePath);
+                    if (file.exists()) {
+                        Desktop.getDesktop().open(file);
+                    } else {
+                        showError("File not found: " + filePath);
                     }
+                } catch (IOException e) {
+                    showError("Cannot open file: " + e.getMessage());
                 }
             }
 
-            /**
-             * Show error placeholder in message bubble
-             */
+            private String formatDuration(int seconds) {
+                int minutes = seconds / 60;
+                int secs = seconds % 60;
+                return String.format("%d:%02d", minutes, secs);
+            }
+
             private void showErrorPlaceholder(VBox bubble, String errorMsg) {
                 Label errorLabel = new Label("❌ " + errorMsg);
                 errorLabel.setStyle("-fx-text-fill: #ff4444; -fx-font-size: 11px;");
                 bubble.getChildren().add(errorLabel);
             }
 
-            /**
-             * Format file size for display
-             */
             private String formatFileSize(long bytes) {
                 if (bytes <= 0) return "0 B";
-                String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
+                String[] units = {"B", "KB", "MB", "GB", "TB"};
                 int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
                 return String.format("%.1f %s", bytes / Math.pow(1024, digitGroups), units[digitGroups]);
             }
 
-            /**
-             * Show full image (placeholder for now)
-             */
-            /**
-             * Show full image in a new window
-             */
             private void showFullImage(String imagePath) {
                 try {
                     File imageFile = new File(imagePath);
@@ -745,17 +580,14 @@ public class ChatController {
                         return;
                     }
 
-                    // Create a new stage for full-screen image
                     Stage imageStage = new Stage();
                     imageStage.setTitle("Image Preview");
 
-                    // Load the image
                     Image image = new Image(imageFile.toURI().toString());
                     ImageView imageView = new ImageView(image);
                     imageView.setPreserveRatio(true);
                     imageView.setSmooth(true);
 
-                    // Create scroll pane for large images
                     ScrollPane scrollPane = new ScrollPane();
                     scrollPane.setContent(imageView);
                     scrollPane.setPannable(true);
@@ -763,10 +595,6 @@ public class ChatController {
                     scrollPane.setFitToHeight(true);
                     scrollPane.setStyle("-fx-background-color: #2d2d2d;");
 
-                    // Create scene
-                    Scene scene = new Scene(scrollPane, 800, 600);
-
-                    // Add download button
                     Button downloadBtn = new Button("⬇ Download");
                     downloadBtn.setStyle("-fx-background-color: #2d7a2d; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 8 15;");
                     downloadBtn.setOnAction(e -> downloadFile(imageFile));
@@ -786,61 +614,56 @@ public class ChatController {
 
                     imageStage.setScene(new Scene(root, 900, 700));
                     imageStage.show();
-
                 } catch (Exception e) {
                     showError("Failed to open image: " + e.getMessage());
                 }
             }
+
+            private void downloadFile(File sourceFile) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save File");
+                fileChooser.setInitialFileName(sourceFile.getName());
+                File destination = fileChooser.showSaveDialog(themeBtn.getScene().getWindow());
+                if (destination != null) {
+                    try {
+                        Files.copy(sourceFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        showInfo("File downloaded successfully!");
+                    } catch (IOException e) {
+                        showError("Failed to download file: " + e.getMessage());
+                    }
+                }
+            }
         });
-        /**
-         * Allow sending messages by pressing Enter key in the input field.
-         */
+
         messageInput.setOnAction(e -> sendMessage());
         messageInput.getStyleClass().add("message-input");
 
-        // Set up update/delete button actions
         if (updateConversationBtn != null) {
             updateConversationBtn.setOnAction(e -> handleUpdateConversation());
             updateConversationBtn.setVisible(false);
-            updateConversationBtn.getStyleClass().add("button-secondary");
         }
         if (deleteConversationBtn != null) {
             deleteConversationBtn.setOnAction(e -> handleDeleteConversation());
             deleteConversationBtn.setVisible(false);
-            deleteConversationBtn.getStyleClass().add("button-danger");
         }
 
-        // Style theme button
-        if (themeBtn != null) {
-            themeBtn.getStyleClass().add("theme-button");
-        }
+        if (themeBtn != null) themeBtn.getStyleClass().add("theme-button");
 
-        // Load contacts if contacts tab exists
-        if (contactsTab != null) {
-            loadContacts();
-        }
-        // Initialize archived tab
+        if (contactsTab != null) loadContacts();
         if (archivedTab != null) {
             loadArchivedConversations();
-
-            // Set up unarchive all button
-            if (unarchiveAllBtn != null) {
-                unarchiveAllBtn.setOnAction(e -> handleUnarchiveAll());
-            }
+            if (unarchiveAllBtn != null) unarchiveAllBtn.setOnAction(e -> handleUnarchiveAll());
         }
 
-        // Setup image handling
         setupImageHandling();
     }
 
-    /**
-     * Custom cell factory for archived conversation list.
-     */
+    // ==================== Archived Conversations ====================
+
     private class ArchivedConversationCell extends ListCell<Conversation> {
         @Override
         protected void updateItem(Conversation c, boolean empty) {
             super.updateItem(c, empty);
-
             if (empty || c == null) {
                 setGraphic(null);
                 return;
@@ -851,29 +674,24 @@ public class ChatController {
             container.setPadding(new Insets(10));
             container.setStyle("-fx-background-color: transparent; -fx-border-color: transparent transparent #e0e0e0 transparent;");
 
-            // Archive icon
             Label archiveIcon = new Label("📦");
             archiveIcon.setStyle("-fx-font-size: 20px; -fx-text-fill: #6c757d;");
 
-            // Conversation info
             VBox infoBox = new VBox(3);
             Label nameLabel = new Label(c.getName() != null ? c.getName() : "Conversation " + c.getId());
             nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #6c757d;");
-
             Label typeLabel = new Label(c.getType() + " • Archived");
             typeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #999;");
-
             infoBox.getChildren().addAll(nameLabel, typeLabel);
             HBox.setHgrow(infoBox, Priority.ALWAYS);
 
-            // Unarchive button
             Button unarchiveBtn = new Button("Unarchive");
             unarchiveBtn.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 15;");
             unarchiveBtn.setOnAction(e -> {
                 try {
                     conversationRepo.updateArchiveStatus(c.getId(), Session.getCurrentUserId(), false);
-                    loadConversations(); // Refresh main list
-                    loadArchivedConversations(); // Refresh archived list
+                    loadConversations();
+                    loadArchivedConversations();
                     showInfo("Conversation unarchived!");
                 } catch (SQLException ex) {
                     showError("Failed to unarchive: " + ex.getMessage());
@@ -885,9 +703,6 @@ public class ChatController {
         }
     }
 
-    /**
-     * Unarchive all conversations at once.
-     */
     private void handleUnarchiveAll() {
         if (archivedConversations.isEmpty()) {
             showInfo("No archived conversations to unarchive.");
@@ -915,10 +730,8 @@ public class ChatController {
         });
     }
 
-    /**
-     * Filters conversations based on search text.
-     * @param searchText The text to search for
-     */
+    // ==================== Filter & Load ====================
+
     private void filterConversations(String searchText) {
         if (searchText == null || searchText.isEmpty()) {
             conversationList.setItems(conversations);
@@ -935,19 +748,13 @@ public class ChatController {
         }
     }
 
-    /**
-     * Loads contacts for the contacts tab.
-     */
     private void loadContacts() {
         if (contactsFlow != null) {
             contactsFlow.getChildren().clear();
-
-            // Sample contacts - replace with actual data from database
             String[] sampleContacts = {
                     "Ahmed Ben Salem", "Sarra Trabelsi", "Mehdi Khemiri",
                     "Nour Ben Ali", "Yasmine Mhiri", "Omar Jelliti"
             };
-
             for (String contactName : sampleContacts) {
                 VBox contactCard = createContactCard(contactName);
                 contactsFlow.getChildren().add(contactCard);
@@ -955,11 +762,6 @@ public class ChatController {
         }
     }
 
-    /**
-     * Creates a contact card for the contacts tab.
-     * @param name The contact's name
-     * @return A VBox containing the contact card
-     */
     private VBox createContactCard(String name) {
         VBox card = new VBox(10);
         card.getStyleClass().add("contact-card");
@@ -980,7 +782,6 @@ public class ChatController {
         messageBtn.setPrefWidth(120);
 
         card.getChildren().addAll(avatar, nameLabel, status, messageBtn);
-
         return card;
     }
 
@@ -992,9 +793,6 @@ public class ChatController {
         }
     }
 
-    /**
-     * Loads all conversations for the current user from the database.
-     */
     private void loadConversations() {
         try {
             conversations.setAll(conversationRepo.findByUser(Session.getCurrentUserId()));
@@ -1004,18 +802,11 @@ public class ChatController {
         }
     }
 
-    /**
-     * Loads all messages for the currently selected conversation.
-     */
     private void loadMessages() {
         if (selectedConversation == null) return;
-
         try {
             messageList.getItems().setAll(
-                    messageRepo.findByConversation(
-                            selectedConversation.getId(),
-                            Session.getCurrentUserId()
-                    )
+                    messageRepo.findByConversation(selectedConversation.getId(), Session.getCurrentUserId())
             );
             if (!messageList.getItems().isEmpty()) {
                 messageList.scrollTo(messageList.getItems().size() - 1);
@@ -1025,13 +816,21 @@ public class ChatController {
         }
     }
 
-    /**
-     * Sends a new message in the current conversation.
-     */
+    private void loadArchivedConversations() {
+        try {
+            archivedConversations.setAll(conversationRepo.findArchivedByUser(Session.getCurrentUserId()));
+            archivedConversationList.setItems(archivedConversations);
+            archivedConversationList.setCellFactory(list -> new ArchivedConversationCell());
+        } catch (SQLException e) {
+            showError("Failed to load archived conversations: " + e.getMessage());
+        }
+    }
+
+    // ==================== Message Actions ====================
+
     @FXML
     private void sendMessage() {
-        if (selectedConversation == null || messageInput.getText().isBlank())
-            return;
+        if (selectedConversation == null || messageInput.getText().isBlank()) return;
 
         Message msg = new Message(
                 selectedConversation.getId(),
@@ -1048,6 +847,8 @@ public class ChatController {
         }
     }
 
+    // ==================== Media Attachment ====================
+
     @FXML
     private void handleAttachImage() {
         if (selectedConversation == null) {
@@ -1062,51 +863,9 @@ public class ChatController {
         );
 
         File selectedFile = fileChooser.showOpenDialog(themeBtn.getScene().getWindow());
-
-        if (selectedFile != null) {
-            sendImageMessage(selectedFile);
-        }
+        if (selectedFile != null) sendImageMessage(selectedFile);
     }
 
-    /**
-     * Send an image message
-     */
-    private void sendImageMessage(File imageFile) {
-        try {
-            // Show loading indicator
-            showInfo("Uploading image...");
-
-            // Save file to server
-            String filePath = uploadService.saveFile(imageFile, "IMAGE");
-            String thumbnailPath = uploadService.generateThumbnail(filePath);
-
-            // Create message object
-            Message msg = new Message(
-                    selectedConversation.getId(),
-                    Session.getCurrentUserId(),
-                    "📷 Image",  // Optional caption
-                    "IMAGE",
-                    filePath
-            );
-            msg.setThumbnailUrl(thumbnailPath);
-            msg.setFileSize(imageFile.length());
-            msg.setFileName(imageFile.getName());
-            msg.setMimeType(Files.probeContentType(imageFile.toPath()));
-
-            // Save to database
-            messageRepo.create(msg);
-
-            // Refresh messages
-            loadMessages();
-
-        } catch (IOException | SQLException e) {
-            showError("Failed to send image: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    /**
-     * Handle video attachment
-     */
     @FXML
     private void handleAttachVideo() {
         if (selectedConversation == null) {
@@ -1121,15 +880,9 @@ public class ChatController {
         );
 
         File selectedFile = fileChooser.showOpenDialog(themeBtn.getScene().getWindow());
-
-        if (selectedFile != null) {
-            sendVideoMessage(selectedFile);
-        }
+        if (selectedFile != null) sendVideoMessage(selectedFile);
     }
 
-    /**
-     * Handle audio attachment
-     */
     @FXML
     private void handleAttachAudio() {
         if (selectedConversation == null) {
@@ -1144,15 +897,9 @@ public class ChatController {
         );
 
         File selectedFile = fileChooser.showOpenDialog(themeBtn.getScene().getWindow());
-
-        if (selectedFile != null) {
-            sendAudioMessage(selectedFile);
-        }
+        if (selectedFile != null) sendAudioMessage(selectedFile);
     }
 
-    /**
-     * Handle file attachment (any type)
-     */
     @FXML
     private void handleAttachFile() {
         if (selectedConversation == null) {
@@ -1162,32 +909,43 @@ public class ChatController {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select File");
-
         File selectedFile = fileChooser.showOpenDialog(themeBtn.getScene().getWindow());
-
-        if (selectedFile != null) {
-            sendFileMessage(selectedFile);
-        }
+        if (selectedFile != null) sendFileMessage(selectedFile);
     }
 
-    /**
-     * Send a video message
-     */
-    private void sendVideoMessage(File videoFile) {
+    private void sendImageMessage(File imageFile) {
         try {
-            showInfo("Uploading video...");
-
-            String filePath = uploadService.saveFile(videoFile, "VIDEO");
-
-            // Get video duration (you'd need a library for this)
-            int duration = 0; // Placeholder
+            showInfo("Uploading image...");
+            String filePath = uploadService.saveFile(imageFile, "IMAGE");
+            String thumbnailPath = uploadService.generateThumbnail(filePath);
 
             Message msg = new Message(
                     selectedConversation.getId(),
                     Session.getCurrentUserId(),
-                    "🎥 Video",
-                    "VIDEO",
-                    filePath
+                    "📷 Image", "IMAGE", filePath
+            );
+            msg.setThumbnailUrl(thumbnailPath);
+            msg.setFileSize(imageFile.length());
+            msg.setFileName(imageFile.getName());
+            msg.setMimeType(Files.probeContentType(imageFile.toPath()));
+
+            messageRepo.create(msg);
+            loadMessages();
+        } catch (IOException | SQLException e) {
+            showError("Failed to send image: " + e.getMessage());
+        }
+    }
+
+    private void sendVideoMessage(File videoFile) {
+        try {
+            showInfo("Uploading video...");
+            String filePath = uploadService.saveFile(videoFile, "VIDEO");
+            int duration = 0;
+
+            Message msg = new Message(
+                    selectedConversation.getId(),
+                    Session.getCurrentUserId(),
+                    "🎥 Video", "VIDEO", filePath
             );
             msg.setFileSize(videoFile.length());
             msg.setFileName(videoFile.getName());
@@ -1196,31 +954,21 @@ public class ChatController {
 
             messageRepo.create(msg);
             loadMessages();
-
         } catch (IOException | SQLException e) {
             showError("Failed to send video: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
-    /**
-     * Send an audio message
-     */
     private void sendAudioMessage(File audioFile) {
         try {
             showInfo("Uploading audio...");
-
             String filePath = uploadService.saveFile(audioFile, "AUDIO");
-
-            // Get audio duration (you'd need a library for this)
-            int duration = 0; // Placeholder
+            int duration = 0;
 
             Message msg = new Message(
                     selectedConversation.getId(),
                     Session.getCurrentUserId(),
-                    "🎵 Audio",
-                    "AUDIO",
-                    filePath
+                    "🎵 Audio", "AUDIO", filePath
             );
             msg.setFileSize(audioFile.length());
             msg.setFileName(audioFile.getName());
@@ -1229,28 +977,20 @@ public class ChatController {
 
             messageRepo.create(msg);
             loadMessages();
-
         } catch (IOException | SQLException e) {
             showError("Failed to send audio: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
-    /**
-     * Send a file message
-     */
     private void sendFileMessage(File file) {
         try {
             showInfo("Uploading file...");
-
             String filePath = uploadService.saveFile(file, "FILE");
 
             Message msg = new Message(
                     selectedConversation.getId(),
                     Session.getCurrentUserId(),
-                    "📎 File",
-                    "FILE",
-                    filePath
+                    "📎 File", "FILE", filePath
             );
             msg.setFileSize(file.length());
             msg.setFileName(file.getName());
@@ -1258,15 +998,263 @@ public class ChatController {
 
             messageRepo.create(msg);
             loadMessages();
-
         } catch (IOException | SQLException e) {
             showError("Failed to send file: " + e.getMessage());
-            e.printStackTrace();
         }
     }
+
+    // ==================== Voice Recording ====================
+
+    @FXML
+    private void toggleVoiceRecording() {
+        if (selectedConversation == null) {
+            showError("Please select a conversation first.");
+            return;
+        }
+
+        try {
+            voiceRecordBtn.setVisible(false);
+            voiceRecordBtn.setManaged(false);
+            recordingIndicator.setVisible(true);
+            recordingIndicator.setManaged(true);
+
+            recordingSeconds = 0;
+            recordingTimeLabel.setText("0:00");
+
+            recordingTimer = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+                recordingSeconds++;
+                int minutes = recordingSeconds / 60;
+                int seconds = recordingSeconds % 60;
+                recordingTimeLabel.setText(String.format("%d:%02d", minutes, seconds));
+            }));
+            recordingTimer.setCycleCount(Timeline.INDEFINITE);
+            recordingTimer.play();
+
+            audioRecorderService.startRecording();
+        } catch (LineUnavailableException e) {
+            showError("Could not start recording: " + e.getMessage());
+            resetRecordingUI();
+        }
+    }
+
+    @FXML
+    private void stopVoiceRecording() {
+        try {
+            if (recordingTimer != null) recordingTimer.stop();
+            File audioFile = audioRecorderService.stopRecording();
+            if (audioFile != null && audioFile.exists()) sendVoiceMessage(audioFile);
+        } catch (IOException e) {
+            showError("Failed to save recording: " + e.getMessage());
+        } finally {
+            resetRecordingUI();
+        }
+    }
+
+    @FXML
+    private void cancelVoiceRecording() {
+        if (recordingTimer != null) recordingTimer.stop();
+        audioRecorderService.cancelRecording();
+        resetRecordingUI();
+        showInfo("Recording cancelled");
+    }
+
+    private void resetRecordingUI() {
+        voiceRecordBtn.setVisible(true);
+        voiceRecordBtn.setManaged(true);
+        recordingIndicator.setVisible(false);
+        recordingIndicator.setManaged(false);
+    }
+
+    private void sendVoiceMessage(File audioFile) {
+        try {
+            showInfo("Sending voice message...");
+            int duration = AudioRecorderService.getAudioDuration(audioFile);
+            String filePath = uploadService.saveFile(audioFile, "AUDIO");
+
+            Message msg = new Message(
+                    selectedConversation.getId(),
+                    Session.getCurrentUserId(),
+                    "🎤 Voice message", "AUDIO", filePath
+            );
+            msg.setFileSize(audioFile.length());
+            msg.setFileName(audioFile.getName());
+            msg.setMimeType("audio/wav");
+            msg.setDuration(duration);
+
+            messageRepo.create(msg);
+            loadMessages();
+            audioFile.delete();
+        } catch (IOException | SQLException e) {
+            showError("Failed to send voice message: " + e.getMessage());
+        }
+    }
+
+    // ==================== Gemini AI Features ====================
+
     /**
-     * Handles the creation of a new conversation.
+     * Translate a message using Gemini API
      */
+    private void translateMessage(Message msg) {
+        // Language choices
+        List<String> languages = List.of("English", "French", "Spanish", "German", "Italian", "Arabic", "Chinese", "Japanese");
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("English", languages);
+        dialog.setTitle("🌐 Translate Message");
+        dialog.setHeaderText("Choose target language");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStyleClass().add("dialog-pane");
+
+        dialog.showAndWait().ifPresent(language -> {
+            // Show loading
+            Alert loading = new Alert(Alert.AlertType.INFORMATION);
+            loading.setTitle("Translating");
+            loading.setHeaderText(null);
+            loading.setContentText("⏳ Translating to " + language + "...");
+            loading.show();
+
+            String prompt = String.format(
+                    "Translate this message to %s. Only return the translation, nothing else:\n\n%s",
+                    language, msg.getContent()
+            );
+
+            new Thread(() -> {
+                try {
+                    String translation = geminiService.generateResponse(prompt);
+
+                    javafx.application.Platform.runLater(() -> {
+                        loading.close();
+
+                        // Show translation result
+                        Alert result = new Alert(Alert.AlertType.INFORMATION);
+                        result.setTitle("Translation");
+                        result.setHeaderText("Translated to " + language);
+
+                        TextArea textArea = new TextArea(translation);
+                        textArea.setWrapText(true);
+                        textArea.setEditable(false);
+                        textArea.setPrefRowCount(5);
+                        textArea.setPrefWidth(400);
+                        textArea.setStyle("-fx-font-size: 14px;");
+
+                        result.getDialogPane().setContent(textArea);
+                        result.getDialogPane().getStyleClass().add("dialog-pane");
+
+                        ButtonType useButton = new ButtonType("Use in Message", ButtonBar.ButtonData.OK_DONE);
+                        result.getButtonTypes().setAll(useButton, ButtonType.CLOSE);
+
+                        result.showAndWait().ifPresent(res -> {
+                            if (res == useButton) {
+                                messageInput.setText(translation);
+                                messageInput.requestFocus();
+                            }
+                        });
+                    });
+                } catch (Exception e) {
+                    javafx.application.Platform.runLater(() -> {
+                        loading.close();
+                        showError("Translation failed: " + e.getMessage());
+                    });
+                }
+            }).start();
+        });
+    }
+
+    /**
+     * Handle smart reply button - generates AI suggestions based on conversation
+     */
+    @FXML
+    private void handleSmartReply() {
+        if (selectedConversation == null) {
+            showError("Please select a conversation first.");
+            return;
+        }
+
+        List<Message> recentMessages = messageList.getItems();
+        if (recentMessages.isEmpty()) {
+            showError("No messages to generate reply from.");
+            return;
+        }
+
+        smartReplyBtn.setDisable(true);
+        smartReplyBtn.setText("⏳ Thinking...");
+
+        // Build conversation context
+        StringBuilder context = new StringBuilder();
+        context.append("Here's a conversation history. Generate a helpful, natural reply:\n\n");
+
+        int start = Math.max(0, recentMessages.size() - 5);
+        for (int i = start; i < recentMessages.size(); i++) {
+            Message msg = recentMessages.get(i);
+            String sender = msg.getSenderId().equals(Session.getCurrentUserId()) ? "Me" : "User";
+            context.append(sender).append(": ").append(msg.getContent()).append("\n");
+        }
+
+        context.append("\nGenerate a single, natural reply to continue this conversation:");
+
+        new Thread(() -> {
+            try {
+                String suggestion = geminiService.generateResponse(context.toString());
+
+                javafx.application.Platform.runLater(() -> {
+                    showSmartReplyDialog(suggestion);
+                    smartReplyBtn.setDisable(false);
+                    smartReplyBtn.setText("🤖 Smart Reply");
+                });
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    showError("Failed to generate reply: " + e.getMessage());
+                    smartReplyBtn.setDisable(false);
+                    smartReplyBtn.setText("🤖 Smart Reply");
+                });
+            }
+        }).start();
+    }
+
+    /**
+     * Show smart reply suggestion dialog
+     */
+    private void showSmartReplyDialog(String suggestion) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("🤖 AI Smart Reply");
+        dialog.setHeaderText("Suggested Reply:");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStyleClass().add("dialog-pane");
+        dialogPane.setPrefWidth(400);
+
+        TextArea suggestionArea = new TextArea(suggestion);
+        suggestionArea.setWrapText(true);
+        suggestionArea.setPrefRowCount(3);
+        suggestionArea.setEditable(true);
+        suggestionArea.setStyle("-fx-font-size: 14px; -fx-padding: 10;");
+
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(20));
+        content.getChildren().addAll(
+                new Label("You can edit this before using:"),
+                suggestionArea
+        );
+
+        dialogPane.setContent(content);
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        okButton.setText("Use This Reply");
+        okButton.setStyle("-fx-background-color: #2d7a2d; -fx-text-fill: white;");
+
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+        cancelButton.setText("Cancel");
+
+        dialog.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                messageInput.setText(suggestionArea.getText());
+                messageInput.requestFocus();
+            }
+        });
+    }
+
+    // ==================== Conversation Management ====================
+
     @FXML
     private void handleCreateConversation() {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -1298,22 +1286,18 @@ public class ChatController {
 
         addBtn.setOnAction(e -> {
             String email = emailField.getText().trim();
-
             if (email.isBlank()) {
                 showError("Please enter an email address.");
                 return;
             }
-
             if (email.equals(currentUserEmail)) {
                 showError("You cannot add yourself to the conversation.");
                 return;
             }
-
             if (participantsList.getItems().contains(email)) {
                 showError("This participant is already added.");
                 return;
             }
-
             participantsList.getItems().add(email);
             emailField.clear();
         });
@@ -1324,15 +1308,10 @@ public class ChatController {
         content.setPadding(new Insets(20));
         content.getStyleClass().add("dialog-content");
         content.getChildren().addAll(
-                createStyledLabel("Conversation Name:"),
-                nameField,
-                createStyledLabel("Conversation Type:"),
-                typeChoice,
-                createStyledLabel("Add Participants by Email:"),
-                emailField,
-                addBtn,
-                createStyledLabel("Participants:"),
-                participantsList
+                createStyledLabel("Conversation Name:"), nameField,
+                createStyledLabel("Conversation Type:"), typeChoice,
+                createStyledLabel("Add Participants by Email:"), emailField, addBtn,
+                createStyledLabel("Participants:"), participantsList
         );
 
         dialog.getDialogPane().setContent(content);
@@ -1373,15 +1352,12 @@ public class ChatController {
 
             try {
                 List<String> validatedUserIds = new ArrayList<>();
-
                 for (String email : participantsList.getItems()) {
                     String userId = conversationUserRepo.findUserIdByEmail(email);
-
                     if (userId == null) {
                         showError("User not found with email: " + email);
                         return;
                     }
-
                     validatedUserIds.add(userId);
                 }
 
@@ -1398,14 +1374,12 @@ public class ChatController {
                 }
 
                 conversationUserRepo.addUserToConversation(conversationId, currentUser, "CREATOR", currentUser);
-
                 for (String userId : validatedUserIds) {
                     conversationUserRepo.addUserToConversation(conversationId, userId, "MEMBER", currentUser);
                 }
 
                 loadConversations();
                 showInfo("Conversation created successfully!");
-
             } catch (Exception ex) {
                 showError("Failed to create conversation: " + ex.getMessage());
                 ex.printStackTrace();
@@ -1413,18 +1387,12 @@ public class ChatController {
         });
     }
 
-    /**
-     * Creates a styled label for dialog sections.
-     */
     private Label createStyledLabel(String text) {
         Label label = new Label(text);
         label.getStyleClass().add("dialog-label");
         return label;
     }
 
-    /**
-     * Handles updating the selected conversation's name.
-     */
     @FXML
     private void handleUpdateConversation() {
         if (selectedConversation == null) {
@@ -1452,31 +1420,13 @@ public class ChatController {
         try {
             conversationRepo.updateName(selectedConversation.getId(), newName);
             loadConversations();
-
-            if (conversationTitleLabel != null) {
-                conversationTitleLabel.setText(newName);
-            }
-
+            if (conversationTitleLabel != null) conversationTitleLabel.setText(newName);
             showInfo("Conversation updated successfully!");
         } catch (SQLException e) {
             showError("Failed to update conversation: " + e.getMessage());
         }
     }
 
-    private void loadArchivedConversations() {
-        try {
-            archivedConversations.setAll(conversationRepo.findArchivedByUser(Session.getCurrentUserId()));
-            archivedConversationList.setItems(archivedConversations);
-            archivedConversationList.setCellFactory(list -> new ArchivedConversationCell());
-        } catch (SQLException e) {
-            showError("Failed to load archived conversations: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles deleting the selected conversation.
-     * Only the creator can delete a conversation.
-     */
     @FXML
     private void handleDeleteConversation() {
         if (selectedConversation == null) {
@@ -1485,9 +1435,7 @@ public class ChatController {
         }
 
         try {
-            boolean isCreator = conversationRepo.isUserCreator(selectedConversation.getId(),
-                    Session.getCurrentUserId());
-
+            boolean isCreator = conversationRepo.isUserCreator(selectedConversation.getId(), Session.getCurrentUserId());
             if (!isCreator) {
                 showError("Only the conversation creator can delete it.");
                 return;
@@ -1509,16 +1457,9 @@ public class ChatController {
                         messageList.getItems().clear();
 
                         selectedConversation = null;
-                        if (conversationTitleLabel != null) {
-                            conversationTitleLabel.setText("Select a conversation");
-                        }
-
-                        if (deleteConversationBtn != null) {
-                            deleteConversationBtn.setVisible(false);
-                        }
-                        if (updateConversationBtn != null) {
-                            updateConversationBtn.setVisible(false);
-                        }
+                        if (conversationTitleLabel != null) conversationTitleLabel.setText("Select a conversation");
+                        if (deleteConversationBtn != null) deleteConversationBtn.setVisible(false);
+                        if (updateConversationBtn != null) updateConversationBtn.setVisible(false);
 
                         showInfo("Conversation deleted successfully!");
                     } catch (SQLException e) {
@@ -1531,32 +1472,6 @@ public class ChatController {
         }
     }
 
-    /**
-     * Toggles between light and dark theme.
-     */
-    @FXML
-    private void toggleTheme() {
-        Scene scene = themeBtn.getScene();
-        scene.getStylesheets().clear();
-
-        if (darkMode) {
-            scene.getStylesheets().add(
-                    getClass().getResource("/com/example/pi_dev/messagingchat.css").toExternalForm()
-            );
-            themeBtn.setText("🌙");
-        } else {
-            scene.getStylesheets().add(
-                    getClass().getResource("/com/example/pi_dev/messagingchat-dark.css").toExternalForm()
-            );
-            themeBtn.setText("☀️");
-        }
-
-        darkMode = !darkMode;
-    }
-
-    /**
-     * Opens the participant management dialog for the selected conversation.
-     */
     @FXML
     private void handleManageParticipants() {
         if (selectedConversation == null) {
@@ -1574,33 +1489,37 @@ public class ChatController {
         }
     }
 
-    /**
-     * Displays an error alert dialog.
-     */
+    @FXML
+    private void toggleTheme() {
+        Scene scene = themeBtn.getScene();
+        scene.getStylesheets().clear();
+
+        if (darkMode) {
+            scene.getStylesheets().add(getClass().getResource("/com/example/pi_dev/messagingchat.css").toExternalForm());
+            themeBtn.setText("🌙");
+        } else {
+            scene.getStylesheets().add(getClass().getResource("/com/example/pi_dev/messagingchat-dark.css").toExternalForm());
+            themeBtn.setText("☀️");
+        }
+
+        darkMode = !darkMode;
+    }
+
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText("An error occurred");
         alert.setContentText(msg);
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStyleClass().add("dialog-pane");
-
+        alert.getDialogPane().getStyleClass().add("dialog-pane");
         alert.showAndWait();
     }
 
-    /**
-     * Displays an information alert dialog.
-     */
     private void showInfo(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");
         alert.setHeaderText(null);
         alert.setContentText(msg);
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStyleClass().add("dialog-pane");
-
+        alert.getDialogPane().getStyleClass().add("dialog-pane");
         alert.showAndWait();
     }
 }

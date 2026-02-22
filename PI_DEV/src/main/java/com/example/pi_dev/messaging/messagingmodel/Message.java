@@ -138,7 +138,7 @@ public class Message {
     }
 
     public boolean isText() {
-        return "TEXT".equals(messageType);
+        return "TEXT".equals(messageType) || messageType == null;
     }
 
     public String getSenderName() {
