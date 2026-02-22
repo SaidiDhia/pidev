@@ -8,6 +8,7 @@ public class Activite {
     private String titre;
     private String description;
     private String typeActivite;
+    private CategorieActivite categorie;
     private String image;
     private Timestamp dateCreation;
     private Timestamp dateModification;
@@ -44,6 +45,14 @@ public class Activite {
         this.typeActivite = typeActivite;
     }
 
+    public CategorieActivite getCategorie() {
+        return categorie;
+    }
+
+    public void setCategorie(CategorieActivite categorie) {
+        this.categorie = categorie;
+    }
+
     public String getImage() {
         return image;
     }
@@ -71,14 +80,24 @@ public class Activite {
     public Activite() {
     }
 
-    public Activite(int id, String titre, String description, String typeActivite, String image, Timestamp dateCreation, Timestamp dateModification) {
+    public Activite(int id, String titre, String description, String typeActivite, CategorieActivite categorie, String image, Timestamp dateCreation, Timestamp dateModification) {
         this.id = id;
         this.titre = titre;
         this.description = description;
         this.typeActivite = typeActivite;
+        this.categorie = categorie;
         this.image = image;
         this.dateCreation = dateCreation;
         this.dateModification = dateModification;
+    }
+
+    public Activite(int id, String titre, String typeActivite, CategorieActivite categorie, String description, String image) {
+        this.id = id;
+        this.titre = titre;
+        this.typeActivite = typeActivite;
+        this.categorie = categorie;
+        this.description = description;
+        this.image = image;
     }
 
     @Override

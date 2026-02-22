@@ -6,7 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -30,8 +30,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 import Entities.Event;
+import Entities.Activite;
 
 public class catalogueController {
 
@@ -165,17 +167,23 @@ public class catalogueController {
     }
     
     private void displayActivites() {
+        System.out.println("Affichage des activités - Nombre dans la liste: " + activitesList.size());
         flowActivites.getChildren().clear();
         for (Activite activite : activitesList) {
+            System.out.println("Ajout de la carte pour: " + activite.getTitre());
             addActiviteCard(activite);
         }
+        System.out.println("Nombre de cartes dans le FlowPane: " + flowActivites.getChildren().size());
     }
     
     private void displayEvents() {
+        System.out.println("Affichage des événements - Nombre dans la liste: " + eventsList.size());
         flowEvents.getChildren().clear();
         for (Event event : eventsList) {
+            System.out.println("Ajout de la carte pour l'événement: " + event.getOrganisateur());
             addEventCard(event);
         }
+        System.out.println("Nombre de cartes d'événements dans le FlowPane: " + flowEvents.getChildren().size());
     }
 
     private void initializeDatabase() {
@@ -190,19 +198,42 @@ public class catalogueController {
     private void loadActivites() {
         activitesList = new ArrayList<>();
         try {
+            System.out.println("Chargement des activités depuis la base de données...");
             Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT id, titre, description, image FROM activites");
-            while (rs.next()) {
-                Activite activite = new Activite(
-                    rs.getInt("id"),
-                    rs.getString("titre"),
-                    "Sport", // default type
-                    rs.getString("description"),
-                    rs.getString("image")
-                );
-                activitesList.add(activite);
+            
+            // Essayer d'abord avec typeActivite
+            ResultSet rs = null;
+            try {
+                rs = stmt.executeQuery("SELECT id, titre, description, type_activite, image FROM activites");
+                while (rs.next()) {
+                    Activite activite = new Activite();
+                    activite.setId(rs.getInt("id"));
+                    activite.setTitre(rs.getString("titre"));
+                    activite.setDescription(rs.getString("description"));
+                    activite.setTypeActivite(rs.getString("type_activite"));
+                    activite.setImage(rs.getString("image"));
+                    activitesList.add(activite);
+                    System.out.println("Activité chargée: " + activite.getTitre());
+                }
+            } catch (SQLException e) {
+                // Si type_activite n'existe pas, utiliser la requête sans cette colonne
+                System.out.println("Colonne type_activite non trouvée, utilisation sans type...");
+                rs = stmt.executeQuery("SELECT id, titre, description, image FROM activites");
+                while (rs.next()) {
+                    Activite activite = new Activite();
+                    activite.setId(rs.getInt("id"));
+                    activite.setTitre(rs.getString("titre"));
+                    activite.setDescription(rs.getString("description"));
+                    activite.setTypeActivite(null); // Pas de type par défaut
+                    activite.setImage(rs.getString("image"));
+                    activitesList.add(activite);
+                    System.out.println("Activité chargée: " + activite.getTitre());
+                }
             }
+            
+            System.out.println("Total activités chargées: " + activitesList.size());
         } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des activités: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -210,6 +241,7 @@ public class catalogueController {
     private void loadEvents() {
         eventsList = new ArrayList<>();
         try {
+            System.out.println("Chargement des événements depuis la base de données...");
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM events");
             while (rs.next()) {
@@ -225,14 +257,16 @@ public class catalogueController {
                 event.setPlacesDisponibles(rs.getInt("places_disponibles"));
                 event.setOrganisateur(rs.getString("organisateur"));
                 event.setMaterielsNecessaires(rs.getString("materiels_necessaires"));
-                event.setImage(rs.getString("image"));
                 event.setStatut(Event.StatutEvent.valueOf(rs.getString("statut")));
                 event.setDateCreation(rs.getTimestamp("date_creation"));
                 event.setDateModification(rs.getTimestamp("date_modification"));
                 
                 eventsList.add(event);
+                System.out.println("Événement chargé: " + event.getOrganisateur());
             }
+            System.out.println("Total événements chargés: " + eventsList.size());
         } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des événements: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -265,14 +299,14 @@ public class catalogueController {
         
         for (Activite activite : activitesList) {
             if (activite.getTitre().toLowerCase().contains(searchText) ||
-                activite.getType().toLowerCase().contains(searchText) ||
+                activite.getTypeActivite().toLowerCase().contains(searchText) ||
                 activite.getDescription().toLowerCase().contains(searchText)) {
                 addActiviteCard(activite);
             }
         }
         
         for (Event eventItem : eventsList) {
-            if (eventItem.getTitre().toLowerCase().contains(searchText)) {
+            if (eventItem.getOrganisateur().toLowerCase().contains(searchText)) {
                 addEventCard(eventItem);
             }
         }
@@ -367,11 +401,8 @@ public class catalogueController {
             Parent root = loader.load();
             
             // Récupérer le contrôleur et passer les données
-            Object controller = loader.getController();
-            if (controller instanceof modifierActiviteController) {
-                modifierActiviteController modifController = (modifierActiviteController) controller;
-                modifController.setActiviteId(activite.getId());
-            }
+            modifierActiviteController controller = loader.getController();
+            controller.setActiviteData(activite);
             
             Stage stage = new Stage();
             stage.setTitle("Modifier/Supprimer Activité: " + activite.getTitre());
@@ -468,8 +499,8 @@ public class catalogueController {
         
         // Charger l'image depuis le chemin
         try {
-            if (activite.getImagePath() != null && !activite.getImagePath().isEmpty() && !activite.getImagePath().equals("default.jpg")) {
-                File imageFile = new File(activite.getImagePath());
+            if (activite.getImage() != null && !activite.getImage().isEmpty() && !activite.getImage().equals("default.jpg")) {
+                File imageFile = new File(activite.getImage());
                 if (imageFile.exists()) {
                     Image image = new Image(imageFile.toURI().toString());
                     imageView.setImage(image);
@@ -488,7 +519,7 @@ public class catalogueController {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Erreur lors du chargement de l'image: " + activite.getImagePath());
+            System.err.println("Erreur lors du chargement de l'image: " + activite.getImage());
             // Image par défaut en cas d'erreur
             imageView.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #ddd;");
         }
@@ -498,8 +529,12 @@ public class catalogueController {
         titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1a5f3f;");
         titleLabel.setWrapText(true);
         
-        Label typeLabel = new Label("Type: " + activite.getType());
-        typeLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+        // Ajouter le type seulement s'il existe
+        if (activite.getTypeActivite() != null && !activite.getTypeActivite().isEmpty()) {
+            Label typeLabel = new Label("Type: " + activite.getTypeActivite());
+            typeLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+            card.getChildren().add(typeLabel);
+        }
         
         Label descLabel = new Label(activite.getDescription());
         descLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #555;");
@@ -521,7 +556,7 @@ public class catalogueController {
         buttonBox.getChildren().addAll(modifierButton, supprimerButton);
         
         // Ajouter tous les éléments à la carte
-        card.getChildren().addAll(imageView, titleLabel, typeLabel, descLabel, buttonBox);
+        card.getChildren().addAll(imageView, titleLabel, descLabel, buttonBox);
         
         // Ajouter le gestionnaire de clic pour ouvrir les détails
         card.setOnMouseClicked(e -> ouvrirDetailsActivite(activite));
@@ -556,82 +591,132 @@ public class catalogueController {
     }
     
     private void addEventCard(Event event) {
-        VBox card = new VBox();
-        card.setSpacing(10);
-        card.setStyle("-fx-border-color: #ccc; -fx-border-width: 1; -fx-padding: 10;");
-        
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(150);
-        imageView.setFitHeight(100);
-        
-        Label titleLabel = new Label(event.getOrganisateur());
-        Label dateDebutLabel = new Label("Début: " + event.getDateDebut());
-        Label dateFinLabel = new Label("Fin: " + event.getDateFin());
-        Label prixLabel = new Label("Prix: " + event.getPrix() + " €");
-        Label capaciteLabel = new Label("Capacité: " + event.getCapaciteMax());
-        Label placesLabel = new Label("Places: " + event.getPlacesDisponibles());
-        
-        card.getChildren().addAll(imageView, titleLabel, dateDebutLabel, dateFinLabel, prixLabel, capaciteLabel, placesLabel);
-        flowEvents.getChildren().add(card);
+        try {
+            System.out.println("Création de la carte pour l'événement: " + event.getOrganisateur());
+            
+            VBox card = new VBox();
+            card.setSpacing(10);
+            card.setStyle("-fx-border-color: #ccc; -fx-border-width: 1; -fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10; -fx-cursor: hand;");
+            
+            // Afficher seulement les infos essentielles sans image
+            Label titleLabel = new Label(event.getOrganisateur());
+            titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a5f3f;");
+            
+            Label lieuLabel = new Label("📍 " + event.getLieu());
+            lieuLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #666;");
+            
+            Label dateDebutLabel = new Label("📅 Début: " + 
+                (event.getDateDebut() != null ? event.getDateDebut().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy ")) : "Non défini"));
+            dateDebutLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #333;");
+            
+            Label dateFinLabel = new Label("📅 Fin: " + 
+                (event.getDateFin() != null ? event.getDateFin().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy ")) : "Non défini"));
+            dateFinLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #333;");
+            
+            Label prixLabel = new Label("💰 Prix: " + (event.getPrix() != null ? event.getPrix() + " TND" : "0 TND"));
+            prixLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d7a2d;");
+            
+            Label capaciteLabel = new Label("👥 Capacité: " + event.getCapaciteMax());
+            capaciteLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+            
+            Label placesLabel = new Label("🎫 Places: " + event.getPlacesDisponibles());
+            placesLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+            
+            // Ajouter les détails si disponibles
+            if (event.getMaterielsNecessaires() != null && !event.getMaterielsNecessaires().trim().isEmpty()) {
+                Label descLabel = new Label("📝 " + event.getMaterielsNecessaires());
+                descLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #555; -fx-wrap-text: true;");
+                descLabel.setMaxWidth(200);
+                card.getChildren().add(descLabel);
+            }
+            
+            // Boutons d'action
+            HBox buttonBox = new HBox(5);
+            buttonBox.setAlignment(javafx.geometry.Pos.CENTER);
+            
+            Button modifierButton = new Button("✏️ Modifier");
+            modifierButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 16; -fx-font-size: 12px; -fx-cursor: hand;");
+            modifierButton.setOnAction(e -> {
+                System.out.println("Clic sur bouton modifier pour: " + event.getOrganisateur());
+                ouvrirModificationEvent(event);
+            });
+            
+            buttonBox.getChildren().add(modifierButton);
+            
+            card.getChildren().addAll(titleLabel, lieuLabel, dateDebutLabel, dateFinLabel, prixLabel, capaciteLabel, placesLabel, buttonBox);
+            
+            // Ajouter le gestionnaire de clic pour ouvrir la réservation
+            card.setOnMouseClicked(e -> {
+                System.out.println("Clic sur la carte pour: " + event.getOrganisateur());
+                ouvrirReservation(event);
+            });
+            
+            flowEvents.getChildren().add(card);
+            System.out.println("Carte ajoutée avec succès pour: " + event.getOrganisateur());
+            
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la création de la carte pour l'événement: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
+    private void ouvrirReservation(Event event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Reservation.fxml"));
+            Parent root = loader.load();
+            
+            // Récupérer le contrôleur et passer les données de l'événement
+            ReservationController controller = loader.getController();
+            controller.loadEvent(event.getId());
+            
+            Stage stage = new Stage();
+            stage.setTitle("Réservation: " + event.getOrganisateur());
+            stage.setScene(new Scene(root));
+            stage.setWidth(900);
+            stage.setHeight(700);
+            stage.setMinWidth(800);
+            stage.setMinHeight(600);
+            stage.centerOnScreen();
+            stage.show();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Erreur lors de l'ouverture de l'interface de réservation");
+        }
+    }
+    
+    private void ouvrirModificationEvent(Event event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/modifierEvent.fxml"));
+            Parent root = loader.load();
+            
+            // Récupérer le contrôleur et passer les données
+            modifierEventController controller = loader.getController();
+            controller.setEventData(event);
+            
+            Stage stage = new Stage();
+            stage.setTitle("Modifier l'événement: " + event.getOrganisateur());
+            stage.setScene(new Scene(root));
+            stage.setWidth(900);
+            stage.setHeight(700);
+            stage.setMinWidth(800);
+            stage.setMinHeight(600);
+            stage.centerOnScreen();
+            stage.show();
+            
+            // Rafraîchir quand la fenêtre se ferme
+            stage.setOnHidden(e -> refreshData());
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Erreur lors de l'ouverture de l'interface de modification");
+        }
+    }
+    
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
         alert.showAndWait();
     }
     
-    public static class Activite {
-        private int id;
-        private String titre;
-        private String type;
-        private String description;
-        private String imagePath;
-        
-        public Activite(int id, String titre, String type, String description, String imagePath) {
-            this.id = id;
-            this.titre = titre;
-            this.type = type;
-            this.description = description;
-            this.imagePath = imagePath;
-        }
-        
-        public int getId() { return id; }
-        public String getTitre() { return titre; }
-        public String getType() { return type; }
-        public String getDescription() { return description; }
-        public String getImagePath() { return imagePath; }
-    }
-    
-    public static class Event {
-        private int id;
-        private String titre;
-        private String imagePath;
-        private Date dateDebut;
-        private Date dateFin;
-        private double prix;
-        private int capaciteMax;
-        private int placesDisponibles;
-        
-        public Event(int id, String titre, String imagePath, Date dateDebut, Date dateFin, double prix, int capaciteMax, int placesDisponibles) {
-            this.id = id;
-            this.titre = titre;
-            this.imagePath = imagePath;
-            this.dateDebut = dateDebut;
-            this.dateFin = dateFin;
-            this.prix = prix;
-            this.capaciteMax = capaciteMax;
-            this.placesDisponibles = placesDisponibles;
-        }
-        
-        public int getId() { return id; }
-        public String getTitre() { return titre; }
-        public String getImagePath() { return imagePath; }
-        public Date getDateDebut() { return dateDebut; }
-        public Date getDateFin() { return dateFin; }
-        public double getPrix() { return prix; }
-        public int getCapaciteMax() { return capaciteMax; }
-        public int getPlacesDisponibles() { return placesDisponibles; }
-    }
-
 }

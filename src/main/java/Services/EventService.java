@@ -63,7 +63,7 @@ public class EventService {
 
         ps.executeUpdate();
     }
-    // ================= DELETE PAR ID =================
+    //  DELETE PAR ID
     public void supprimer(int idEvent) throws SQLException {
         String sql = "DELETE FROM events WHERE id = ?";
 
@@ -73,7 +73,7 @@ public class EventService {
         ps.executeUpdate();
     }
 
-    // ================= DELETE PAR ACTIVITE =================
+    //  DELETE PAR ACTIVITE
     public void supprimerParActivite(int idActivite) throws SQLException {
         String sql = "DELETE FROM events WHERE id_activite = ?";
 

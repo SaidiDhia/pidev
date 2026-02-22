@@ -34,15 +34,27 @@ public class ActiviteCardController {
         
         // Utiliser reflection pour accéder aux méthodes de l'activité
         try {
-            // Récupérer les données via reflection
+            // Récupérer les données via reflection avec les bonnes méthodes
             String titre = (String) activite.getClass().getMethod("getTitre").invoke(activite);
-            String type = (String) activite.getClass().getMethod("getType").invoke(activite);
+            String type = (String) activite.getClass().getMethod("getTypeActivite").invoke(activite);
             String description = (String) activite.getClass().getMethod("getDescription").invoke(activite);
-            String imagePath = (String) activite.getClass().getMethod("getImagePath").invoke(activite);
+            String imagePath = (String) activite.getClass().getMethod("getImage").invoke(activite);
+            
+            System.out.println("DEBUG ActiviteCard - Titre: " + titre);
+            System.out.println("DEBUG ActiviteCard - Type: " + type);
+            System.out.println("DEBUG ActiviteCard - Description: " + description);
+            System.out.println("DEBUG ActiviteCard - Image: " + imagePath);
             
             // Remplir les champs avec les données de l'activité
             titreLabel.setText(titre);
-            typeLabel.setText(type);
+            
+            // Gérer le type (peut être null)
+            if (type != null && !type.isEmpty()) {
+                typeLabel.setText(type);
+            } else {
+                typeLabel.setText("Non spécifié");
+            }
+            
             descriptionLabel.setText(description);
             
             // Charger l'image
@@ -86,22 +98,10 @@ public class ActiviteCardController {
         }
     }
 
+    //stage li tji fi woset scene w fi woset  e scene li fih fxml fih l affichage
     @FXML
     void goToCatalogue(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Catalogue.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Catalogue");
-            stage.setWidth(1200);
-            stage.setHeight(800);
-            stage.centerOnScreen();
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Erreur lors du chargement du catalogue");
-        }
+        fermerFenetre();
     }
 
     @FXML
@@ -153,6 +153,11 @@ public class ActiviteCardController {
             e.printStackTrace();
             showAlert("Erreur lors de l'ouverture de l'interface de réservation");
         }
+    }
+
+    private void fermerFenetre() {
+        Stage stage = (Stage) titreLabel.getScene().getWindow();
+        stage.close();
     }
 
     private void showAlert(String message) {

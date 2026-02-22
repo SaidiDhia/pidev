@@ -1,5 +1,7 @@
 package Controllers;
 
+import Entities.CategorieActivite;
+import Entities.TypeActivite;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -9,12 +11,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 public class AjoutActiviteController {
 
     @FXML private TextField titreField;
     @FXML private TextArea descriptionArea;
-    @FXML private TextField typeactField;
+    @FXML private ComboBox<CategorieActivite> categorieCombo;
+    @FXML private ComboBox<TypeActivite> typeactField;
     @FXML private TextField imageField1;
     @FXML private Button ajouterButton;
     @FXML private Button annulerButton;
@@ -23,6 +27,8 @@ public class AjoutActiviteController {
 
     public void initialize() {
         initializeDatabase();
+        initializeCategories();
+        initializeTypes();
     }
 
     private void initializeDatabase() {
@@ -34,11 +40,30 @@ public class AjoutActiviteController {
         }
     }
 
+    private void initializeCategories() {
+        categorieCombo.getItems().addAll(CategorieActivite.values());
+        categorieCombo.setOnAction(e -> updateTypes());
+    }
+
+    private void updateTypes() {
+        CategorieActivite selectedCategorie = categorieCombo.getValue();
+        if (selectedCategorie != null) {
+            typeactField.getItems().clear();
+            typeactField.getItems().addAll(TypeActivite.getTypesByCategorie(selectedCategorie));
+        }
+    }
+
+    private void initializeTypes() {
+        // Initialiser avec une liste vide
+        typeactField.setPromptText("Veuillez d'abord sélectionner une catégorie");
+    }
+
     @FXML
     void ajouter(ActionEvent event) {
         String titre = titreField.getText().trim();
         String description = descriptionArea.getText().trim();
-        String type = typeactField.getText().trim();
+        TypeActivite type = typeactField.getValue();
+        CategorieActivite categorie = categorieCombo.getValue();
         String imagePath = imageField1.getText().trim();
 
         // Validation des champs
@@ -66,24 +91,26 @@ public class AjoutActiviteController {
             return;
         }
         
-        if (type.isEmpty()) {
-            showAlert("Le type est obligatoire");
-            typeactField.requestFocus();
+        if (categorie == null) {
+            showAlert("La catégorie est obligatoire");
+            categorieCombo.requestFocus();
             return;
         }
         
-        if (!type.matches("^[A-Za-zÀ-ÿ\\s]{2,30}$")) {
-            showAlert("Le type doit contenir uniquement des lettres (2-30 caractères)");
+        if (type == null) {
+            showAlert("Le type d'activité est obligatoire");
             typeactField.requestFocus();
             return;
         }
 
         try {
-            String sql = "INSERT INTO activites (titre, description, image) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO activites (titre, description, type_activite, categorie, image) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, titre);
             pstmt.setString(2, description);
-            pstmt.setString(3, imagePath.isEmpty() ? "default.jpg" : imagePath);
+            pstmt.setString(3, type.getNom());
+            pstmt.setString(4, categorie.name());
+            pstmt.setString(5, imagePath.isEmpty() ? "default.jpg" : imagePath);
             pstmt.executeUpdate();
 
             showAlert("Activité ajoutée avec succès");

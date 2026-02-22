@@ -30,7 +30,7 @@ public class ActiviteService {
         ps.executeUpdate();
     }
 
-    // ================= READ =================
+    //  READ
     public List<Activite> afficher() throws SQLException {
 
         List<Activite> list = new ArrayList<>();
@@ -57,7 +57,7 @@ public class ActiviteService {
         return list;
     }
 
-    // ================= UPDATE =================
+    //  UPDATE
     public void modifier(Activite a) throws SQLException {
 
         String sql = "UPDATE activite SET titre=?, description=?, type_activite=?, image=?, date_modification=NOW() WHERE id=?";
@@ -73,7 +73,7 @@ public class ActiviteService {
         ps.executeUpdate();
     }
 
-    // ================= DELETE =================
+    //  DELETE
     public void supprimer(int id) throws SQLException {
 
         String sql = "DELETE FROM activite WHERE id=?";

@@ -12,16 +12,20 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             // Charger le FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Reservation.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Catalogue.fxml"));
             Parent root = loader.load();
 
             // Créer la scène
             Scene scene = new Scene(root);
 
             // Configurer le stage
-            primaryStage.setTitle("Wanderlust - Réservation");
+            primaryStage.setTitle("Wanderlust - Catalogue");
             primaryStage.setScene(scene);
-            primaryStage.setResizable(false);
+            primaryStage.setWidth(1400);
+            primaryStage.setHeight(900);
+            primaryStage.setMinWidth(1200);
+            primaryStage.setMinHeight(700);
+            primaryStage.centerOnScreen();
             primaryStage.show();
 
         } catch (Exception e) {

@@ -13,16 +13,16 @@ public class CatalogueRefreshManager {
         return instance;
     }
     
-    public void requestRefresh() {
+    public synchronized void requestRefresh() {
         refreshRequested = true;
-        notifyAll();
+        // notifyAll() supprimé pour éviter l'erreur de thread
     }
     
-    public boolean isRefreshRequested() {
+    public synchronized boolean isRefreshRequested() {
         return refreshRequested;
     }
     
-    public void resetRefresh() {
+    public synchronized void resetRefresh() {
         refreshRequested = false;
     }
 }

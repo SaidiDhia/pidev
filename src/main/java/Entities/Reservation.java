@@ -70,4 +70,11 @@ public class Reservation {
 
     public Event getEvent() { return event; }
     public void setEvent(Event event) { this.event = event; }
+
+    public Double getPrixUnitaire() {
+        if (event != null && event.getPrix() != null) {
+            return event.getPrix().doubleValue();
+        }
+        return 0.0;
+    }
 }

@@ -17,31 +17,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventController {
+import Entities.Event;
+
+public class modifierEventController {
 
     @FXML
     private ComboBox<String> activiteCombo;
 
     @FXML
-    private Button ajouterEventButton;
+    private Button annulerButton;
 
     @FXML
     private TextField capaciteField;
-
-    @FXML
-    private Button catalogue;
-
-    @FXML
-    private CheckBox check1;
-
-    @FXML
-    private CheckBox check2;
-
-    @FXML
-    private CheckBox check3;
-
-    @FXML
-    private CheckBox check4;
 
     @FXML
     private DatePicker dateDebutPicker;
@@ -53,27 +40,21 @@ public class EventController {
     private TextArea descriptionField;
 
     @FXML
-    private ComboBox<String> difficulteCombo;
-
-    @FXML
-    private TextField emailorgField;
-
-    @FXML
-    private TextArea equipementField;
-
-    @FXML
     private TextField lieuField;
+
+    @FXML
+    private Button modifierEventButton;
 
     @FXML
     private TextField nomorgField;
 
     @FXML
-    private TextField prixField;
+    private Button supprimerEventButton;
 
     @FXML
-    private TextField telephoneorgField;
+    private TextField prixField;
 
-    private Object currentActivite;
+    private Event currentEvent;
     private Connection connection;
     private List<Object> activitesList;
 
@@ -135,84 +116,80 @@ public class EventController {
         }
     }
 
-    public void setActiviteData(Object activite) {
-        this.currentActivite = activite;
-
+    public void setEventData(Event event) {
+        this.currentEvent = event;
+        
         try {
-            String titre = (String) activite.getClass().getMethod("getTitre").invoke(activite);
-            String description = (String) activite.getClass().getMethod("getDescription").invoke(activite);
-
+            // Remplir les champs avec les données de l'événement
             if (nomorgField != null) {
-                nomorgField.setText("Événement: " + titre);
+                nomorgField.setText(event.getOrganisateur());
             }
             if (descriptionField != null) {
-                descriptionField.setText(description);
+                descriptionField.setText(event.getMaterielsNecessaires());
             }
             if (lieuField != null) {
-                lieuField.setText("Lieu à définir");
+                lieuField.setText(event.getLieu());
             }
             if (prixField != null) {
-                prixField.setText("0");
+                prixField.setText(String.valueOf(event.getPrix()));
             }
             if (capaciteField != null) {
-                capaciteField.setText("20");
+                capaciteField.setText(String.valueOf(event.getCapaciteMax()));
             }
-
-            if (activiteCombo != null && titre != null) {
-                activiteCombo.setValue(titre);
+            if (dateDebutPicker != null && event.getDateDebut() != null) {
+                dateDebutPicker.setValue(event.getDateDebut().toLocalDate());
             }
-
+            if (dateFinPicker != null && event.getDateFin() != null) {
+                dateFinPicker.setValue(event.getDateFin().toLocalDate());
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erreur lors de la récupération des données de l'activité");
+            System.err.println("Erreur lors de la récupération des données de l'événement");
         }
     }
 
     @FXML
-    void ajouterEvent(ActionEvent event) {
+    void modifierEvent(ActionEvent event) {
         try {
-            String selectedTitre = activiteCombo.getValue();
             String nomEvent = nomorgField.getText().trim();
             String description = descriptionField.getText().trim();
             String lieu = lieuField.getText().trim();
             String prix = prixField.getText().trim();
             String capacite = capaciteField.getText().trim();
-
-            if (selectedTitre == null || selectedTitre.isEmpty()) {
-                showAlert("Veuillez sélectionner une activité");
-                return;
-            }
-
+            
+            // Contrôle de saisie
             if (nomEvent.isEmpty()) {
                 showAlert("Le nom de l'événement est obligatoire");
                 return;
             }
-
+            
             if (description.isEmpty()) {
                 showAlert("La description est obligatoire");
                 return;
             }
-
+            
             if (lieu.isEmpty()) {
                 showAlert("Le lieu est obligatoire");
                 return;
             }
-
+            
             if (dateDebutPicker.getValue() == null) {
                 showAlert("La date de début est obligatoire");
                 return;
             }
-
+            
             if (dateFinPicker.getValue() == null) {
                 showAlert("La date de fin est obligatoire");
                 return;
             }
-
+            
             if (dateFinPicker.getValue().isBefore(dateDebutPicker.getValue())) {
                 showAlert("La date de fin doit être après la date de début");
                 return;
             }
-
+            
+            // Validation du prix
             double prixValue = 0;
             try {
                 prixValue = Double.parseDouble(prix.isEmpty() ? "0" : prix);
@@ -224,7 +201,8 @@ public class EventController {
                 showAlert("Veuillez entrer un prix valide");
                 return;
             }
-
+            
+            // Validation de la capacité
             int capaciteValue = 20;
             try {
                 capaciteValue = Integer.parseInt(capacite.isEmpty() ? "20" : capacite);
@@ -237,88 +215,94 @@ public class EventController {
                 return;
             }
 
-            Object selectedActivite = null;
-            for (Object activite : activitesList) {
-                try {
-                    Method getTitreMethod = activite.getClass().getMethod("getTitre");
-                    String titre = (String) getTitreMethod.invoke(activite);
-                    if (titre.equals(activiteCombo.getValue())) {
-                        selectedActivite = activite;
-                        break;
-                    }
-                } catch (Exception e) {
-                    continue;
-                }
-            }
-
-            if (selectedActivite == null) {
-                showAlert("Activité non trouvée");
-                return;
-            }
-
-            String sql = "INSERT INTO events (id_activite, organisateur, materiels_necessaires, lieu, prix, capacite_max, places_disponibles, date_debut, date_fin, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            // Mettre à jour l'événement dans la base de données
+            String sql = "UPDATE events SET organisateur = ?, materiels_necessaires = ?, lieu = ?, prix = ?, capacite_max = ?, places_disponibles = ?, date_debut = ?, date_fin = ? WHERE id = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
-
-            int activiteId = (Integer) selectedActivite.getClass().getMethod("getId").invoke(selectedActivite);
-            pstmt.setInt(1, activiteId);
-            pstmt.setString(2, nomEvent);
-            pstmt.setString(3, description);
-            pstmt.setString(4, lieu);
-            pstmt.setDouble(5, prixValue);
+            
+            pstmt.setString(1, nomEvent);
+            pstmt.setString(2, description);
+            pstmt.setString(3, lieu);
+            pstmt.setDouble(4, prixValue);
+            pstmt.setInt(5, capaciteValue);
             pstmt.setInt(6, capaciteValue);
-            pstmt.setInt(7, capaciteValue);
-            pstmt.setDate(8, dateDebutPicker.getValue() != null ? java.sql.Date.valueOf(dateDebutPicker.getValue()) : null);
-            pstmt.setDate(9, dateFinPicker.getValue() != null ? java.sql.Date.valueOf(dateFinPicker.getValue()) : null);
-
-            // Image non nécessaire pour les événements
-            pstmt.setString(10, null);
-
+            pstmt.setDate(7, dateDebutPicker.getValue() != null ? java.sql.Date.valueOf(dateDebutPicker.getValue()) : null);
+            pstmt.setDate(8, dateFinPicker.getValue() != null ? java.sql.Date.valueOf(dateFinPicker.getValue()) : null);
+            
+            // Récupérer l'ID de l'événement actuel
+            int eventId = getCurrentEventId();
+            pstmt.setInt(9, eventId);
+            
             int rowsAffected = pstmt.executeUpdate();
-
+            
             if (rowsAffected > 0) {
-                showAlert("Événement créé avec succès!");
-                clearFields();
-                // Revenir automatiquement au catalogue
+                showAlert("Événement modifié avec succès!");
                 goToCatalogue(event);
             } else {
-                showAlert("Erreur lors de la création de l'événement");
+                showAlert("Erreur lors de la modification de l'événement");
             }
-
+            
         } catch (Exception e) {
-            System.err.println("ERREUR lors de la création de l'événement:");
+            System.err.println("ERREUR lors de la modification de l'événement:");
             e.printStackTrace();
-            showAlert("Erreur lors de la création de l'événement: " + e.getMessage());
+            showAlert("Erreur lors de la modification de l'événement: " + e.getMessage());
         }
     }
 
-    private void clearFields() {
-        nomorgField.clear();
-        descriptionField.clear();
-        lieuField.clear();
-        prixField.clear();
-        capaciteField.clear();
-        dateDebutPicker.setValue(null);
-        dateFinPicker.setValue(null);
-        activiteCombo.setValue(null);
+    @FXML
+    void supprimerEvent(ActionEvent event) {
+        try {
+            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmation.setTitle("Confirmation de suppression");
+            confirmation.setHeaderText("Voulez-vous vraiment supprimer cet événement?");
+            confirmation.setContentText("Cette action est irréversible.");
+            
+            if (confirmation.showAndWait().get() == ButtonType.OK) {
+                // Supprimer l'événement de la base de données
+                String sql = "DELETE FROM events WHERE id = ?";
+                PreparedStatement pstmt = connection.prepareStatement(sql);
+                
+                int eventId = getCurrentEventId();
+                pstmt.setInt(1, eventId);
+                
+                int rowsAffected = pstmt.executeUpdate();
+                
+                if (rowsAffected > 0) {
+                    showAlert("Événement supprimé avec succès!");
+                    goToCatalogue(event);
+                } else {
+                    showAlert("Erreur lors de la suppression de l'événement");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("ERREUR lors de la suppression de l'événement:");
+            e.printStackTrace();
+            showAlert("Erreur lors de la suppression de l'événement: " + e.getMessage());
+        }
     }
 
-    
+    private int getCurrentEventId() {
+        // Cette méthode devrait récupérer l'ID de l'événement actuel
+        // Vous devrez adapter cette logique selon votre structure de données
+        if (currentEvent != null) {
+            try {
+                // Si vous avez un getId() dans votre classe Event
+                Method getIdMethod = currentEvent.getClass().getMethod("getId");
+                return (Integer) getIdMethod.invoke(currentEvent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return 0; // Valeur par défaut à adapter
+    }
+
     @FXML
     void goToCatalogue(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Catalogue.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Catalogue");
-            stage.setWidth(1200);
-            stage.setHeight(800);
-            stage.centerOnScreen();
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Erreur lors du chargement du catalogue");
-        }
+        fermerFenetre();
+    }
+
+    private void fermerFenetre() {
+        Stage stage = (Stage) activiteCombo.getScene().getWindow();
+        stage.close();
     }
 
     private void showAlert(String message) {
