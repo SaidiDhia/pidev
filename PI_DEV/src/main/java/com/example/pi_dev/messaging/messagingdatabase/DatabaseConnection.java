@@ -24,7 +24,7 @@ public class DatabaseConnection {
         return instance;
     }
 
-    // 🔥 THIS IS THE IMPORTANT PART
+    // rakkz lenna THIS IS THE IMPORTANT PART
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }

@@ -5,6 +5,7 @@ import com.example.pi_dev.messaging.messagingmodel.Message;
 import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
 import com.example.pi_dev.messaging.messagingrepository.ConversationUserRepository;
 import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
+import com.example.pi_dev.messaging.messagingrepository.UserRepository;
 import com.example.pi_dev.messaging.messagingsession.Session;
 
 import javafx.fxml.FXML;
@@ -48,12 +49,17 @@ public class ChatController {
     @FXML private Tab contactsTab;                             // Contacts tab
     @FXML private ScrollPane contactsScrollPane;               // Scroll pane for contacts
     @FXML private FlowPane contactsFlow;                       // Flow pane for contact cards
+    @FXML private Tab archivedTab;
+    @FXML private ListView<Conversation> archivedConversationList;
+    @FXML private Button unarchiveAllBtn;
 
+    private ObservableList<Conversation> archivedConversations = FXCollections.observableArrayList();
     // ==================== Repositories (Data Access Layer) ====================
 
     private final ConversationRepository conversationRepo = new ConversationRepository();        // Handles conversation DB operations
     private final MessageRepository messageRepo = new MessageRepository();                      // Handles message DB operations
     private final ConversationUserRepository conversationUserRepo = new ConversationUserRepository(); // Handles conversation-user relationships
+    private final UserRepository userRepo = new UserRepository();
 
     // ==================== State Variables ====================
 
@@ -142,7 +148,7 @@ public class ChatController {
         /**
          * Custom cell factory for conversation list items.
          * Displays conversation name (or ID as fallback) and type with proper styling.
-         * Includes 3-dot menu for rename and delete operations.
+         * Includes 3-dot menu for rename, pin, archive, mute, and manage participants.
          */
         conversationList.setCellFactory(list -> new ListCell<>() {
             @Override
@@ -177,11 +183,71 @@ public class ChatController {
                 Button menuBtn = new Button("⋮");
                 menuBtn.getStyleClass().add("menu-button");
 
-                // Create context menu with edit/delete options
+                // Create context menu with all options (DELETE OPTION REMOVED)
                 ContextMenu menu = new ContextMenu();
                 MenuItem rename = new MenuItem("Rename");
-                MenuItem delete = new MenuItem("Delete");
-                menu.getItems().addAll(rename, delete);
+                MenuItem manageParticipants = new MenuItem("Manage Participants");
+
+                // Add Pin/Unpin option
+                MenuItem pinItem = new MenuItem(c.isPinned() ? "Unpin" : "Pin");
+                pinItem.setOnAction(e -> {
+                    try {
+                        boolean newPinState = !c.isPinned();
+                        conversationRepo.updatePinStatus(c.getId(), Session.getCurrentUserId(), newPinState);
+                        c.setPinned(newPinState);
+                        loadConversations();
+                        showInfo(newPinState ? "Conversation pinned!" : "Conversation unpinned!");
+                    } catch (SQLException ex) {
+                        showError("Failed to update pin status: " + ex.getMessage());
+                    }
+                });
+
+                // Add Archive/Unarchive option
+                MenuItem archiveItem = new MenuItem(c.isArchived() ? "Unarchive" : "Archive");
+                // In the archive menu item:
+                archiveItem.setOnAction(e -> {
+                    try {
+                        boolean newArchiveState = !c.isArchived();
+                        conversationRepo.updateArchiveStatus(c.getId(), Session.getCurrentUserId(), newArchiveState);
+                        c.setArchived(newArchiveState);
+                        loadConversations(); // Refresh main list
+                        if (archivedTab != null) {
+                            loadArchivedConversations(); // Refresh archived list
+                        }
+                        showInfo(newArchiveState ? "Conversation archived!" : "Conversation unarchived!");
+                    } catch (SQLException ex) {
+                        showError("Failed to update archive status: " + ex.getMessage());
+                    }
+                });
+
+
+                // Add Mute/Unmute option
+                MenuItem muteItem = new MenuItem(c.isMuteNotifications() ? "Unmute" : "Mute");
+                muteItem.setOnAction(e -> {
+                    try {
+                        boolean newMuteState = !c.isMuteNotifications();
+                        conversationRepo.updateMuteStatus(c.getId(), Session.getCurrentUserId(), newMuteState);
+                        c.setMuteNotifications(newMuteState);
+                        showInfo(newMuteState ? "Notifications muted!" : "Notifications unmuted!");
+                    } catch (SQLException ex) {
+                        showError("Failed to update mute status: " + ex.getMessage());
+                    }
+                });
+
+                // Add separator for organization
+                SeparatorMenuItem separator = new SeparatorMenuItem();
+
+                // Add items to menu in logical order - WITHOUT DELETE OPTION
+                menu.getItems().addAll(rename, pinItem, archiveItem, muteItem, separator, manageParticipants);
+
+                // Add action for manage participants
+                manageParticipants.setOnAction(e -> {
+                    if (c.getType().equals("GROUP")) {
+                        handleManageParticipants();
+                    } else {
+                        showInfo("Personal conversations don't have participant management.");
+                    }
+                });
 
                 // Show menu when button is clicked
                 menuBtn.setOnAction(e -> menu.show(menuBtn, Side.BOTTOM, 0, 0));
@@ -199,39 +265,11 @@ public class ChatController {
 
                     dialog.showAndWait().ifPresent(newName -> {
                         try {
-                            // Use the repository's updateName method
                             conversationRepo.updateName(c.getId(), newName.trim());
-                            loadConversations();  // Refresh the list
+                            loadConversations();
                             showInfo("Conversation renamed successfully!");
                         } catch (SQLException ex) {
                             showError("Failed to rename: " + ex.getMessage());
-                        }
-                    });
-                });
-
-                // ========== Delete action with confirmation ==========
-                delete.setOnAction(e -> {
-                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-                    confirm.setTitle("Delete Conversation");
-                    confirm.setHeaderText("Are you sure you want to delete this conversation?");
-                    confirm.setContentText("This will delete all messages and cannot be undone.");
-
-                    // Style dialog
-                    DialogPane dialogPane = confirm.getDialogPane();
-                    dialogPane.getStyleClass().add("dialog-pane");
-
-                    confirm.showAndWait().ifPresent(result -> {
-                        if (result == ButtonType.OK) {
-                            try {
-                                // Use the repository's delete method (handles messages & participants)
-                                conversationRepo.delete(c.getId());
-                                loadConversations();  // Refresh list
-                                messageList.getItems().clear();  // Clear message view
-                                selectedConversation = null;  // Clear selection
-                                showInfo("Conversation deleted successfully!");
-                            } catch (SQLException ex) {
-                                showError("Failed to delete: " + ex.getMessage());
-                            }
                         }
                     });
                 });
@@ -268,6 +306,17 @@ public class ChatController {
                 String currentUser = Session.getCurrentUserId();
                 boolean isMine = msg.getSenderId().equals(currentUser);
 
+                // ========== Get sender's full name ==========
+                String senderName = "User " + msg.getSenderId(); // default
+                try {
+                    String fullName = userRepo.getUserFullName(msg.getSenderId());
+                    if (fullName != null && !fullName.isEmpty()) {
+                        senderName = fullName;
+                    }
+                } catch (SQLException e) {
+                    // Ignore, use default
+                }
+
                 // ========== Three-dots menu button for message actions ==========
                 Button menuBtn = new Button("⋮");
                 menuBtn.getStyleClass().add("menu-button");
@@ -281,13 +330,13 @@ public class ChatController {
                 // Show menu when button is clicked
                 menuBtn.setOnAction(e -> menu.show(menuBtn, Side.BOTTOM, 0, 0));
 
-                // Only show menu button for user's own messages (privacy/permission)
+                // Only show menu button for user's own messages
                 menuBtn.setVisible(isMine);
 
                 // ========== Message header with sender info and timestamp ==========
                 Label header = new Label(
-                        "User " + msg.getSenderId() + " • " +
-                                msg.getCreatedAt().toLocalTime().withNano(0)  // Format time without nanoseconds
+                        senderName + " • " +
+                                msg.getCreatedAt().toLocalTime().withNano(0)
                 );
                 header.getStyleClass().add("message-header");
 
@@ -298,16 +347,14 @@ public class ChatController {
                     confirm.setHeaderText("Are you sure?");
                     confirm.setContentText("This action cannot be undone.");
 
-                    // Style dialog
                     DialogPane dialogPane = confirm.getDialogPane();
                     dialogPane.getStyleClass().add("dialog-pane");
 
                     confirm.showAndWait().ifPresent(result -> {
                         if (result == ButtonType.OK) {
                             try {
-                                // Hard delete from database (requires permission)
                                 messageRepo.delete(msg.getId(), currentUser);
-                                loadMessages();  // Refresh message list
+                                loadMessages();
                             } catch (SQLException ex) {
                                 showError(ex.getMessage());
                             }
@@ -322,14 +369,13 @@ public class ChatController {
                     dialog.setHeaderText("Edit your message");
                     dialog.setContentText("New content:");
 
-                    // Style dialog
                     DialogPane dialogPane = dialog.getDialogPane();
                     dialogPane.getStyleClass().add("dialog-pane");
 
                     dialog.showAndWait().ifPresent(newText -> {
                         try {
                             messageRepo.update(msg.getId(), currentUser, newText);
-                            loadMessages();  // Refresh message list
+                            loadMessages();
                         } catch (SQLException ex) {
                             showError(ex.getMessage());
                         }
@@ -338,8 +384,8 @@ public class ChatController {
 
                 // ========== Message content bubble ==========
                 Label content = new Label(msg.getContent());
-                content.setWrapText(true);           // Allow text wrapping
-                content.setMaxWidth(300);             // Limit bubble width for readability
+                content.setWrapText(true);
+                content.setMaxWidth(300);
                 content.getStyleClass().add("message-bubble");
 
                 // Combine header and content in vertical layout
@@ -357,16 +403,14 @@ public class ChatController {
                 HBox messageRow;
 
                 if (isMine) {
-                    // Current user's messages: menu on LEFT, bubble on RIGHT
                     messageRow = new HBox(menuBtn, bubble);
                     messageRow.setAlignment(Pos.CENTER_RIGHT);
                 } else {
-                    // Other users' messages: bubble on LEFT, menu on RIGHT
                     messageRow = new HBox(bubble, menuBtn);
                     messageRow.setAlignment(Pos.CENTER_LEFT);
                 }
 
-                messageRow.setSpacing(6);  // Spacing between bubble and menu
+                messageRow.setSpacing(6);
 
                 // Final container with padding
                 HBox container = new HBox(messageRow);
@@ -387,12 +431,12 @@ public class ChatController {
         // Set up update/delete button actions
         if (updateConversationBtn != null) {
             updateConversationBtn.setOnAction(e -> handleUpdateConversation());
-            updateConversationBtn.setVisible(false);  // Initially hidden
+            updateConversationBtn.setVisible(false);
             updateConversationBtn.getStyleClass().add("button-secondary");
         }
         if (deleteConversationBtn != null) {
             deleteConversationBtn.setOnAction(e -> handleDeleteConversation());
-            deleteConversationBtn.setVisible(false);  // Initially hidden
+            deleteConversationBtn.setVisible(false);
             deleteConversationBtn.getStyleClass().add("button-danger");
         }
 
@@ -405,18 +449,104 @@ public class ChatController {
         if (contactsTab != null) {
             loadContacts();
         }
-    }
+        // Initialize archived tab
+        if (archivedTab != null) {
+            loadArchivedConversations();
 
+            // Set up unarchive all button
+            if (unarchiveAllBtn != null) {
+                unarchiveAllBtn.setOnAction(e -> handleUnarchiveAll());
+            }
+        }
+    }
+    /**
+     * Custom cell factory for archived conversation list.
+     */
+    private class ArchivedConversationCell extends ListCell<Conversation> {
+        @Override
+        protected void updateItem(Conversation c, boolean empty) {
+            super.updateItem(c, empty);
+
+            if (empty || c == null) {
+                setGraphic(null);
+                return;
+            }
+
+            HBox container = new HBox(10);
+            container.setAlignment(Pos.CENTER_LEFT);
+            container.setPadding(new Insets(10));
+            container.setStyle("-fx-background-color: transparent; -fx-border-color: transparent transparent #e0e0e0 transparent;");
+
+            // Archive icon
+            Label archiveIcon = new Label("📦");
+            archiveIcon.setStyle("-fx-font-size: 20px; -fx-text-fill: #6c757d;");
+
+            // Conversation info
+            VBox infoBox = new VBox(3);
+            Label nameLabel = new Label(c.getName() != null ? c.getName() : "Conversation " + c.getId());
+            nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #6c757d;");
+
+            Label typeLabel = new Label(c.getType() + " • Archived");
+            typeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #999;");
+
+            infoBox.getChildren().addAll(nameLabel, typeLabel);
+            HBox.setHgrow(infoBox, Priority.ALWAYS);
+
+            // Unarchive button
+            Button unarchiveBtn = new Button("Unarchive");
+            unarchiveBtn.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 15;");
+            unarchiveBtn.setOnAction(e -> {
+                try {
+                    conversationRepo.updateArchiveStatus(c.getId(), Session.getCurrentUserId(), false);
+                    loadConversations(); // Refresh main list
+                    loadArchivedConversations(); // Refresh archived list
+                    showInfo("Conversation unarchived!");
+                } catch (SQLException ex) {
+                    showError("Failed to unarchive: " + ex.getMessage());
+                }
+            });
+
+            container.getChildren().addAll(archiveIcon, infoBox, unarchiveBtn);
+            setGraphic(container);
+        }
+    }
+    /**
+     * Unarchive all conversations at once.
+     */
+    private void handleUnarchiveAll() {
+        if (archivedConversations.isEmpty()) {
+            showInfo("No archived conversations to unarchive.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Unarchive All");
+        confirm.setHeaderText("Unarchive all conversations?");
+        confirm.setContentText("This will move all archived conversations back to your main list.");
+
+        confirm.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                try {
+                    for (Conversation c : archivedConversations) {
+                        conversationRepo.updateArchiveStatus(c.getId(), Session.getCurrentUserId(), false);
+                    }
+                    loadConversations();
+                    loadArchivedConversations();
+                    showInfo("All conversations unarchived!");
+                } catch (SQLException e) {
+                    showError("Failed to unarchive all: " + e.getMessage());
+                }
+            }
+        });
+    }
     /**
      * Filters conversations based on search text.
      * @param searchText The text to search for
      */
     private void filterConversations(String searchText) {
         if (searchText == null || searchText.isEmpty()) {
-            // Show all conversations
             conversationList.setItems(conversations);
         } else {
-            // Filter conversations
             ObservableList<Conversation> filtered = FXCollections.observableArrayList();
             for (Conversation c : conversations) {
                 if (c.getName() != null && c.getName().toLowerCase().contains(searchText.toLowerCase())) {
@@ -433,8 +563,6 @@ public class ChatController {
      * Loads contacts for the contacts tab.
      */
     private void loadContacts() {
-        // This would typically load from a UserRepository
-        // For now, we'll add sample contacts
         if (contactsFlow != null) {
             contactsFlow.getChildren().clear();
 
@@ -480,9 +608,16 @@ public class ChatController {
         return card;
     }
 
+    private String getCurrentUserEmail() {
+        try {
+            return userRepo.getUserEmail(Session.getCurrentUserId());
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
     /**
      * Loads all conversations for the current user from the database.
-     * Updates the conversationList UI component.
      */
     private void loadConversations() {
         try {
@@ -495,7 +630,6 @@ public class ChatController {
 
     /**
      * Loads all messages for the currently selected conversation.
-     * Auto-scrolls to the latest message.
      */
     private void loadMessages() {
         if (selectedConversation == null) return;
@@ -507,7 +641,6 @@ public class ChatController {
                             Session.getCurrentUserId()
                     )
             );
-            // Auto-scroll to the bottom (latest message)
             if (!messageList.getItems().isEmpty()) {
                 messageList.scrollTo(messageList.getItems().size() - 1);
             }
@@ -518,16 +651,12 @@ public class ChatController {
 
     /**
      * Sends a new message in the current conversation.
-     * Triggered by clicking send button or pressing Enter.
      */
     @FXML
     private void sendMessage() {
-
-        // Validate that a conversation is selected and message is not empty
         if (selectedConversation == null || messageInput.getText().isBlank())
             return;
 
-        // Create new message object
         Message msg = new Message(
                 selectedConversation.getId(),
                 Session.getCurrentUserId(),
@@ -535,74 +664,71 @@ public class ChatController {
         );
 
         try {
-            // Save to database
             messageRepo.create(msg);
-            messageInput.clear();      // Clear input field
-            loadMessages();             // Refresh message list (will auto-scroll)
+            messageInput.clear();
+            loadMessages();
         } catch (SQLException e) {
             showError(e.getMessage());
         }
     }
 
     /**
-     * Handles the creation of a new conversation with proper validation flow:
-     * VALIDATE ALL EMAILS → CREATE → ADD PARTICIPANTS
-     * This prevents partial conversation creation if any email is invalid.
+     * Handles the creation of a new conversation.
      */
     @FXML
     private void handleCreateConversation() {
-
-        // ========== Create and configure the dialog ==========
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Create Conversation");
         dialog.setHeaderText("Start a new conversation");
 
-        // ========== Input fields ==========
-        // Conversation name field
         TextField nameField = new TextField();
         nameField.setPromptText("Conversation name");
         nameField.getStyleClass().add("dialog-field");
 
-        // Conversation type choice (PERSONAL or GROUP)
         ChoiceBox<String> typeChoice = new ChoiceBox<>();
         typeChoice.getItems().addAll("PERSONAL", "GROUP");
         typeChoice.setValue("PERSONAL");
         typeChoice.getStyleClass().add("dialog-field");
 
-        // Email input for adding participants
         TextField emailField = new TextField();
         emailField.setPromptText("Participant email");
         emailField.getStyleClass().add("dialog-field");
 
-        // List to display added participants
         ListView<String> participantsList = new ListView<>();
         participantsList.setPrefHeight(100);
         participantsList.getStyleClass().add("participants-list");
 
-        // Button to add participant by email
         Button addBtn = new Button("Add Participant");
         addBtn.setMaxWidth(Double.MAX_VALUE);
         addBtn.getStyleClass().addAll("button", "button-secondary");
 
-        /**
-         * Add participant action:
-         * - Validates email is not blank
-         * - Checks for duplicates
-         * - Adds to list and clears input field
-         */
+        String currentUserEmail = getCurrentUserEmail();
+
         addBtn.setOnAction(e -> {
             String email = emailField.getText().trim();
-            if (!email.isBlank() && !participantsList.getItems().contains(email)) {
-                participantsList.getItems().add(email);
-                emailField.clear();
+
+            if (email.isBlank()) {
+                showError("Please enter an email address.");
+                return;
             }
+
+            if (email.equals(currentUserEmail)) {
+                showError("You cannot add yourself to the conversation.");
+                return;
+            }
+
+            if (participantsList.getItems().contains(email)) {
+                showError("This participant is already added.");
+                return;
+            }
+
+            participantsList.getItems().add(email);
+            emailField.clear();
         });
 
-        // Allow pressing Enter in email field to add participant
         emailField.setOnAction(e -> addBtn.fire());
 
-        // ========== Layout construction ==========
-        VBox content = new VBox(10);  // 10px spacing between elements
+        VBox content = new VBox(10);
         content.setPadding(new Insets(20));
         content.getStyleClass().add("dialog-content");
         content.getChildren().addAll(
@@ -617,98 +743,75 @@ public class ChatController {
                 participantsList
         );
 
-        // Add content and buttons to dialog
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         dialog.getDialogPane().getStyleClass().add("dialog-pane");
 
-        // ========== Get OK button and add validation ==========
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
         okButton.getStyleClass().add("button");
 
         Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
         cancelButton.getStyleClass().add("button-secondary");
 
-        // ========== Get OK button and add validation ==========
         okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            // Validate before allowing dialog to close
             if (nameField.getText().trim().isEmpty()) {
                 showError("Conversation name cannot be empty.");
-                event.consume();  // Prevent dialog from closing
+                event.consume();
             } else if (participantsList.getItems().isEmpty()) {
                 showError("Please add at least one participant.");
-                event.consume();  // Prevent dialog from closing
+                event.consume();
             }
         });
 
-        // ========== Handle dialog result ==========
         dialog.showAndWait().ifPresent(result -> {
-
-            // Only proceed if OK was clicked
             if (result != ButtonType.OK) return;
 
             String name = nameField.getText().trim();
             String type = typeChoice.getValue();
 
-            // Validate again (in case validation filter was bypassed)
             if (name.isBlank()) {
                 showError("Conversation name cannot be empty.");
                 return;
             }
 
-            /**
-             * Business rule validation:
-             * PERSONAL conversations must have exactly 1 participant (plus current user)
-             * Note: The current user is added automatically, so we check for 1 additional participant
-             */
             if (type.equals("PERSONAL") && participantsList.getItems().size() != 1) {
                 showError("Personal conversation must have exactly 1 participant.");
                 return;
             }
 
             try {
-                // ========== STEP 1: VALIDATE ALL EMAILS FIRST ==========
                 List<String> validatedUserIds = new ArrayList<>();
 
                 for (String email : participantsList.getItems()) {
-                    // Find user ID by email
                     String userId = conversationUserRepo.findUserIdByEmail(email);
 
                     if (userId == null) {
-                        // If ANY email is invalid, STOP completely - no conversation created
                         showError("User not found with email: " + email);
-                        return; // ⛔ STOP - DO NOT CREATE CONVERSATION
+                        return;
                     }
 
                     validatedUserIds.add(userId);
                 }
 
-                // ========== STEP 2: ONLY NOW CREATE CONVERSATION ==========
                 Conversation c = new Conversation();
                 c.setName(name);
                 c.setType(type);
 
-                long conversationId = conversationRepo.create(c);
+                String currentUser = Session.getCurrentUserId();
+                long conversationId = conversationRepo.create(c, currentUser);
 
                 if (conversationId == -1) {
                     showError("Failed to create conversation.");
                     return;
                 }
 
-                // ========== STEP 3: ADD ALL PARTICIPANTS ==========
-                // Add current user first
-                String currentUser = Session.getCurrentUserId();
-                conversationUserRepo.addUserToConversation(conversationId, currentUser);
+                conversationUserRepo.addUserToConversation(conversationId, currentUser, "CREATOR", currentUser);
 
-                // Add all validated participants
                 for (String userId : validatedUserIds) {
-                    conversationUserRepo.addUserToConversation(conversationId, userId);
+                    conversationUserRepo.addUserToConversation(conversationId, userId, "MEMBER", currentUser);
                 }
 
-                // Refresh the conversation list to show the new conversation
                 loadConversations();
-
-                // Show success message
                 showInfo("Conversation created successfully!");
 
             } catch (Exception ex) {
@@ -720,8 +823,6 @@ public class ChatController {
 
     /**
      * Creates a styled label for dialog sections.
-     * @param text The label text
-     * @return A styled Label
      */
     private Label createStyledLabel(String text) {
         Label label = new Label(text);
@@ -731,23 +832,19 @@ public class ChatController {
 
     /**
      * Handles updating the selected conversation's name.
-     * Uses the repository's updateName method.
      */
     @FXML
     private void handleUpdateConversation() {
-        // Check if a conversation is selected
         if (selectedConversation == null) {
             showError("Please select a conversation first.");
             return;
         }
 
-        // Show a dialog to enter new name
         TextInputDialog dialog = new TextInputDialog(selectedConversation.getName());
         dialog.setTitle("Update Conversation");
         dialog.setHeaderText("Rename conversation");
         dialog.setContentText("New name:");
 
-        // Style the dialog
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getStyleClass().add("dialog-pane");
 
@@ -761,11 +858,9 @@ public class ChatController {
         }
 
         try {
-            // Use the repository's updateName method
             conversationRepo.updateName(selectedConversation.getId(), newName);
-            loadConversations();  // Refresh the list
+            loadConversations();
 
-            // Update title label
             if (conversationTitleLabel != null) {
                 conversationTitleLabel.setText(newName);
             }
@@ -775,85 +870,118 @@ public class ChatController {
             showError("Failed to update conversation: " + e.getMessage());
         }
     }
-
+    private void loadArchivedConversations() {
+        try {
+            archivedConversations.setAll(conversationRepo.findArchivedByUser(Session.getCurrentUserId()));
+            archivedConversationList.setItems(archivedConversations);
+            archivedConversationList.setCellFactory(list -> new ArchivedConversationCell());
+        } catch (SQLException e) {
+            showError("Failed to load archived conversations: " + e.getMessage());
+        }
+    }
     /**
      * Handles deleting the selected conversation.
-     * Uses the repository's delete method which handles cascading deletes.
+     * Only the creator can delete a conversation.
      */
     @FXML
     private void handleDeleteConversation() {
-        // Check if a conversation is selected
         if (selectedConversation == null) {
             showError("Please select a conversation first.");
             return;
         }
 
-        // Show confirmation dialog
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Delete Conversation");
-        confirm.setHeaderText("Delete " + selectedConversation.getName() + "?");
-        confirm.setContentText("This will delete all messages and cannot be undone.");
+        try {
+            boolean isCreator = conversationRepo.isUserCreator(selectedConversation.getId(),
+                    Session.getCurrentUserId());
 
-        // Style the dialog
-        DialogPane dialogPane = confirm.getDialogPane();
-        dialogPane.getStyleClass().add("dialog-pane");
-
-        confirm.showAndWait().ifPresent(result -> {
-            if (result == ButtonType.OK) {
-                try {
-                    // Use the repository's delete method
-                    conversationRepo.delete(selectedConversation.getId());
-                    loadConversations();  // Refresh list
-                    messageList.getItems().clear();  // Clear message view
-                    selectedConversation = null;  // Clear selection
-
-                    // Update title label
-                    if (conversationTitleLabel != null) {
-                        conversationTitleLabel.setText("Select a conversation");
-                    }
-
-                    showInfo("Conversation deleted successfully!");
-                } catch (SQLException e) {
-                    showError("Failed to delete conversation: " + e.getMessage());
-                }
+            if (!isCreator) {
+                showError("Only the conversation creator can delete it.");
+                return;
             }
-        });
+
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Delete Conversation");
+            confirm.setHeaderText("Delete \"" + selectedConversation.getName() + "\"?");
+            confirm.setContentText("This will delete all messages and cannot be undone.");
+
+            DialogPane dialogPane = confirm.getDialogPane();
+            dialogPane.getStyleClass().add("dialog-pane");
+
+            confirm.showAndWait().ifPresent(result -> {
+                if (result == ButtonType.OK) {
+                    try {
+                        conversationRepo.delete(selectedConversation.getId());
+                        loadConversations();
+                        messageList.getItems().clear();
+
+                        selectedConversation = null;
+                        if (conversationTitleLabel != null) {
+                            conversationTitleLabel.setText("Select a conversation");
+                        }
+
+                        if (deleteConversationBtn != null) {
+                            deleteConversationBtn.setVisible(false);
+                        }
+                        if (updateConversationBtn != null) {
+                            updateConversationBtn.setVisible(false);
+                        }
+
+                        showInfo("Conversation deleted successfully!");
+                    } catch (SQLException e) {
+                        showError("Failed to delete conversation: " + e.getMessage());
+                    }
+                }
+            });
+        } catch (SQLException e) {
+            showError("Failed to check permissions: " + e.getMessage());
+        }
     }
 
     /**
      * Toggles between light and dark theme.
-     * Switches CSS stylesheets and updates button icon.
      */
     @FXML
     private void toggleTheme() {
-
-        // Get the scene from the theme button
         Scene scene = themeBtn.getScene();
-
-        // Clear existing stylesheets to avoid conflicts
         scene.getStylesheets().clear();
 
         if (darkMode) {
-            // Switch to light mode
             scene.getStylesheets().add(
                     getClass().getResource("/com/example/pi_dev/messagingchat.css").toExternalForm()
             );
-            themeBtn.setText("🌙");  // Moon icon for dark mode (indicates can switch to dark)
+            themeBtn.setText("🌙");
         } else {
-            // Switch to dark mode
             scene.getStylesheets().add(
                     getClass().getResource("/com/example/pi_dev/messagingchat-dark.css").toExternalForm()
             );
-            themeBtn.setText("☀️");  // Sun icon for light mode (indicates can switch to light)
+            themeBtn.setText("☀️");
         }
 
-        // Toggle the state
         darkMode = !darkMode;
     }
 
     /**
+     * Opens the participant management dialog for the selected conversation.
+     */
+    @FXML
+    private void handleManageParticipants() {
+        if (selectedConversation == null) {
+            showError("Please select a conversation first.");
+            return;
+        }
+
+        try {
+            ParticipantManagementDialog dialog = new ParticipantManagementDialog(selectedConversation);
+            dialog.show();
+            loadConversations();
+        } catch (SQLException e) {
+            showError("Failed to load participants: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Displays an error alert dialog.
-     * @param msg The error message to display
      */
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -861,7 +989,6 @@ public class ChatController {
         alert.setHeaderText("An error occurred");
         alert.setContentText(msg);
 
-        // Style the dialog
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStyleClass().add("dialog-pane");
 
@@ -870,7 +997,6 @@ public class ChatController {
 
     /**
      * Displays an information alert dialog.
-     * @param msg The information message to display
      */
     private void showInfo(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -878,7 +1004,6 @@ public class ChatController {
         alert.setHeaderText(null);
         alert.setContentText(msg);
 
-        // Style the dialog
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStyleClass().add("dialog-pane");
 
