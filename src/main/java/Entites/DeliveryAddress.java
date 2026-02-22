@@ -9,6 +9,7 @@ public class DeliveryAddress {
     private String city;
     private String postalCode;
     private String notes;
+    private String email;      // optional — used to send order confirmation email
 
     public DeliveryAddress() {}
 
@@ -46,4 +47,8 @@ public class DeliveryAddress {
 
     public String getNotes()             { return notes != null ? notes : ""; }
     public void   setNotes(String notes) { this.notes = notes; }
+
+    // email is optional — getter returns empty string if null (never NPE)
+    public String getEmail()               { return email != null ? email.trim() : ""; }
+    public void   setEmail(String email)   { this.email = email; }
 }

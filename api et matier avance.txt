@@ -1,0 +1,10 @@
+API:
+
+Stripe API : LivraisonController.java → online payment checkout
+Cloudinary API : CloudinaryConfig.java + ImageUploader.java → image upload
+
+Métiers Avancées:
+
+Email Service (JavaMail/SMTP) : EmailService.java → sends order confirmation emails (cash + online)
+
+PDF Invoice Generation (iText) : FactureDetailsController.java → generates downloadable PDF invoice with table, colors, totals

@@ -93,8 +93,20 @@ public class FactureListController {
         Label dateLabel = new Label("📅 " + sdf.format(facture.getDate()));
         dateLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 13px;");
 
-        Label statusLabel = new Label("✓ Completed");
-        statusLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 12px;");
+        String status = facture.getDeliveryStatus();
+        String statusText;
+        String statusColor;
+
+        switch (status) {
+            case "confirmed" -> { statusText = "✅ Confirmed";  statusColor = "#4CAF50"; }
+            case "cancelled" -> { statusText = "❌ Cancelled";  statusColor = "#F44336"; }
+            default          -> { statusText = "⏳ Pending";    statusColor = "#FF9800"; }
+        }
+
+        Label statusLabel = new Label(statusText);
+        statusLabel.setStyle("-fx-text-fill: " + statusColor + "; -fx-font-weight: bold; -fx-font-size: 12px;");
+        //Label statusLabel = new Label("✓ Completed");
+        //statusLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 12px;");
 
         infoBox.getChildren().addAll(invoiceLabel, dateLabel, statusLabel);
 

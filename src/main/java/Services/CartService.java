@@ -43,6 +43,13 @@ public class CartService {
     }
 
     // ─── Get cart items ───────────────────────────────────────────────────────
+    //
+    // FIX 1: Alias ci.quantity AS cart_qty so it doesn't collide with p.quantity.
+    //         Before this fix, rs.getInt("quantity") at the bottom of the loop
+    //         was reading the PRODUCT's stock count, not the cart item count.
+    //
+    // FIX 2: Load reserved_quantity into the Product object so that
+    //         getAvailableQuantity() returns the correct number everywhere.
 
     public Map<Product, Integer> getCartItems(int userId) {
         Map<Product, Integer> cartItems = new LinkedHashMap<>();
@@ -50,21 +57,39 @@ public class CartService {
             int cartId = getOrCreateCart(userId);
             if (cartId == -1) return cartItems;
 
-            String sql = "SELECT ci.quantity, p.* FROM cart_item ci " +
-                         "JOIN products p ON ci.product_id = p.id WHERE ci.cart_id = ?";
+            // FIX 1: alias ci.quantity to avoid column name collision with p.quantity
+            String sql = "SELECT ci.quantity AS cart_qty, p.* " +
+                         "FROM cart_item ci " +
+                         "JOIN products p ON ci.product_id = p.id " +
+                         "WHERE ci.cart_id = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setInt(1, cartId);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
                 Product product = new Product(
-                    rs.getString("title"), rs.getString("description"),
-                    rs.getString("type"), rs.getFloat("price"),
-                    rs.getInt("quantity"), rs.getString("category"),
-                    rs.getString("image"), rs.getTimestamp("created_date"),
+                    rs.getString("title"),
+                    rs.getString("description"),
+                    rs.getString("type"),
+                    rs.getFloat("price"),
+                    rs.getInt("quantity"),          // product's physical stock
+                    rs.getString("category"),
+                    rs.getString("image"),
+                    rs.getTimestamp("created_date"),
                     rs.getInt("userId")
                 );
                 product.setId(rs.getInt("id"));
-                cartItems.put(product, rs.getInt("quantity"));
+
+                // FIX 2: load reserved_quantity so getAvailableQuantity() is correct
+                try {
+                    product.setReservedQuantity(rs.getInt("reserved_quantity"));
+                } catch (Exception ex) {
+                    // column might not exist in older DB schema — safe to ignore
+                }
+
+                // FIX 1: use the aliased column for cart item quantity
+                int cartQty = rs.getInt("cart_qty");
+                cartItems.put(product, cartQty);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -79,8 +104,8 @@ public class CartService {
             Product product = productService.getProductById(productId);
             if (product == null || quantity < 1) return false;
 
-            // Available = quantity - reserved
-            int available = product.getQuantity() - product.getReservedQuantity();
+            // Available = physical stock - reserved
+            int available = product.getAvailableQuantity();
             if (available < quantity) {
                 System.out.println("Not enough stock. Available: " + available);
                 return false;
@@ -121,8 +146,9 @@ public class CartService {
         try {
             if (newQuantity < 1) return removeFromCart(userId, productId);
             Product product = productService.getProductById(productId);
-            int available = product.getQuantity() - product.getReservedQuantity();
-            if (product == null || newQuantity > available) return false;
+            if (product == null) return false;
+            int available = product.getAvailableQuantity();
+            if (newQuantity > available) return false;
             int cartId = getOrCreateCart(userId);
             PreparedStatement stmt = con.prepareStatement(
                 "UPDATE cart_item SET quantity = ? WHERE cart_id = ? AND product_id = ?");
@@ -159,12 +185,18 @@ public class CartService {
     }
 
     // ─── BUY ONLINE (Stripe confirmed) → deduct stock immediately ────────────
+    //
+    // quantity -= qty   (item physically leaves warehouse right now)
+    // reserved unchanged (online orders never touch reserved)
 
     public boolean buyCartOnline(int userId, DeliveryAddress deliveryAddress) {
         return processPurchase(userId, "online", "confirmed", deliveryAddress);
     }
 
     // ─── BUY CASH → reserve stock, wait for delivery confirmation ────────────
+    //
+    // reserved += qty   (lock the stock — item still in warehouse)
+    // quantity unchanged (item hasn't shipped yet)
 
     public boolean buyCartCash(int userId, DeliveryAddress deliveryAddress) {
         return processPurchase(userId, "cash", "pending", deliveryAddress);
@@ -174,9 +206,9 @@ public class CartService {
 
     private boolean processPurchase(int userId, String paymentMethod,
                                     String deliveryStatus, DeliveryAddress deliveryAddress) {
-        FactureService          factureService  = new FactureService();
-        FactureProductService   fpService       = new FactureProductService();
-        DeliveryAddressService  daService       = new DeliveryAddressService();
+        FactureService         factureService = new FactureService();
+        FactureProductService  fpService      = new FactureProductService();
+        DeliveryAddressService daService      = new DeliveryAddressService();
 
         try {
             con.setAutoCommit(false);
@@ -184,13 +216,15 @@ public class CartService {
             Map<Product, Integer> items = getCartItems(userId);
             if (items.isEmpty()) { con.rollback(); return false; }
 
-            // Re-check available stock
+            // Re-check stock from DB (fresh reads, not stale cart data)
             for (Map.Entry<Product, Integer> entry : items.entrySet()) {
-                Product product  = productService.getProductById(entry.getKey().getId());
-                int     reqQty   = entry.getValue();
-                int     available = product.getQuantity() - product.getReservedQuantity();
-                if (product == null || available < reqQty) {
-                    System.out.println("Stock issue: " + entry.getKey().getTitle());
+                Product fresh = productService.getProductById(entry.getKey().getId());
+                int     reqQty = entry.getValue();
+                if (fresh == null) { con.rollback(); return false; }
+                int available = fresh.getAvailableQuantity();
+                if (available < reqQty) {
+                    System.out.println("Stock issue: " + entry.getKey().getTitle()
+                        + " — need " + reqQty + ", available " + available);
                     con.rollback();
                     return false;
                 }
@@ -216,26 +250,33 @@ public class CartService {
             deliveryAddress.setFactureId(factureId);
             daService.save(deliveryAddress);
 
-            // Update stock + save products
+            // Update stock
             for (Map.Entry<Product, Integer> entry : items.entrySet()) {
                 Product product  = entry.getKey();
                 int     quantity = entry.getValue();
 
                 if ("online".equals(paymentMethod)) {
-                    // Online: deduct stock now
+                    // Online (Stripe): deduct stock immediately — item is sold & will ship
                     PreparedStatement ps = con.prepareStatement(
                         "UPDATE products SET quantity = quantity - ? WHERE id = ?");
-                    ps.setInt(1, quantity); ps.setInt(2, product.getId());
+                    ps.setInt(1, quantity);
+                    ps.setInt(2, product.getId());
                     ps.executeUpdate();
+                    System.out.println("buyOnline: product " + product.getId()
+                        + " qty-=" + quantity);
+
                 } else {
-                    // Cash: reserve stock (don't deduct yet)
+                    // Cash (COD): lock/reserve stock — item stays in warehouse until confirmed
                     PreparedStatement ps = con.prepareStatement(
                         "UPDATE products SET reserved_quantity = reserved_quantity + ? WHERE id = ?");
-                    ps.setInt(1, quantity); ps.setInt(2, product.getId());
+                    ps.setInt(1, quantity);
+                    ps.setInt(2, product.getId());
                     ps.executeUpdate();
+                    System.out.println("buyCash: product " + product.getId()
+                        + " reserved+=" + quantity);
                 }
 
-                // Save facture_product
+                // Save facture_product snapshot
                 FactureProduct fp = new FactureProduct();
                 fp.setFactureId(factureId);
                 fp.setProductId(product.getId());

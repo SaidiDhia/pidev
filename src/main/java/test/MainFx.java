@@ -24,7 +24,7 @@ public class MainFx extends Application {
         mainScene = new Scene(rootPane, 900, 650);
 
         mainStage = primaryStage;
-        mainStage.setTitle("Product Management");
+        mainStage.setTitle("Marketplace App");
         mainStage.setScene(mainScene);
         mainStage.setMinWidth(900);
         mainStage.setMinHeight(650);

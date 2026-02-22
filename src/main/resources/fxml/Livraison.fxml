@@ -37,7 +37,8 @@
                 </VBox>
 
                 <!-- DELIVERY ADDRESS -->
-                <VBox spacing="14" style="-fx-background-color:white;-fx-background-radius:12;-fx-border-color:#E0E0E0;-fx-border-radius:12;-fx-padding:22;-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.07),8,0,0,2);">
+                <VBox spacing="14"
+                      style="-fx-background-color:white;-fx-background-radius:12;-fx-border-color:#E0E0E0;-fx-border-radius:12;-fx-padding:22;-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.07),8,0,0,2);">
                     <HBox spacing="8" alignment="CENTER_LEFT">
                         <Label text="🏠" style="-fx-font-size:18px;"/>
                         <Label text="Delivery Address" style="-fx-font-size:15px;-fx-font-weight:bold;"/>
@@ -104,11 +105,25 @@
                                       prefRowCount="2"
                                       style="-fx-background-radius:8;-fx-border-color:#BDBDBD;-fx-border-radius:8;-fx-padding:10;-fx-font-size:13px;"/>
                         </VBox>
+
+                        <!-- ✉️ Email — NEW FIELD (optional) -->
+                        <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2">
+                            <padding><Insets top="8"/></padding>
+                            <HBox spacing="6" alignment="CENTER_LEFT">
+                                <Label text="✉️  Email Address" style="-fx-font-weight:bold;-fx-font-size:13px;"/>
+                                <Label text="(optional — receive order confirmation)"
+                                       style="-fx-text-fill:#999;-fx-font-size:11px;"/>
+                            </HBox>
+                            <TextField fx:id="emailField" promptText="e.g. you@email.com"
+                                       style="-fx-background-radius:8;-fx-border-color:#BDBDBD;-fx-border-radius:8;-fx-padding:10;-fx-font-size:13px;"/>
+                        </VBox>
+
                     </GridPane>
                 </VBox>
 
                 <!-- PAYMENT METHOD -->
-                <VBox spacing="12" style="-fx-background-color:white;-fx-background-radius:12;-fx-border-color:#E0E0E0;-fx-border-radius:12;-fx-padding:22;-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.07),8,0,0,2);">
+                <VBox spacing="12"
+                      style="-fx-background-color:white;-fx-background-radius:12;-fx-border-color:#E0E0E0;-fx-border-radius:12;-fx-padding:22;-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.07),8,0,0,2);">
                     <HBox spacing="8" alignment="CENTER_LEFT">
                         <Label text="💳" style="-fx-font-size:18px;"/>
                         <Label text="Payment Method" style="-fx-font-size:15px;-fx-font-weight:bold;"/>
@@ -149,9 +164,10 @@
                 <Label fx:id="totalBottomLabel" text="0.000 TND"
                        style="-fx-font-size:24px;-fx-font-weight:bold;-fx-text-fill:#2E7D32;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Continue  →" onAction="#confirmOrder"
+                <Button text="Continue  →" onAction="#confirmOrder" styleClass="button-confirm"
                         style="-fx-background-color:linear-gradient(to right,#00796B,#43A047);-fx-text-fill:white;-fx-background-radius:25;-fx-padding:13 40;-fx-font-size:15px;-fx-font-weight:bold;-fx-cursor:hand;-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.2),8,0,0,3);"/>
             </HBox>
         </VBox>
     </bottom>
+
 </BorderPane>

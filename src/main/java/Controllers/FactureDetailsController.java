@@ -72,8 +72,16 @@ public class FactureDetailsController {
 
         invoiceNumberLabel.setText("Invoice #" + currentFacture.getId());
         invoiceDateLabel.setText("Date: " + sdf.format(currentFacture.getDate()));
-        statusLabel.setText("✓ COMPLETED");
-        paymentLabel.setText("Credit Card");
+        String status = currentFacture.getDeliveryStatus();
+        switch (status) {
+            case "confirmed" -> { statusLabel.setText("✅ Confirmed"); statusLabel.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold;"); }
+            case "cancelled" -> { statusLabel.setText("❌ Cancelled"); statusLabel.setStyle("-fx-text-fill: #F44336; -fx-font-weight: bold;"); }
+            default          -> { statusLabel.setText("⏳ Pending");   statusLabel.setStyle("-fx-text-fill: #FF9800; -fx-font-weight: bold;"); }
+        }
+        //statusLabel.setText("✓ COMPLETED");
+        String method = currentFacture.getPaymentMethod();
+        paymentLabel.setText("cash".equals(method) ? "💵 Cash on Delivery" : "💳 Credit Card");
+        //paymentLabel.setText("Credit Card");
         totalLabel.setText(String.format("%.2f DT", currentFacture.getTotal()));
     }
 
@@ -251,8 +259,17 @@ public class FactureDetailsController {
         // Invoice Info
         document.add(new Paragraph("Invoice Number: #" + currentFacture.getId()).setBold());
         document.add(new Paragraph("Date: " + sdf.format(currentFacture.getDate())));
-        document.add(new Paragraph("Status: COMPLETED").setFontColor(ColorConstants.GREEN));
-        document.add(new Paragraph("Payment Method: Credit Card"));
+        String status = currentFacture.getDeliveryStatus();
+        document.add(new Paragraph("Status: " + status.toUpperCase())
+                .setFontColor("confirmed".equals(status) ? ColorConstants.GREEN
+                        : "cancelled".equals(status) ? ColorConstants.RED
+                        : ColorConstants.ORANGE));
+
+        //document.add(new Paragraph("Status: COMPLETED").setFontColor(ColorConstants.GREEN));
+        String method = currentFacture.getPaymentMethod();
+        String methodLabel = "cash".equals(method) ? "Cash on Delivery" : "Credit Card (Stripe)";
+        document.add(new Paragraph("Payment Method: " + methodLabel));
+        //document.add(new Paragraph("Payment Method: Credit Card"));
         document.add(new Paragraph("\n"));
 
         // Products Table
