@@ -14,6 +14,8 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.geometry.Insets?>
 
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <VBox fx:id="mainContainer" style="-fx-background-color: linear-gradient(to bottom, #f0f8f0, #ffffff); -fx-padding: 0;"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
@@ -143,10 +145,17 @@
                                         <HBox fx:id="messageInputContainer" spacing="10" style="-fx-background-color: #f0f8f0; -fx-background-radius: 30; -fx-padding: 10 15;" alignment="CENTER">
                                             <children>
                                                 <!-- New attachment button -->
-                                                <Button fx:id="attachImageBtn"
-                                                        style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;"
-                                                        text="📎"
-                                                        onAction="#handleAttachImage"/>
+                                                <!-- Replace the attachImageBtn with this MenuButton -->
+                                                <MenuButton fx:id="attachMenuBtn"
+                                                            style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;"
+                                                            text="📎">
+                                                    <items>
+                                                        <MenuItem text="📷 Image" onAction="#handleAttachImage"/>
+                                                        <MenuItem text="🎥 Video" onAction="#handleAttachVideo"/>
+                                                        <MenuItem text="🎵 Audio" onAction="#handleAttachAudio"/>
+                                                        <MenuItem text="📎 File" onAction="#handleAttachFile"/>
+                                                    </items>
+                                                </MenuButton>
 
                                                 <TextField fx:id="messageInput"
                                                            promptText="Type a message or paste image..."

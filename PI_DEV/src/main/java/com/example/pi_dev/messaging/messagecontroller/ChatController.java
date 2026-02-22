@@ -15,21 +15,27 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +73,7 @@ public class ChatController {
 
     private ObservableList<Conversation> archivedConversations = FXCollections.observableArrayList();
     // ==================== Repositories (Data Access Layer) ====================
-
+    @FXML private MenuButton attachMenuBtn;
     private final ConversationRepository conversationRepo = new ConversationRepository();        // Handles conversation DB operations
     private final MessageRepository messageRepo = new MessageRepository();                      // Handles message DB operations
     private final ConversationUserRepository conversationUserRepo = new ConversationUserRepository(); // Handles conversation-user relationships
@@ -305,6 +311,10 @@ public class ChatController {
          * REPLACED: Custom cell factory for message list items with image support.
          * Now displays images, videos, audio, and files properly.
          */
+        /**
+         * REPLACED: Custom cell factory for message list items with image support.
+         * Now displays images, videos, audio, and files properly.
+         */
         messageList.setCellFactory(list -> new ListCell<>() {
 
             @Override
@@ -476,7 +486,7 @@ public class ChatController {
                             imageView.setPreserveRatio(true);
                             imageView.setStyle("-fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);");
 
-                            // Add click handler to enlarge (placeholder for now)
+                            // Add click handler to enlarge
                             imageView.setOnMouseClicked(e -> showFullImage(fileUrl));
 
                             bubble.getChildren().add(imageView);
@@ -508,88 +518,198 @@ public class ChatController {
             }
 
             /**
-             * Display a video message (placeholder for now)
+             * Display a video message with thumbnail/player
+             */
+            /**
+             * Display a video message with thumbnail/player (clickable)
              */
             private void displayVideoMessage(Message msg, VBox bubble) {
-                HBox videoBox = new HBox(8);
-                videoBox.setAlignment(Pos.CENTER_LEFT);
+                try {
+                    String fileUrl = msg.getFileUrl();
+                    if (fileUrl != null) {
+                        File videoFile = new File(fileUrl);
+                        if (videoFile.exists()) {
+                            // Create a video thumbnail (placeholder)
+                            Label videoThumbnail = new Label("🎥");
+                            videoThumbnail.setStyle("-fx-font-size: 48px; -fx-text-fill: #2d7a2d;");
+                            videoThumbnail.setPrefSize(200, 120);
+                            videoThumbnail.setAlignment(Pos.CENTER);
+                            videoThumbnail.setStyle("-fx-background-color: #f0f0f0; -fx-background-radius: 8; -fx-font-size: 48px; -fx-text-fill: #2d7a2d;");
 
-                Label iconLabel = new Label("🎥");
-                iconLabel.setStyle("-fx-font-size: 24px;");
+                            // Add play button overlay
+                            Label playButton = new Label("▶");
+                            playButton.setStyle("-fx-font-size: 24px; -fx-text-fill: white; -fx-background-color: rgba(0,0,0,0.5); -fx-background-radius: 20; -fx-padding: 5 15;");
 
-                VBox infoBox = new VBox(2);
-                Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Video");
-                fileName.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+                            StackPane videoStack = new StackPane(videoThumbnail, playButton);
+                            videoStack.setStyle("-fx-cursor: hand;");
+                            videoStack.setOnMouseClicked(e -> openFile(fileUrl));
 
-                String infoText = "";
-                if (msg.getDuration() != null) {
-                    infoText += msg.getDuration() + "s";
+                            bubble.getChildren().add(videoStack);
+
+                            // Video info
+                            VBox infoBox = new VBox(2);
+                            Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Video");
+                            fileName.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+
+                            String infoText = "";
+                            if (msg.getDuration() != null && msg.getDuration() > 0) {
+                                infoText += formatDuration(msg.getDuration());
+                            }
+                            if (msg.getFileSize() > 0) {
+                                if (!infoText.isEmpty()) infoText += " • ";
+                                infoText += formatFileSize(msg.getFileSize());
+                            }
+                            Label fileInfo = new Label(infoText);
+                            fileInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+
+                            infoBox.getChildren().addAll(fileName, fileInfo);
+                            bubble.getChildren().add(infoBox);
+                        } else {
+                            showErrorPlaceholder(bubble, "Video file not found");
+                        }
+                    }
+                } catch (Exception e) {
+                    showErrorPlaceholder(bubble, "Failed to load video");
                 }
-                if (msg.getFileSize() > 0) {
-                    if (!infoText.isEmpty()) infoText += " • ";
-                    infoText += formatFileSize(msg.getFileSize());
-                }
-                Label fileInfo = new Label(infoText);
-                fileInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
-
-                infoBox.getChildren().addAll(fileName, fileInfo);
-                videoBox.getChildren().addAll(iconLabel, infoBox);
-
-                bubble.getChildren().add(videoBox);
             }
 
             /**
-             * Display an audio message (placeholder for now)
+             * Display an audio message with player controls
+             */
+            /**
+             * Display an audio message with player controls (clickable)
              */
             private void displayAudioMessage(Message msg, VBox bubble) {
-                HBox audioBox = new HBox(8);
-                audioBox.setAlignment(Pos.CENTER_LEFT);
+                try {
+                    String fileUrl = msg.getFileUrl();
+                    if (fileUrl != null) {
+                        File audioFile = new File(fileUrl);
+                        if (audioFile.exists()) {
+                            HBox audioBox = new HBox(10);
+                            audioBox.setAlignment(Pos.CENTER_LEFT);
+                            audioBox.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 20; -fx-padding: 8; -fx-cursor: hand;");
+                            audioBox.setOnMouseClicked(e -> openFile(fileUrl));
 
-                Label iconLabel = new Label("🎵");
-                iconLabel.setStyle("-fx-font-size: 24px;");
+                            // Play button
+                            Label playIcon = new Label("▶");
+                            playIcon.setStyle("-fx-font-size: 20px; -fx-text-fill: #2d7a2d; -fx-min-width: 30;");
 
-                VBox infoBox = new VBox(2);
-                Label title = new Label("Audio Message");
-                title.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+                            // Audio info
+                            VBox infoBox = new VBox(2);
+                            Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Audio");
+                            fileName.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
 
-                String infoText = "";
-                if (msg.getDuration() != null) {
-                    infoText += msg.getDuration() + "s";
+                            String duration = "";
+                            if (msg.getDuration() != null && msg.getDuration() > 0) {
+                                duration = formatDuration(msg.getDuration());
+                            } else {
+                                duration = formatFileSize(msg.getFileSize());
+                            }
+                            Label durationLabel = new Label(duration);
+                            durationLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+
+                            infoBox.getChildren().addAll(fileName, durationLabel);
+
+                            audioBox.getChildren().addAll(playIcon, infoBox);
+                            HBox.setHgrow(infoBox, Priority.ALWAYS);
+
+                            bubble.getChildren().add(audioBox);
+                        } else {
+                            showErrorPlaceholder(bubble, "Audio file not found");
+                        }
+                    }
+                } catch (Exception e) {
+                    showErrorPlaceholder(bubble, "Failed to load audio");
                 }
-                if (msg.getFileSize() > 0) {
-                    if (!infoText.isEmpty()) infoText += " • ";
-                    infoText += formatFileSize(msg.getFileSize());
-                }
-                Label fileInfo = new Label(infoText);
-                fileInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
-
-                infoBox.getChildren().addAll(title, fileInfo);
-                audioBox.getChildren().addAll(iconLabel, infoBox);
-
-                bubble.getChildren().add(audioBox);
             }
 
             /**
-             * Display a file attachment
+             * Play media file (opens with default system player or embedded player)
+             */
+            private void playMedia(String filePath, String type) {
+                try {
+                    File file = new File(filePath);
+                    if (file.exists()) {
+                        // Open with default system application
+                        Desktop.getDesktop().open(file);
+                    } else {
+                        showError("File not found: " + filePath);
+                    }
+                } catch (IOException e) {
+                    showError("Cannot open file: " + e.getMessage());
+                }
+            }
+
+            /**
+             * Format duration in seconds to MM:SS format
+             */
+            private String formatDuration(int seconds) {
+                int minutes = seconds / 60;
+                int secs = seconds % 60;
+                return String.format("%d:%02d", minutes, secs);
+            }
+            /**
+             * Open a file with the default system application
+             */
+            private void openFile(String filePath) {
+                try {
+                    File file = new File(filePath);
+                    if (!file.exists()) {
+                        showError("File not found: " + filePath);
+                        return;
+                    }
+
+                    // Open with default system application
+                    Desktop.getDesktop().open(file);
+
+                } catch (IOException e) {
+                    showError("Cannot open file: " + e.getMessage());
+                }
+            }
+
+            /**
+             * Display a file attachment (clickable)
              */
             private void displayFileMessage(Message msg, VBox bubble) {
                 HBox fileBox = new HBox(8);
                 fileBox.setAlignment(Pos.CENTER_LEFT);
+                fileBox.setStyle("-fx-cursor: hand; -fx-background-color: #f5f5f5; -fx-background-radius: 8; -fx-padding: 8;");
+                fileBox.setOnMouseClicked(e -> openFile(msg.getFileUrl()));
 
                 Label iconLabel = new Label("📎");
-                iconLabel.setStyle("-fx-font-size: 20px;");
+                iconLabel.setStyle("-fx-font-size: 24px;");
 
                 VBox fileInfo = new VBox(2);
                 Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Unknown file");
-                fileName.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333;");
+                fileName.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2d7a2d;");
 
                 Label fileSize = new Label(formatFileSize(msg.getFileSize()));
-                fileSize.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+                fileSize.setStyle("-fx-font-size: 11px; -fx-text-fill: #666;");
 
                 fileInfo.getChildren().addAll(fileName, fileSize);
                 fileBox.getChildren().addAll(iconLabel, fileInfo);
+                HBox.setHgrow(fileInfo, Priority.ALWAYS);
 
                 bubble.getChildren().add(fileBox);
+            }
+            /**
+             * Download/save file to user's chosen location
+             */
+            private void downloadFile(File sourceFile) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save File");
+                fileChooser.setInitialFileName(sourceFile.getName());
+
+                File destination = fileChooser.showSaveDialog(themeBtn.getScene().getWindow());
+
+                if (destination != null) {
+                    try {
+                        Files.copy(sourceFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        showInfo("File downloaded successfully!");
+                    } catch (IOException e) {
+                        showError("Failed to download file: " + e.getMessage());
+                    }
+                }
             }
 
             /**
@@ -614,15 +734,64 @@ public class ChatController {
             /**
              * Show full image (placeholder for now)
              */
+            /**
+             * Show full image in a new window
+             */
             private void showFullImage(String imagePath) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Image Preview");
-                alert.setHeaderText("Full screen image viewer coming soon!");
-                alert.setContentText("Image path: " + imagePath);
-                alert.showAndWait();
+                try {
+                    File imageFile = new File(imagePath);
+                    if (!imageFile.exists()) {
+                        showError("Image file not found");
+                        return;
+                    }
+
+                    // Create a new stage for full-screen image
+                    Stage imageStage = new Stage();
+                    imageStage.setTitle("Image Preview");
+
+                    // Load the image
+                    Image image = new Image(imageFile.toURI().toString());
+                    ImageView imageView = new ImageView(image);
+                    imageView.setPreserveRatio(true);
+                    imageView.setSmooth(true);
+
+                    // Create scroll pane for large images
+                    ScrollPane scrollPane = new ScrollPane();
+                    scrollPane.setContent(imageView);
+                    scrollPane.setPannable(true);
+                    scrollPane.setFitToWidth(true);
+                    scrollPane.setFitToHeight(true);
+                    scrollPane.setStyle("-fx-background-color: #2d2d2d;");
+
+                    // Create scene
+                    Scene scene = new Scene(scrollPane, 800, 600);
+
+                    // Add download button
+                    Button downloadBtn = new Button("⬇ Download");
+                    downloadBtn.setStyle("-fx-background-color: #2d7a2d; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 8 15;");
+                    downloadBtn.setOnAction(e -> downloadFile(imageFile));
+
+                    Button closeBtn = new Button("✖ Close");
+                    closeBtn.setStyle("-fx-background-color: #ff6b6b; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 8 15;");
+                    closeBtn.setOnAction(e -> imageStage.close());
+
+                    HBox buttonBar = new HBox(10, downloadBtn, closeBtn);
+                    buttonBar.setAlignment(Pos.CENTER);
+                    buttonBar.setPadding(new Insets(10));
+                    buttonBar.setStyle("-fx-background-color: #f0f0f0;");
+
+                    BorderPane root = new BorderPane();
+                    root.setCenter(scrollPane);
+                    root.setBottom(buttonBar);
+
+                    imageStage.setScene(new Scene(root, 900, 700));
+                    imageStage.show();
+
+                } catch (Exception e) {
+                    showError("Failed to open image: " + e.getMessage());
+                }
             }
         });
-
         /**
          * Allow sending messages by pressing Enter key in the input field.
          */
@@ -935,7 +1104,166 @@ public class ChatController {
             e.printStackTrace();
         }
     }
+    /**
+     * Handle video attachment
+     */
+    @FXML
+    private void handleAttachVideo() {
+        if (selectedConversation == null) {
+            showError("Please select a conversation first.");
+            return;
+        }
 
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Video");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mov", "*.mkv", "*.wmv")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(themeBtn.getScene().getWindow());
+
+        if (selectedFile != null) {
+            sendVideoMessage(selectedFile);
+        }
+    }
+
+    /**
+     * Handle audio attachment
+     */
+    @FXML
+    private void handleAttachAudio() {
+        if (selectedConversation == null) {
+            showError("Please select a conversation first.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Audio");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Audio Files", "*.mp3", "*.wav", "*.aac", "*.ogg", "*.m4a")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(themeBtn.getScene().getWindow());
+
+        if (selectedFile != null) {
+            sendAudioMessage(selectedFile);
+        }
+    }
+
+    /**
+     * Handle file attachment (any type)
+     */
+    @FXML
+    private void handleAttachFile() {
+        if (selectedConversation == null) {
+            showError("Please select a conversation first.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select File");
+
+        File selectedFile = fileChooser.showOpenDialog(themeBtn.getScene().getWindow());
+
+        if (selectedFile != null) {
+            sendFileMessage(selectedFile);
+        }
+    }
+
+    /**
+     * Send a video message
+     */
+    private void sendVideoMessage(File videoFile) {
+        try {
+            showInfo("Uploading video...");
+
+            String filePath = uploadService.saveFile(videoFile, "VIDEO");
+
+            // Get video duration (you'd need a library for this)
+            int duration = 0; // Placeholder
+
+            Message msg = new Message(
+                    selectedConversation.getId(),
+                    Session.getCurrentUserId(),
+                    "🎥 Video",
+                    "VIDEO",
+                    filePath
+            );
+            msg.setFileSize(videoFile.length());
+            msg.setFileName(videoFile.getName());
+            msg.setMimeType(Files.probeContentType(videoFile.toPath()));
+            msg.setDuration(duration);
+
+            messageRepo.create(msg);
+            loadMessages();
+
+        } catch (IOException | SQLException e) {
+            showError("Failed to send video: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Send an audio message
+     */
+    private void sendAudioMessage(File audioFile) {
+        try {
+            showInfo("Uploading audio...");
+
+            String filePath = uploadService.saveFile(audioFile, "AUDIO");
+
+            // Get audio duration (you'd need a library for this)
+            int duration = 0; // Placeholder
+
+            Message msg = new Message(
+                    selectedConversation.getId(),
+                    Session.getCurrentUserId(),
+                    "🎵 Audio",
+                    "AUDIO",
+                    filePath
+            );
+            msg.setFileSize(audioFile.length());
+            msg.setFileName(audioFile.getName());
+            msg.setMimeType(Files.probeContentType(audioFile.toPath()));
+            msg.setDuration(duration);
+
+            messageRepo.create(msg);
+            loadMessages();
+
+        } catch (IOException | SQLException e) {
+            showError("Failed to send audio: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Send a file message
+     */
+    private void sendFileMessage(File file) {
+        try {
+            showInfo("Uploading file...");
+
+            String filePath = uploadService.saveFile(file, "FILE");
+
+            Message msg = new Message(
+                    selectedConversation.getId(),
+                    Session.getCurrentUserId(),
+                    "📎 File",
+                    "FILE",
+                    filePath
+            );
+            msg.setFileSize(file.length());
+            msg.setFileName(file.getName());
+            msg.setMimeType(Files.probeContentType(file.toPath()));
+
+            messageRepo.create(msg);
+            loadMessages();
+
+        } catch (IOException | SQLException e) {
+            showError("Failed to send file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     /**
      * Handles the creation of a new conversation.
      */

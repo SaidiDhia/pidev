@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ImageMessageCell.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/FileUploadService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/MessagingMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/MessagingMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ChatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/Message.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/MessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/MessageRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -224,7 +220,7 @@
       <workItem from="1771316890457" duration="1366000" />
       <workItem from="1771427143731" duration="7967000" />
       <workItem from="1771491323029" duration="1643000" />
-      <workItem from="1771766058476" duration="2831000" />
+      <workItem from="1771766058476" duration="4195000" />
     </task>
     <servers />
   </component>
