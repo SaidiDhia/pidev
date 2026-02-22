@@ -142,10 +142,17 @@
                                         <!-- Message Input Area -->
                                         <HBox fx:id="messageInputContainer" spacing="10" style="-fx-background-color: #f0f8f0; -fx-background-radius: 30; -fx-padding: 10 15;" alignment="CENTER">
                                             <children>
+                                                <!-- New attachment button -->
+                                                <Button fx:id="attachImageBtn"
+                                                        style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;"
+                                                        text="📎"
+                                                        onAction="#handleAttachImage"/>
+
                                                 <TextField fx:id="messageInput"
-                                                           promptText="Type your message..."
+                                                           promptText="Type a message or paste image..."
                                                            HBox.hgrow="ALWAYS"
                                                            style="-fx-border-color: #5cb85c; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 12 20; -fx-font-size: 14px;"/>
+
                                                 <Button fx:id="sendButton" onAction="#sendMessage"
                                                         style="-fx-background-color: #2d7a2d; -fx-text-fill: white; -fx-background-radius: 25; -fx-border-radius: 25; -fx-padding: 12 25; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;"
                                                         text="Send ➤"/>

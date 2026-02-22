@@ -6,6 +6,7 @@ import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
 import com.example.pi_dev.messaging.messagingrepository.ConversationUserRepository;
 import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
 import com.example.pi_dev.messaging.messagingrepository.UserRepository;
+import com.example.pi_dev.messaging.messagingservice.FileUploadService;
 import com.example.pi_dev.messaging.messagingsession.Session;
 
 import javafx.fxml.FXML;
@@ -14,13 +15,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.FlowPane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.FileChooser;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +62,9 @@ public class ChatController {
     @FXML private ListView<Conversation> archivedConversationList;
     @FXML private Button unarchiveAllBtn;
 
+    @FXML private Button attachImageBtn;
+    private final FileUploadService uploadService = new FileUploadService();
+
     private ObservableList<Conversation> archivedConversations = FXCollections.observableArrayList();
     // ==================== Repositories (Data Access Layer) ====================
 
@@ -66,7 +78,11 @@ public class ChatController {
     private Conversation selectedConversation;  // Currently selected conversation
     private boolean darkMode = false;            // Current theme state (false = light mode, true = dark mode)
     private ObservableList<Conversation> conversations = FXCollections.observableArrayList();  // Observable list for conversations
-
+    private void setupImageHandling() {
+        if (attachImageBtn != null) {
+            attachImageBtn.setOnAction(e -> handleAttachImage());
+        }
+    }
     /**
      * Initializes the controller after FXML loading.
      * Sets up UI components, listeners, and cell factories.
@@ -286,9 +302,8 @@ public class ChatController {
         });
 
         /**
-         * Custom cell factory for message list items.
-         * Complex layout with different alignments for sent/received messages,
-         * edit/delete functionality, and contextual menus.
+         * REPLACED: Custom cell factory for message list items with image support.
+         * Now displays images, videos, audio, and files properly.
          */
         messageList.setCellFactory(list -> new ListCell<>() {
 
@@ -382,26 +397,38 @@ public class ChatController {
                     });
                 });
 
-                // ========== Message content bubble ==========
-                Label content = new Label(msg.getContent());
-                content.setWrapText(true);
-                content.setMaxWidth(300);
-                content.getStyleClass().add("message-bubble");
+                // ========== Create message bubble with content based on type ==========
+                VBox bubble = new VBox(5);
+                bubble.setMaxWidth(350);
 
-                // Combine header and content in vertical layout
-                VBox bubble = new VBox(header, content);
-                bubble.setSpacing(2);
+                // Add header to bubble
+                bubble.getChildren().add(header);
+
+                // ========== Display content based on message type ==========
+                if (msg.isImage()) {
+                    displayImageMessage(msg, bubble);
+                } else if (msg.isVideo()) {
+                    displayVideoMessage(msg, bubble);
+                } else if (msg.isAudio()) {
+                    displayAudioMessage(msg, bubble);
+                } else if (msg.isFile()) {
+                    displayFileMessage(msg, bubble);
+                } else {
+                    // Text message
+                    displayTextMessage(msg, bubble);
+                }
 
                 // Add appropriate style class based on sender
                 if (isMine) {
                     bubble.getStyleClass().add("mine");
+                    bubble.setStyle("-fx-background-color: #dcf8c6; -fx-background-radius: 15 15 2 15; -fx-padding: 8;");
                 } else {
                     bubble.getStyleClass().add("theirs");
+                    bubble.setStyle("-fx-background-color: white; -fx-background-radius: 15 15 15 2; -fx-padding: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 15 15 15 2;");
                 }
 
                 // ========== Layout based on message sender ==========
                 HBox messageRow;
-
                 if (isMine) {
                     messageRow = new HBox(menuBtn, bubble);
                     messageRow.setAlignment(Pos.CENTER_RIGHT);
@@ -409,16 +436,190 @@ public class ChatController {
                     messageRow = new HBox(bubble, menuBtn);
                     messageRow.setAlignment(Pos.CENTER_LEFT);
                 }
-
                 messageRow.setSpacing(6);
 
                 // Final container with padding
                 HBox container = new HBox(messageRow);
                 container.setPadding(new Insets(5));
                 container.setAlignment(isMine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
-                HBox.setHgrow(messageRow, isMine ? Priority.NEVER : Priority.NEVER);
+                HBox.setHgrow(messageRow, Priority.NEVER);
 
                 setGraphic(container);
+            }
+
+            /**
+             * Display a text message
+             */
+            private void displayTextMessage(Message msg, VBox bubble) {
+                Text text = new Text(msg.getContent());
+                text.setStyle("-fx-fill: #333;");
+                TextFlow textFlow = new TextFlow(text);
+                textFlow.setMaxWidth(300);
+                bubble.getChildren().add(textFlow);
+            }
+
+            /**
+             * Display an image message with actual image
+             */
+            private void displayImageMessage(Message msg, VBox bubble) {
+                try {
+                    String fileUrl = msg.getFileUrl();
+                    if (fileUrl != null) {
+                        // Load image from file
+                        File imageFile = new File(fileUrl);
+                        if (imageFile.exists()) {
+                            Image image = new Image(imageFile.toURI().toString());
+                            ImageView imageView = new ImageView(image);
+
+                            // Scale image to fit
+                            imageView.setFitWidth(250);
+                            imageView.setPreserveRatio(true);
+                            imageView.setStyle("-fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+
+                            // Add click handler to enlarge (placeholder for now)
+                            imageView.setOnMouseClicked(e -> showFullImage(fileUrl));
+
+                            bubble.getChildren().add(imageView);
+
+                            // Add image info
+                            if (msg.getFileName() != null || msg.getFileSize() > 0) {
+                                Label info = new Label();
+                                String infoText = "📷 ";
+                                if (msg.getFileName() != null) {
+                                    infoText += msg.getFileName();
+                                }
+                                if (msg.getFileSize() > 0) {
+                                    infoText += " • " + formatFileSize(msg.getFileSize());
+                                }
+                                info.setText(infoText);
+                                info.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+                                bubble.getChildren().add(info);
+                            }
+                        } else {
+                            showErrorPlaceholder(bubble, "Image file not found");
+                        }
+                    } else {
+                        showErrorPlaceholder(bubble, "No image URL");
+                    }
+                } catch (Exception e) {
+                    showErrorPlaceholder(bubble, "Failed to load image");
+                    e.printStackTrace();
+                }
+            }
+
+            /**
+             * Display a video message (placeholder for now)
+             */
+            private void displayVideoMessage(Message msg, VBox bubble) {
+                HBox videoBox = new HBox(8);
+                videoBox.setAlignment(Pos.CENTER_LEFT);
+
+                Label iconLabel = new Label("🎥");
+                iconLabel.setStyle("-fx-font-size: 24px;");
+
+                VBox infoBox = new VBox(2);
+                Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Video");
+                fileName.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+
+                String infoText = "";
+                if (msg.getDuration() != null) {
+                    infoText += msg.getDuration() + "s";
+                }
+                if (msg.getFileSize() > 0) {
+                    if (!infoText.isEmpty()) infoText += " • ";
+                    infoText += formatFileSize(msg.getFileSize());
+                }
+                Label fileInfo = new Label(infoText);
+                fileInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+
+                infoBox.getChildren().addAll(fileName, fileInfo);
+                videoBox.getChildren().addAll(iconLabel, infoBox);
+
+                bubble.getChildren().add(videoBox);
+            }
+
+            /**
+             * Display an audio message (placeholder for now)
+             */
+            private void displayAudioMessage(Message msg, VBox bubble) {
+                HBox audioBox = new HBox(8);
+                audioBox.setAlignment(Pos.CENTER_LEFT);
+
+                Label iconLabel = new Label("🎵");
+                iconLabel.setStyle("-fx-font-size: 24px;");
+
+                VBox infoBox = new VBox(2);
+                Label title = new Label("Audio Message");
+                title.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+
+                String infoText = "";
+                if (msg.getDuration() != null) {
+                    infoText += msg.getDuration() + "s";
+                }
+                if (msg.getFileSize() > 0) {
+                    if (!infoText.isEmpty()) infoText += " • ";
+                    infoText += formatFileSize(msg.getFileSize());
+                }
+                Label fileInfo = new Label(infoText);
+                fileInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+
+                infoBox.getChildren().addAll(title, fileInfo);
+                audioBox.getChildren().addAll(iconLabel, infoBox);
+
+                bubble.getChildren().add(audioBox);
+            }
+
+            /**
+             * Display a file attachment
+             */
+            private void displayFileMessage(Message msg, VBox bubble) {
+                HBox fileBox = new HBox(8);
+                fileBox.setAlignment(Pos.CENTER_LEFT);
+
+                Label iconLabel = new Label("📎");
+                iconLabel.setStyle("-fx-font-size: 20px;");
+
+                VBox fileInfo = new VBox(2);
+                Label fileName = new Label(msg.getFileName() != null ? msg.getFileName() : "Unknown file");
+                fileName.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+                Label fileSize = new Label(formatFileSize(msg.getFileSize()));
+                fileSize.setStyle("-fx-font-size: 10px; -fx-text-fill: #999;");
+
+                fileInfo.getChildren().addAll(fileName, fileSize);
+                fileBox.getChildren().addAll(iconLabel, fileInfo);
+
+                bubble.getChildren().add(fileBox);
+            }
+
+            /**
+             * Show error placeholder in message bubble
+             */
+            private void showErrorPlaceholder(VBox bubble, String errorMsg) {
+                Label errorLabel = new Label("❌ " + errorMsg);
+                errorLabel.setStyle("-fx-text-fill: #ff4444; -fx-font-size: 11px;");
+                bubble.getChildren().add(errorLabel);
+            }
+
+            /**
+             * Format file size for display
+             */
+            private String formatFileSize(long bytes) {
+                if (bytes <= 0) return "0 B";
+                String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
+                int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
+                return String.format("%.1f %s", bytes / Math.pow(1024, digitGroups), units[digitGroups]);
+            }
+
+            /**
+             * Show full image (placeholder for now)
+             */
+            private void showFullImage(String imagePath) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Image Preview");
+                alert.setHeaderText("Full screen image viewer coming soon!");
+                alert.setContentText("Image path: " + imagePath);
+                alert.showAndWait();
             }
         });
 
@@ -458,7 +659,11 @@ public class ChatController {
                 unarchiveAllBtn.setOnAction(e -> handleUnarchiveAll());
             }
         }
+
+        // Setup image handling
+        setupImageHandling();
     }
+
     /**
      * Custom cell factory for archived conversation list.
      */
@@ -510,6 +715,7 @@ public class ChatController {
             setGraphic(container);
         }
     }
+
     /**
      * Unarchive all conversations at once.
      */
@@ -539,6 +745,7 @@ public class ChatController {
             }
         });
     }
+
     /**
      * Filters conversations based on search text.
      * @param searchText The text to search for
@@ -669,6 +876,63 @@ public class ChatController {
             loadMessages();
         } catch (SQLException e) {
             showError(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleAttachImage() {
+        if (selectedConversation == null) {
+            showError("Please select a conversation first.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Image");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(themeBtn.getScene().getWindow());
+
+        if (selectedFile != null) {
+            sendImageMessage(selectedFile);
+        }
+    }
+
+    /**
+     * Send an image message
+     */
+    private void sendImageMessage(File imageFile) {
+        try {
+            // Show loading indicator
+            showInfo("Uploading image...");
+
+            // Save file to server
+            String filePath = uploadService.saveFile(imageFile, "IMAGE");
+            String thumbnailPath = uploadService.generateThumbnail(filePath);
+
+            // Create message object
+            Message msg = new Message(
+                    selectedConversation.getId(),
+                    Session.getCurrentUserId(),
+                    "📷 Image",  // Optional caption
+                    "IMAGE",
+                    filePath
+            );
+            msg.setThumbnailUrl(thumbnailPath);
+            msg.setFileSize(imageFile.length());
+            msg.setFileName(imageFile.getName());
+            msg.setMimeType(Files.probeContentType(imageFile.toPath()));
+
+            // Save to database
+            messageRepo.create(msg);
+
+            // Refresh messages
+            loadMessages();
+
+        } catch (IOException | SQLException e) {
+            showError("Failed to send image: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -870,6 +1134,7 @@ public class ChatController {
             showError("Failed to update conversation: " + e.getMessage());
         }
     }
+
     private void loadArchivedConversations() {
         try {
             archivedConversations.setAll(conversationRepo.findArchivedByUser(Session.getCurrentUserId()));
@@ -879,6 +1144,7 @@ public class ChatController {
             showError("Failed to load archived conversations: " + e.getMessage());
         }
     }
+
     /**
      * Handles deleting the selected conversation.
      * Only the creator can delete a conversation.
