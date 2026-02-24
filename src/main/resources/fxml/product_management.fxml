@@ -32,6 +32,11 @@
                 <Button text="🛍️ Available Products"
                         styleClass="nav-btn"
                         onAction="#goToAvailableProduct"/>
+                <Button text="📊 Dashboard" onAction="#openDashboard"
+                        style="-fx-background-color: #2E7D32; -fx-text-fill: white;
+                   -fx-background-radius: 8; -fx-padding: 8 16;
+                   -fx-font-weight: bold; -fx-cursor: hand;"/>
+
             </HBox>
 
             <!-- CENTER: Page Title (grows to take available space) -->

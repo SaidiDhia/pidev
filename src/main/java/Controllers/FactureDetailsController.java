@@ -17,6 +17,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import com.itextpdf.layout.borders.Border;
+
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -236,60 +238,68 @@ public class FactureDetailsController {
     private void generatePDF(File file) throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-        // Create PDF writer and document
         PdfWriter writer = new PdfWriter(file.getAbsolutePath());
         PdfDocument pdfDoc = new PdfDocument(writer);
         Document document = new Document(pdfDoc);
 
         // Title
-        Paragraph title = new Paragraph("WONDERLUST.COM")
-                .setTextAlignment(TextAlignment.CENTER)
-                .setFontSize(20)
-                .setBold()
-                .setMarginBottom(5);
-        document.add(title);
-
-        Paragraph subtitle = new Paragraph("INVOICE")
-                .setTextAlignment(TextAlignment.CENTER)
-                .setFontSize(16)
-                .setBold()
-                .setMarginBottom(20);
-        document.add(subtitle);
+        document.add(new Paragraph("WONDERLUST.COM")
+                .setTextAlignment(TextAlignment.CENTER).setFontSize(20).setBold().setMarginBottom(5));
+        document.add(new Paragraph("INVOICE")
+                .setTextAlignment(TextAlignment.CENTER).setFontSize(16).setBold().setMarginBottom(20));
 
         // Invoice Info
         document.add(new Paragraph("Invoice Number: #" + currentFacture.getId()).setBold());
         document.add(new Paragraph("Date: " + sdf.format(currentFacture.getDate())));
+
         String status = currentFacture.getDeliveryStatus();
         document.add(new Paragraph("Status: " + status.toUpperCase())
                 .setFontColor("confirmed".equals(status) ? ColorConstants.GREEN
                         : "cancelled".equals(status) ? ColorConstants.RED
                         : ColorConstants.ORANGE));
 
-        //document.add(new Paragraph("Status: COMPLETED").setFontColor(ColorConstants.GREEN));
         String method = currentFacture.getPaymentMethod();
-        String methodLabel = "cash".equals(method) ? "Cash on Delivery" : "Credit Card (Stripe)";
-        document.add(new Paragraph("Payment Method: " + methodLabel));
-        //document.add(new Paragraph("Payment Method: Credit Card"));
+
+
+
+// Payment method line
+        document.add(new Paragraph("Payment Method: " + ("cash".equals(method) ? "Cash on Delivery" : "Credit Card (Stripe)")));
+        document.add(new Paragraph("\n"));
+
+// QR code centered below invoice info
+        try {
+            String qrContent = "WonderLust Invoice\n" +
+                    "Order #" + currentFacture.getId() + "\n" +
+                    "Date: " + sdf.format(currentFacture.getDate()) + "\n" +
+                    "Total: " + String.format("%.2f DT", currentFacture.getTotal()) + "\n" +
+                    "Status: " + status + "\n" +
+                    "Payment: " + method;
+
+            byte[] qrBytes = Utils.QRCodeGenerator.generateQRCode(qrContent, 200, 200);
+            com.itextpdf.io.image.ImageData imageData = com.itextpdf.io.image.ImageDataFactory.create(qrBytes);
+            com.itextpdf.layout.element.Image qrImage = new com.itextpdf.layout.element.Image(imageData);
+            qrImage.setWidth(120).setHeight(120);
+            qrImage.setHorizontalAlignment(com.itextpdf.layout.properties.HorizontalAlignment.CENTER);
+            document.add(qrImage);
+            document.add(new Paragraph("Scan to verify your order")
+                    .setFontSize(9)
+                    .setFontColor(ColorConstants.GRAY)
+                    .setTextAlignment(TextAlignment.CENTER));
+        } catch (Exception e) {
+            System.err.println("QR generation failed: " + e.getMessage());
+        }
         document.add(new Paragraph("\n"));
 
         // Products Table
-        Paragraph productsTitle = new Paragraph("PURCHASED ITEMS")
-                .setBold()
-                .setFontSize(14)
-                .setMarginBottom(10);
-        document.add(productsTitle);
+        document.add(new Paragraph("PURCHASED ITEMS").setBold().setFontSize(14).setMarginBottom(10));
 
-        // Create table with 4 columns
         Table table = new Table(new float[]{3, 1, 2, 2});
         table.setWidth(pdfDoc.getDefaultPageSize().getWidth() - 80);
-
-        // Table headers
         table.addHeaderCell("Product");
         table.addHeaderCell("Quantity");
         table.addHeaderCell("Unit Price");
         table.addHeaderCell("Subtotal");
 
-        // Add products
         for (FactureProduct product : products) {
             table.addCell(product.getProductTitle());
             table.addCell(String.valueOf(product.getQuantity()));
@@ -300,26 +310,18 @@ public class FactureDetailsController {
         document.add(table);
         document.add(new Paragraph("\n"));
 
-        // Total
-        Paragraph total = new Paragraph("TOTAL: " + String.format("%.2f DT", currentFacture.getTotal()))
-                .setBold()
-                .setFontSize(18)
+        document.add(new Paragraph("TOTAL: " + String.format("%.2f DT", currentFacture.getTotal()))
+                .setBold().setFontSize(18)
                 .setTextAlignment(TextAlignment.RIGHT)
-                .setFontColor(ColorConstants.GREEN);
-        document.add(total);
+                .setFontColor(ColorConstants.GREEN));
 
         document.add(new Paragraph("\n\n"));
+        document.add(new Paragraph("Thank you for your purchase!")
+                .setTextAlignment(TextAlignment.CENTER).setItalic().setFontColor(ColorConstants.GRAY));
 
-        // Footer
-        Paragraph footer = new Paragraph("Thank you for your purchase!")
-                .setTextAlignment(TextAlignment.CENTER)
-                .setItalic()
-                .setFontColor(ColorConstants.GRAY);
-        document.add(footer);
-
-        // Close document
         document.close();
     }
+
 
     /**
      * Go back to facture list

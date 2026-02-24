@@ -193,7 +193,7 @@ public class FactureListController {
      */
     @FXML
     private void goBack() {
-        MainFx.setCenter("/fxml/ProductAvailable.fxml");
+        MainFx.setCenter("/fxml/BuyerHome.fxml");
     }
 
 

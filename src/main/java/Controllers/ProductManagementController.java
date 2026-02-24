@@ -133,16 +133,20 @@ public class ProductManagementController {
         Label createdDate = new Label("Created: " + p.getCreatedDate());
 
         // --- ACTION BUTTONS ---
-        HBox actions = new HBox(10);
         Button edit = new Button("Edit");
         edit.getStyleClass().add("btn-edit");
+        edit.setPrefWidth(90);
+        edit.setPrefHeight(32);
         edit.setOnAction(e -> openUpdateDialog(p));
 
         Button delete = new Button("Delete");
         delete.getStyleClass().add("btn-delete");
+        delete.setPrefWidth(90);
+        delete.setPrefHeight(32);
         delete.setOnAction(e -> deleteProduct(p));
 
-        actions.getChildren().addAll(edit, delete);
+        HBox actions = new HBox(8, edit, delete);
+        actions.setAlignment(javafx.geometry.Pos.CENTER);
 
         // --- ADD ALL ELEMENTS TO CARD ---
         card.getChildren().addAll(imageView, title, desc, price, quantity, type, category, createdDate, actions);
@@ -174,285 +178,314 @@ public class ProductManagementController {
                 .forEach(p -> productFlow.getChildren().add(createProductCard(p)));
     }
 
-    // ADD PRODUCT
+
     @FXML
     private void handleAdd() {
-
         Dialog<Product> dialog = new Dialog<>();
-        dialog.setTitle("Add Product");
-        dialog.setHeaderText("Fill all required fields");
+        dialog.setTitle("New Product");
         dialog.setResizable(true);
 
-        ButtonType addButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        ButtonType addButtonType = new ButtonType("Add Product", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
 
-        // --- GRID SETUP ---
-        GridPane grid = new GridPane();
-        grid.setHgap(15);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(20));
+        VBox root = new VBox(0);
+        root.setStyle("-fx-background-color: #F8F9FA;");
 
-        ColumnConstraints col0 = new ColumnConstraints(); // labels
-        ColumnConstraints col1 = new ColumnConstraints();
-        col1.setHgrow(Priority.ALWAYS); // inputs grow
-        grid.getColumnConstraints().addAll(col0, col1);
+        // Header
+        VBox header = new VBox(2);
+        header.setPadding(new Insets(12, 20, 10, 20));
+        header.setStyle("-fx-background-color: #1B5E20;");
+        Label headerTitle = new Label("➕  Add New Product");
+        headerTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label headerSub = new Label("Fill in the product details below");
+        headerSub.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.7);");
+        header.getChildren().addAll(headerTitle, headerSub);
 
-        // --- INPUT FIELDS ---
-        TextField titleField = new TextField();
-        TextField descriptionField = new TextField();
+        // Form
+        VBox form = new VBox(6);
+        form.setPadding(new Insets(12, 20, 12, 20));
+        form.setStyle("-fx-background-color: #F8F9FA;");
+
+        TextField titleField       = styledField("e.g. Tente de camping 3 places");
+        TextField descriptionField = styledField("Describe your product...");
+        TextField priceField       = styledField("e.g. 150");
+        TextField quantityField    = styledField("e.g. 10");
+
         ComboBox<String> typeField = new ComboBox<>(FXCollections.observableArrayList("For Sale", "For Rent"));
-        TextField priceField = new TextField();
-        TextField quantityField = new TextField();
+        typeField.setPromptText("Select type");
+        typeField.setMaxWidth(Double.MAX_VALUE);
+
         ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList("camping", "hiking", "beach"));
+        categoryField.setPromptText("Select category");
+        categoryField.setMaxWidth(Double.MAX_VALUE);
 
-        // --- ERROR LABELS ---
-        Label titleError = new Label();
-        Label typeError = new Label();
-        Label priceError = new Label();
-        Label quantityError = new Label();
-        Label categoryError = new Label();
-        // Example for error labels
-        titleError.getStyleClass().add("label-error");
-        typeError.getStyleClass().add("label-error");
-        priceError.getStyleClass().add("label-error");
-        quantityError.getStyleClass().add("label-error");
-        categoryError.getStyleClass().add("label-error");
+        Label titleError    = errorLabel();
+        Label typeError     = errorLabel();
+        Label priceError    = errorLabel();
+        Label quantityError = errorLabel();
+        Label categoryError = errorLabel();
 
-
-        // --- ADD TO GRID ---
-        grid.add(new Label("Title:"), 0, 0);          grid.add(titleField, 1, 0);          grid.add(titleError, 2, 0);
-        grid.add(new Label("Description:"), 0, 1);    grid.add(descriptionField, 1, 1);
-        grid.add(new Label("Type:"), 0, 2);           grid.add(typeField, 1, 2);           grid.add(typeError, 2, 2);
-        grid.add(new Label("Price:"), 0, 3);          grid.add(priceField, 1, 3);          grid.add(priceError, 2, 3);
-        grid.add(new Label("Quantity:"), 0, 4);       grid.add(quantityField, 1, 4);       grid.add(quantityError, 2, 4);
-        grid.add(new Label("Category:"), 0, 5);       grid.add(categoryField, 1, 5);       grid.add(categoryError, 2, 5);
-
-        // --- IMAGE CHOOSER ---
-        Button chooseImageBtn = new Button("Choose Image");
-        Label imageLabel = new Label("No file selected");
-        imageLabel.getStyleClass().add("label-image");
         File[] selectedFile = new File[1];
+        Label imageLabel = new Label("No image selected");
+        imageLabel.setStyle("-fx-text-fill: #999; -fx-font-size: 11px;");
+        ImageView imagePreview = new ImageView();
+        imagePreview.setFitWidth(60);
+        imagePreview.setFitHeight(60);
+        imagePreview.setPreserveRatio(true);
+        imagePreview.setVisible(false);
+
+        Button chooseImageBtn = new Button("📷 Choose Image");
+        chooseImageBtn.setStyle("-fx-background-color: white; -fx-text-fill: #2E7D32; -fx-border-color: #2E7D32; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 5 12; -fx-font-size: 11px; -fx-cursor: hand;");
         chooseImageBtn.setOnAction(e -> {
-            javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
-            fc.getExtensionFilters().addAll(
-                    new javafx.stage.FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
-            );
+            FileChooser fc = new FileChooser();
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg"));
             File file = fc.showOpenDialog(dialog.getDialogPane().getScene().getWindow());
             if (file != null) {
                 selectedFile[0] = file;
                 imageLabel.setText(file.getName());
+                imageLabel.setStyle("-fx-text-fill: #2E7D32; -fx-font-size: 11px;");
+                imagePreview.setImage(new Image(file.toURI().toString(), 60, 60, true, true));
+                imagePreview.setVisible(true);
             }
         });
-        grid.add(chooseImageBtn, 0, 6);
-        grid.add(imageLabel, 1, 6);
 
-        dialog.getDialogPane().setContent(grid);
+        HBox imageRow = new HBox(10, chooseImageBtn, imageLabel, imagePreview);
+        imageRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        // --- VALIDATION ON BUTTON CLICK ---
-        Button addButton = (Button) dialog.getDialogPane().lookupButton(addButtonType);
-        addButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+        form.getChildren().addAll(
+                formRow("Title *", titleField, titleError),
+                formRow("Description", descriptionField, new Label()),
+                formRow("Type *", typeField, typeError),
+                formRow("Price (TND) *", priceField, priceError),
+                formRow("Quantity *", quantityField, quantityError),
+                formRow("Category *", categoryField, categoryError),
+                sectionLabel("Product Image"),
+                imageRow
+        );
 
+        ScrollPane scrollPane = new ScrollPane(form);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background-color: #F8F9FA; -fx-background: #F8F9FA;");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        root.getChildren().addAll(header, scrollPane);
+
+        dialog.getDialogPane().setContent(root);
+        dialog.getDialogPane().setPrefWidth(440);
+        dialog.getDialogPane().setPrefHeight(480);
+        dialog.getDialogPane().setStyle("-fx-background-color: #F8F9FA; -fx-padding: 0;");
+
+        Button addBtn = (Button) dialog.getDialogPane().lookupButton(addButtonType);
+        addBtn.setStyle("-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20;");
+
+        addBtn.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
             boolean valid = true;
-
-            // --- TITLE ---
-            if (titleField.getText().trim().isEmpty()) {
-                titleError.setText("Title is required");
-                valid = false;
-            } else titleError.setText("");
-
-            // --- TYPE ---
-            if (typeField.getValue() == null || typeField.getValue().trim().isEmpty()) {
-                typeError.setText("Type is required");
-                valid = false;
-            } else typeError.setText("");
-
-            // --- PRICE ---
-            try {
-                float p = Float.parseFloat(priceField.getText());
-                if (p < 0) { priceError.setText("Price must be ≥ 0"); valid = false; }
-                else priceError.setText("");
-            } catch (Exception e) { priceError.setText("Invalid price"); valid = false; }
-
-            // --- QUANTITY ---
-            try {
-                int q = Integer.parseInt(quantityField.getText());
-                if (q < 0) { quantityError.setText("Quantity must be ≥ 0"); valid = false; }
-                else quantityError.setText("");
-            } catch (Exception e) { quantityError.setText("Invalid quantity"); valid = false; }
-
-            // --- CATEGORY ---
-            if (categoryField.getValue() == null || categoryField.getValue().trim().isEmpty()) {
-                categoryError.setText("Category is required");
-                valid = false;
-            } else categoryError.setText("");
-
-            if (!valid) {
-                event.consume(); // prevent dialog from closing if invalid
-            }
+            if (titleField.getText().trim().isEmpty()) { titleError.setText("⚠ Required"); valid = false; } else titleError.setText("");
+            if (typeField.getValue() == null) { typeError.setText("⚠ Required"); valid = false; } else typeError.setText("");
+            try { float pv = Float.parseFloat(priceField.getText()); if (pv < 0) { priceError.setText("⚠ Must be ≥ 0"); valid = false; } else priceError.setText(""); }
+            catch (Exception e) { priceError.setText("⚠ Invalid price"); valid = false; }
+            try { int q = Integer.parseInt(quantityField.getText()); if (q < 0) { quantityError.setText("⚠ Must be ≥ 0"); valid = false; } else quantityError.setText(""); }
+            catch (Exception e) { quantityError.setText("⚠ Invalid quantity"); valid = false; }
+            if (categoryField.getValue() == null) { categoryError.setText("⚠ Required"); valid = false; } else categoryError.setText("");
+            if (!valid) event.consume();
         });
 
-        // --- RESULT CONVERTER ---
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == addButtonType) {
+        dialog.setResultConverter(btn -> {
+            if (btn == addButtonType) {
                 Product p = new Product();
-                p.setTitle(titleField.getText());
-                p.setDescription(descriptionField.getText());
+                p.setTitle(titleField.getText().trim());
+                p.setDescription(descriptionField.getText().trim());
                 p.setType(typeField.getValue());
                 p.setPrice(Float.parseFloat(priceField.getText()));
                 p.setQuantity(Integer.parseInt(quantityField.getText()));
                 p.setCategory(categoryField.getValue());
                 p.setCreatedDate(new Date());
-                if (selectedFile[0] != null) p.setImage(ImageUploader.uploadImage(selectedFile[0]));
+                if (selectedFile[0] != null) p.setImage(Utils.ImageUploader.uploadImage(selectedFile[0]));
                 return p;
             }
             return null;
         });
 
-        Optional<Product> result = dialog.showAndWait();
-        result.ifPresent(p -> {
-            ps.addProduct(p);
-            loadProducts();
-            showAlert("Success", "Product added successfully!");
-        });
+        dialog.showAndWait().ifPresent(p -> { ps.addProduct(p); loadProducts(); showAlert("✅ Success", "Product added successfully!"); });
     }
-
 
     private void openUpdateDialog(Product p) {
         Dialog<Product> dialog = new Dialog<>();
         dialog.setTitle("Update Product");
-        dialog.setHeaderText("Update the product details below");
         dialog.setResizable(true);
 
-        ButtonType updateButtonType = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+        ButtonType updateButtonType = new ButtonType("Save Changes", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
 
-        // --- GRID SETUP ---
-        GridPane grid = new GridPane();
-        grid.setHgap(15); // horizontal space between columns
-        grid.setVgap(10); // vertical space between rows
-        grid.setPadding(new Insets(20)); // outer padding
+        VBox root = new VBox(0);
+        root.setStyle("-fx-background-color: #F8F9FA;");
 
-        ColumnConstraints colLabel = new ColumnConstraints();
-        colLabel.setPercentWidth(25);
-        ColumnConstraints colField = new ColumnConstraints();
-        colField.setPercentWidth(50);
-        colField.setHgrow(Priority.ALWAYS);
-        ColumnConstraints colError = new ColumnConstraints();
-        colError.setPercentWidth(25);
-        grid.getColumnConstraints().addAll(colLabel, colField, colError);
+        // Header
+        VBox header = new VBox(2);
+        header.setPadding(new Insets(12, 20, 10, 20));
+        header.setStyle("-fx-background-color: #1565C0;");
+        Label headerTitle = new Label("✏️  Update Product");
+        headerTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label headerSub = new Label("Editing: " + p.getTitle());
+        headerSub.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.7);");
+        header.getChildren().addAll(headerTitle, headerSub);
 
-        // --- INPUT FIELDS ---
-        TextField titleField = new TextField(p.getTitle());
-        TextField descriptionField = new TextField(p.getDescription());
+        // Form
+        VBox form = new VBox(6);
+        form.setPadding(new Insets(12, 20, 12, 20));
+        form.setStyle("-fx-background-color: #F8F9FA;");
+
+        TextField titleField = styledField(p.getTitle()); titleField.setText(p.getTitle());
+        TextField descriptionField = styledField(p.getDescription()); descriptionField.setText(p.getDescription());
+        TextField priceField = styledField(String.valueOf(p.getPrice())); priceField.setText(String.valueOf(p.getPrice()));
+        TextField quantityField = styledField(String.valueOf(p.getQuantity())); quantityField.setText(String.valueOf(p.getQuantity()));
 
         ComboBox<String> typeField = new ComboBox<>(FXCollections.observableArrayList("For Sale", "For Rent"));
         typeField.setValue(p.getType());
+        typeField.setMaxWidth(Double.MAX_VALUE);
 
-        TextField priceField = new TextField(String.valueOf(p.getPrice()));
-        TextField quantityField = new TextField(String.valueOf(p.getQuantity()));
-
-        ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList("camping", "nature", "beach"));
+        ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList("camping", "hiking", "beach"));
         categoryField.setValue(p.getCategory());
+        categoryField.setMaxWidth(Double.MAX_VALUE);
 
-        // --- ERROR LABELS ---
-        Label titleError = new Label();
-        Label typeError = new Label();
-        Label priceError = new Label();
-        Label quantityError = new Label();
-        Label categoryError = new Label();
-        Label changeError = new Label(); // for "no changes" error
+        Label titleError = errorLabel(), typeError = errorLabel(), priceError = errorLabel(),
+                qtyError = errorLabel(), catError = errorLabel(), changeError = errorLabel();
 
-        titleError.setStyle("-fx-text-fill: red; -fx-font-size: 11;");
-        typeError.setStyle("-fx-text-fill: red; -fx-font-size: 11;");
-        priceError.setStyle("-fx-text-fill: red; -fx-font-size: 11;");
-        quantityError.setStyle("-fx-text-fill: red; -fx-font-size: 11;");
-        categoryError.setStyle("-fx-text-fill: red; -fx-font-size: 11;");
-        changeError.setStyle("-fx-text-fill: red; -fx-font-size: 12; -fx-font-weight: bold;");
-
-        // --- ADD TO GRID ---
-        grid.add(new Label("Title:"), 0, 0);      grid.add(titleField, 1, 0);      grid.add(titleError, 2, 0);
-        grid.add(new Label("Description:"), 0, 1);grid.add(descriptionField, 1, 1);
-        grid.add(new Label("Type:"), 0, 2);       grid.add(typeField, 1, 2);       grid.add(typeError, 2, 2);
-        grid.add(new Label("Price:"), 0, 3);      grid.add(priceField, 1, 3);      grid.add(priceError, 2, 3);
-        grid.add(new Label("Quantity:"), 0, 4);   grid.add(quantityField, 1, 4);   grid.add(quantityError, 2, 4);
-        grid.add(new Label("Category:"), 0, 5);   grid.add(categoryField, 1, 5);   grid.add(categoryError, 2, 5);
-        grid.add(changeError, 0, 6, 3, 1); // span all columns
-
-        // --- IMAGE VIEW ---
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(100);
-        imageView.setFitHeight(100);
-        imageView.setPreserveRatio(true);
-        if (p.getImage() != null && !p.getImage().isEmpty()) {
-            imageView.setImage(new Image(p.getImage(), 100, 100, true, true));
-        }
-
-        Button chooseImageBtn = new Button("Change Image");
         File[] selectedFile = new File[1];
+        ImageView imagePreview = new ImageView();
+        imagePreview.setFitWidth(60); imagePreview.setFitHeight(60); imagePreview.setPreserveRatio(true);
+        if (p.getImage() != null && !p.getImage().isEmpty())
+            imagePreview.setImage(new Image(p.getImage(), 60, 60, true, true));
+
+        Button chooseImageBtn = new Button("📷 Change Image");
+        chooseImageBtn.setStyle("-fx-background-color: white; -fx-text-fill: #1565C0; -fx-border-color: #1565C0; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 5 12; -fx-font-size: 11px; -fx-cursor: hand;");
         chooseImageBtn.setOnAction(e -> {
-            javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
-            fc.getExtensionFilters().addAll(
-                    new javafx.stage.FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
-            );
+            FileChooser fc = new FileChooser();
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg"));
             File file = fc.showOpenDialog(dialog.getDialogPane().getScene().getWindow());
-            if (file != null) {
-                selectedFile[0] = file;
-                imageView.setImage(new Image(file.toURI().toString(), 100, 100, true, true));
-            }
+            if (file != null) { selectedFile[0] = file; imagePreview.setImage(new Image(file.toURI().toString(), 60, 60, true, true)); }
         });
 
-        HBox imageBox = new HBox(10, chooseImageBtn, imageView);
-        imageBox.setPadding(new Insets(5, 0, 5, 0));
-        grid.add(imageBox, 0, 7, 3, 1);
+        HBox imageRow = new HBox(10, chooseImageBtn, imagePreview);
+        imageRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        dialog.getDialogPane().setContent(grid);
+        form.getChildren().addAll(
+                formRow("Title *", titleField, titleError),
+                formRow("Description", descriptionField, new Label()),
+                formRow("Type *", typeField, typeError),
+                formRow("Price (TND) *", priceField, priceError),
+                formRow("Quantity *", quantityField, qtyError),
+                formRow("Category *", categoryField, catError),
+                changeError,
+                sectionLabel("Product Image"),
+                imageRow
+        );
 
-        // --- VALIDATION ON BUTTON CLICK ---
-        Button updateButton = (Button) dialog.getDialogPane().lookupButton(updateButtonType);
-        updateButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+        ScrollPane scrollPane = new ScrollPane(form);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background-color: #F8F9FA; -fx-background: #F8F9FA;");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        root.getChildren().addAll(header, scrollPane);
+
+        dialog.getDialogPane().setContent(root);
+        dialog.getDialogPane().setPrefWidth(440);
+        dialog.getDialogPane().setPrefHeight(480);
+        dialog.getDialogPane().setStyle("-fx-background-color: #F8F9FA; -fx-padding: 0;");
+
+        Button saveBtn = (Button) dialog.getDialogPane().lookupButton(updateButtonType);
+        saveBtn.setStyle("-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 20;");
+
+        saveBtn.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
             boolean valid = true;
-
-            if (titleField.getText().trim().isEmpty()) { titleError.setText("Title is required"); valid = false; } else titleError.setText("");
-            if (typeField.getValue() == null || typeField.getValue().trim().isEmpty()) { typeError.setText("Type is required"); valid = false; } else typeError.setText("");
-            try { float pVal = Float.parseFloat(priceField.getText()); if (pVal < 0) { priceError.setText("≥0"); valid = false; } else priceError.setText(""); } catch (Exception e) { priceError.setText("Invalid"); valid = false; }
-            try { int qVal = Integer.parseInt(quantityField.getText()); if (qVal < 0) { quantityError.setText("≥0"); valid = false; } else quantityError.setText(""); } catch (Exception e) { quantityError.setText("Invalid"); valid = false; }
-            if (categoryField.getValue() == null || categoryField.getValue().trim().isEmpty()) { categoryError.setText("Category is required"); valid = false; } else categoryError.setText("");
-
-            // --- CHECK CHANGES ---
-            boolean changed = !titleField.getText().equals(p.getTitle()) ||
-                    !descriptionField.getText().equals(p.getDescription()) ||
-                    !typeField.getValue().equals(p.getType()) ||
-                    !priceField.getText().equals(String.valueOf(p.getPrice())) ||
-                    !quantityField.getText().equals(String.valueOf(p.getQuantity())) ||
-                    !categoryField.getValue().equals(p.getCategory()) ||
-                    selectedFile[0] != null;
-
-            if (!changed) { changeError.setText("You need to change at least one field"); valid = false; } else { changeError.setText(""); }
-
+            if (titleField.getText().trim().isEmpty()) { titleError.setText("⚠ Required"); valid = false; } else titleError.setText("");
+            if (typeField.getValue() == null) { typeError.setText("⚠ Required"); valid = false; } else typeError.setText("");
+            try { float pVal = Float.parseFloat(priceField.getText()); if (pVal < 0) { priceError.setText("⚠ ≥ 0"); valid = false; } else priceError.setText(""); }
+            catch (Exception e) { priceError.setText("⚠ Invalid"); valid = false; }
+            try { int qVal = Integer.parseInt(quantityField.getText()); if (qVal < 0) { qtyError.setText("⚠ ≥ 0"); valid = false; } else qtyError.setText(""); }
+            catch (Exception e) { qtyError.setText("⚠ Invalid"); valid = false; }
+            if (categoryField.getValue() == null) { catError.setText("⚠ Required"); valid = false; } else catError.setText("");
+            boolean changed = !titleField.getText().equals(p.getTitle()) || !descriptionField.getText().equals(p.getDescription()) ||
+                    !typeField.getValue().equals(p.getType()) || !priceField.getText().equals(String.valueOf(p.getPrice())) ||
+                    !quantityField.getText().equals(String.valueOf(p.getQuantity())) || !categoryField.getValue().equals(p.getCategory()) || selectedFile[0] != null;
+            if (!changed) { changeError.setText("⚠ No changes detected"); valid = false; } else changeError.setText("");
             if (!valid) event.consume();
         });
 
-        // --- RESULT CONVERTER ---
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == updateButtonType) {
-                p.setTitle(titleField.getText());
-                p.setDescription(descriptionField.getText());
+        dialog.setResultConverter(btn -> {
+            if (btn == updateButtonType) {
+                p.setTitle(titleField.getText().trim());
+                p.setDescription(descriptionField.getText().trim());
                 p.setType(typeField.getValue());
                 p.setPrice(Float.parseFloat(priceField.getText()));
                 p.setQuantity(Integer.parseInt(quantityField.getText()));
                 p.setCategory(categoryField.getValue());
-                if (selectedFile[0] != null) p.setImage(ImageUploader.uploadImage(selectedFile[0]));
+                if (selectedFile[0] != null) p.setImage(Utils.ImageUploader.uploadImage(selectedFile[0]));
                 return p;
             }
             return null;
         });
 
-        Optional<Product> result = dialog.showAndWait();
-        result.ifPresent(updated -> {
-            ps.updateProduct(updated);
-            loadProducts();
-            showAlert("Success", "Product updated successfully!");
-        });
+        dialog.showAndWait().ifPresent(updated -> { ps.updateProduct(updated); loadProducts(); showAlert("✅ Updated", "Product updated successfully!"); });
+    }
+
+
+    // ── UI Helper methods — ADD THESE TOO ─────────────────────────────────────
+
+    private TextField styledField(String prompt) {
+        TextField tf = new TextField();
+        tf.setPromptText(prompt);
+        tf.setPrefWidth(Double.MAX_VALUE);
+        tf.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-border-color: #E0E0E0;" +
+                        "-fx-border-radius: 6;" +
+                        "-fx-background-radius: 6;" +
+                        "-fx-padding: 6 10;" +
+                        "-fx-font-size: 11px;");
+
+        tf.focusedProperty().addListener((o, was, now) ->
+                tf.setStyle(tf.getStyle().replace(
+                        now ? "#E0E0E0" : "#43A047",
+                        now ? "#43A047" : "#E0E0E0")));
+        return tf;
+    }
+
+    private String comboStyle() {
+        return "-fx-background-color: white;" +
+                "-fx-border-color: #E0E0E0;" +
+                "-fx-border-radius: 6;" +
+                "-fx-background-radius: 6;" +
+                "-fx-padding: 2 6;" +
+                "-fx-font-size: 11px;";
+    }
+
+    private Label errorLabel() {
+        Label l = new Label();
+        l.setStyle("-fx-text-fill: #E53935; -fx-font-size: 11px;");
+        return l;
+    }
+
+    private Label sectionLabel(String text) {
+        Label l = new Label(text);
+        l.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #666;");
+        return l;
+    }
+
+    private VBox formRow(String labelText, javafx.scene.Node field, javafx.scene.Node error) {
+        VBox box = new VBox(4);
+        Label lbl = new Label(labelText);
+        lbl.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #555;");
+        field.setStyle(((javafx.scene.control.Control) field).getStyle());
+        VBox.setVgrow(field, javafx.scene.layout.Priority.NEVER);
+        box.getChildren().addAll(lbl, field, error);
+        return box;
     }
 
     private void deleteProduct(Product p) {
@@ -474,6 +507,18 @@ public class ProductManagementController {
         alert.setContentText(msg);
         alert.show();
     }
+    @FXML
+    private void openDashboard() {
+        MainFx.setCenter("/fxml/StatsDashboard.fxml");
+    }
+    @FXML
+    private void goToRoleSelection() {
+        MainFx.setCenter("/fxml/RoleSelection.fxml");
+    }
+
+
+
+
 
 
     @FXML private void openOrders() { MainFx.setCenter("/fxml/OrdersManagement.fxml"); }

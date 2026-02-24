@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ProductService {
     private Connection con;
-    public static int CURRENT_USER_ID = 2; // temporary
+    public static int CURRENT_USER_ID = 1; // temporary
 
     public ProductService() {
         con = Mydatabase.getInstance().getConnection();

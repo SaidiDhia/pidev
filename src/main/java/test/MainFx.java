@@ -16,7 +16,7 @@ public class MainFx extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Parent firstPage = FXMLLoader.load(getClass().getResource("/fxml/FactureList.fxml"));
+        Parent firstPage = FXMLLoader.load(getClass().getResource("/fxml/RoleSelection.fxml"));
 
         rootPane = new BorderPane();
         rootPane.setCenter(firstPage);

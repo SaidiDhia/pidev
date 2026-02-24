@@ -297,7 +297,7 @@ public class OrdersManagementController {
         };
     }
 
-    @FXML private void goBack() { MainFx.setCenter("/fxml/product_management.fxml"); }
+    @FXML private void goBack() { MainFx.setCenter("/fxml/SellerHome.fxml"); }
 
     private void showAlert(Alert.AlertType t, String title, String msg) {
         Alert a = new Alert(t); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
