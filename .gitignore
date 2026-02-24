@@ -36,3 +36,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Ignore IntelliJ files
+.idea/
+*.iml
