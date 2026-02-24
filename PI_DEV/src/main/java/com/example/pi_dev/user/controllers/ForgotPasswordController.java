@@ -1,6 +1,7 @@
 package com.example.pi_dev.user.controllers;
 
 import com.example.pi_dev.user.services.UserService;
+import com.example.pi_dev.common.services.ActivityLogService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -40,6 +41,7 @@ public class ForgotPasswordController {
     private Button actionButton;
 
     private final UserService userService = new UserService();
+    private final ActivityLogService activityLogService = new ActivityLogService();
     private boolean isResetStage = false;
 
     @FXML
@@ -88,6 +90,7 @@ public class ForgotPasswordController {
 
             boolean success = userService.resetPassword(token, newPass);
             if (success) {
+                activityLogService.log(emailField.getText(), "PASSWORD_RESET_FORGOT", "User reset password via forgot password flow");
                 statusLabel.setText("Password reset successfully! Redirecting...");
                 statusLabel.setStyle("-fx-text-fill: green;");
                 // Navigate back to login after short delay or immediately

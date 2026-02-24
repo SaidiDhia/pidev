@@ -16,10 +16,11 @@ public class User {
     private RoleEnum role;
     private TFAMethod tfaMethod;
     private LocalDateTime createdAt;
+    private String profilePicture;
 
     public User() {}
 
-    public User(UUID userId, String email, String passwordHash, String fullName, String phoneNumber, Boolean isActive, RoleEnum role, TFAMethod tfaMethod, LocalDateTime createdAt) {
+    public User(UUID userId, String email, String passwordHash, String fullName, String phoneNumber, Boolean isActive, RoleEnum role, TFAMethod tfaMethod, LocalDateTime createdAt, String profilePicture) {
         this.userId = userId;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -29,6 +30,7 @@ public class User {
         this.role = role;
         this.tfaMethod = tfaMethod;
         this.createdAt = createdAt;
+        this.profilePicture = profilePicture;
     }
 
     // Getters and Setters
@@ -58,4 +60,7 @@ public class User {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getProfilePicture() { return profilePicture; }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
 }

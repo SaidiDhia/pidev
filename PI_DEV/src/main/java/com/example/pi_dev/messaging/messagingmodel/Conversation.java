@@ -10,7 +10,12 @@ public class Conversation {
     private long contextId;
     private LocalDateTime createdAt;
     private String name;
-
+    private String createdBy;      // New field
+    private Long lastMessageId;     // New field
+    private LocalDateTime lastActivity; // New field
+    private boolean isArchived;      // New field
+    private boolean isPinned;        // New field
+    private boolean muteNotifications; // New field
 
     public Conversation() {}
 
@@ -38,15 +43,29 @@ public class Conversation {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+
+    public Long getLastMessageId() { return lastMessageId; }
+    public void setLastMessageId(Long lastMessageId) { this.lastMessageId = lastMessageId; }
+
+    public LocalDateTime getLastActivity() { return lastActivity; }
+    public void setLastActivity(LocalDateTime lastActivity) { this.lastActivity = lastActivity; }
+
+    public boolean isArchived() { return isArchived; }
+    public void setArchived(boolean archived) { isArchived = archived; }
+
+    public boolean isPinned() { return isPinned; }
+    public void setPinned(boolean pinned) { isPinned = pinned; }
+
+    public boolean isMuteNotifications() { return muteNotifications; }
+    public void setMuteNotifications(boolean muteNotifications) { this.muteNotifications = muteNotifications; }
+
     @Override
     public String toString() {
-        return type + " - " + contextType + " #" + contextId;
+        return type + " - " + (name != null ? name : "Conversation " + id);
     }
-
-
-
 }

@@ -73,6 +73,15 @@ public class UserService implements IUserService {
         }
     }
 
+    public User getUserByEmail(String email) {
+        try {
+            return userRepository.findByEmail(email).orElse(null);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     public List<User> getAllUsers() {
         try {

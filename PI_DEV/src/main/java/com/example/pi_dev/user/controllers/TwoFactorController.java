@@ -5,6 +5,7 @@ import com.example.pi_dev.user.enums.TFAMethod;
 import com.example.pi_dev.user.models.User;
 import com.example.pi_dev.user.services.UserService;
 import com.example.pi_dev.user.utils.UserSession;
+import com.example.pi_dev.common.services.ActivityLogService;
 import com.github.sarxos.webcam.Webcam;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -62,6 +63,7 @@ public class TwoFactorController {
     private Label errorLabel;
 
     private final UserService userService = new UserService();
+    private final ActivityLogService activityLogService = new ActivityLogService();
     private boolean isSetupMode = false;
     private String method = "QR"; // Default
     
@@ -262,6 +264,7 @@ public class TwoFactorController {
         
         if (isValid) {
              System.out.println("Face Verified!");
+             activityLogService.log(user.getEmail(), "2FA_VERIFY_SUCCESS", "Face verification successful");
              navigateToHome(null); // Helper handles role
              // Close current window
              Stage stage = (Stage) captureButton.getScene().getWindow();
@@ -284,6 +287,7 @@ public class TwoFactorController {
                     userService.setupTwoFactorFace(user.getUserId(), capturedImageBytes);
                     userService.finalizeTwoFactorSetup(user.getUserId(), TFAMethod.FACE);
                     user.setTfaMethod(TFAMethod.FACE); // Update local session
+                    activityLogService.log(user.getEmail(), "2FA_SETUP", "Enabled Face ID 2FA");
                     
                     navigateTo("/com/example/pi_dev/user/settings.fxml", event);
                 } catch (Exception e) {
@@ -306,11 +310,13 @@ public class TwoFactorController {
             
             if (isValid) {
                 System.out.println("2FA Verified!");
+                activityLogService.log(user.getEmail(), "2FA_VERIFY_SUCCESS", "Verified 2FA code (" + method + ")");
                 
                 if (isSetupMode) {
                      TFAMethod newMethod = method.equals("EMAIL") ? TFAMethod.EMAIL : TFAMethod.QR;
                      userService.finalizeTwoFactorSetup(user.getUserId(), newMethod);
                      user.setTfaMethod(newMethod); // Update local session
+                     activityLogService.log(user.getEmail(), "2FA_SETUP", "Enabled " + newMethod + " 2FA");
                 }
 
                 navigateToHome(event);
@@ -324,6 +330,12 @@ public class TwoFactorController {
 
     private void navigateToHome(ActionEvent event) {
         User user = UserSession.getInstance().getCurrentUser();
+        
+        if (isInsideHomeView(event)) {
+            closeHomeOverlay(event);
+            return;
+        }
+
         String path = "/com/example/pi_dev/user/settings.fxml";
         if (user.getRole() == RoleEnum.ADMIN) {
             path = "/com/example/pi_dev/user/admin_dashboard.fxml";
@@ -353,9 +365,51 @@ public class TwoFactorController {
         }
     }
 
+    private boolean isInsideHomeView(ActionEvent event) {
+        Node source = null;
+        if (event != null) {
+            source = (Node) event.getSource();
+        } else if (verifyButton.getScene() != null) {
+            source = verifyButton;
+        }
+
+        if (source != null && source.getScene() != null && source.getScene().getRoot() instanceof javafx.scene.layout.BorderPane) {
+            javafx.scene.layout.BorderPane root = (javafx.scene.layout.BorderPane) source.getScene().getRoot();
+            return root.getCenter() instanceof javafx.scene.layout.StackPane && 
+                   root.getCenter().getId() != null && 
+                   root.getCenter().getId().equals("mainContentArea");
+        }
+        return false;
+    }
+
+    private void closeHomeOverlay(ActionEvent event) {
+        Node source = null;
+        if (event != null) {
+            source = (Node) event.getSource();
+        } else if (verifyButton.getScene() != null) {
+            source = verifyButton;
+        }
+
+        if (source != null) {
+            javafx.scene.layout.StackPane mainContentArea = (javafx.scene.layout.StackPane) source.getScene().lookup("#mainContentArea");
+            if (mainContentArea != null) {
+                mainContentArea.getChildren().remove(mainContentArea.getChildren().size() - 1);
+                // Trigger refresh on the controller if possible
+                Object controller = mainContentArea.getScene().getUserData();
+                if (controller instanceof com.example.pi_dev.venue.controllers.HomeController) {
+                    ((com.example.pi_dev.venue.controllers.HomeController) controller).refresh();
+                }
+            }
+        }
+    }
+
     @FXML
     void goBack(ActionEvent event) {
         stopWebcam();
+        if (isInsideHomeView(event)) {
+            closeHomeOverlay(event);
+            return;
+        }
         if (isSetupMode) {
             navigateTo("/com/example/pi_dev/user/settings.fxml", event);
         } else {

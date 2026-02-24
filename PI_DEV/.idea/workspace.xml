@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ChatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,8 +19,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="FxmlFile" />
-        <option value="Class" />
         <option value="CSS File" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -64,6 +67,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Application.GeminiDirectTest.executor&quot;: &quot;Run&quot;,
     &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
     &quot;Application.MainTest.executor&quot;: &quot;Run&quot;,
@@ -71,6 +75,7 @@
     &quot;Application.TestDB.executor&quot;: &quot;Run&quot;,
     &quot;Application.TestMessaging.executor&quot;: &quot;Run&quot;,
     &quot;Application.UserMain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.VenueMain.executor&quot;: &quot;Run&quot;,
     &quot;Application.com.example.pi_dev.user.UserMain.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
@@ -79,10 +84,11 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/messaging&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/jacer/Desktop/pi_dev/pidev/PI_DEV&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/jacer/Desktop/pi_dev/YASMINE/PI_DEV&quot;,
     &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -106,9 +112,9 @@
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MessagingMain">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.Main" />
+  <component name="RunManager" selected="Application.VenueMain">
+    <configuration name="GeminiDirectTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.GeminiDirectTest" />
       <module name="PI_DEV" />
       <extension name="coverage">
         <pattern>
@@ -133,12 +139,25 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserMain" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.UserMain" />
+    <configuration name="UserCrudConsole" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.user.UserCrudConsole" />
       <module name="PI_DEV" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.example.pi_dev.*" />
+          <option name="PATTERN" value="com.example.pi_dev.user.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VenueMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.venue.VenueMain" />
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.venue.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -161,19 +180,19 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.MessagingMain" />
-        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.VenueMain" />
+        <item itemvalue="Application.UserCrudConsole" />
         <item itemvalue="Application.com.example.pi_dev.user.UserMain" />
         <item itemvalue="Application.MessagingMain" />
-        <item itemvalue="Application.com.example.pi_dev.user.UserMain" />
+        <item itemvalue="Application.GeminiDirectTest" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
       </set>
     </attachedChunks>
   </component>
@@ -195,6 +214,15 @@
       <workItem from="1770161061032" duration="302000" />
       <workItem from="1770563698814" duration="2521000" />
       <workItem from="1770566315192" duration="6091000" />
+      <workItem from="1770744572936" duration="5176000" />
+      <workItem from="1770825730261" duration="6504000" />
+      <workItem from="1770992750314" duration="23685000" />
+      <workItem from="1771108141389" duration="1775000" />
+      <workItem from="1771316890457" duration="1366000" />
+      <workItem from="1771427143731" duration="7967000" />
+      <workItem from="1771491323029" duration="1643000" />
+      <workItem from="1771766058476" duration="13125000" />
+      <workItem from="1771845011900" duration="1856000" />
     </task>
     <servers />
   </component>
@@ -223,9 +251,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XSLT-Support.FileAssociations.UIState">
-    <expand />
-    <select />
   </component>
 </project>

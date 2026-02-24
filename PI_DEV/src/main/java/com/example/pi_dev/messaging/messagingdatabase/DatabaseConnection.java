@@ -11,7 +11,7 @@ public class DatabaseConnection {
     private static final String URL =
             "jdbc:mysql://localhost:3306/wonderlust_db?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "saididhia";
 
     private DatabaseConnection() {
         // empty constructor
@@ -24,7 +24,7 @@ public class DatabaseConnection {
         return instance;
     }
 
-    // 🔥 THIS IS THE IMPORTANT PART
+    // rakkz lenna THIS IS THE IMPORTANT PART
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }

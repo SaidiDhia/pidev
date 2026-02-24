@@ -14,7 +14,7 @@ import java.util.UUID;
 public class UserRepository {
 
     public void create(User user) throws SQLException {
-        String sql = "INSERT INTO users (user_id, email, password_hash, full_name, phone_number, is_active, role, tfa_method, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (user_id, email, password_hash, full_name, phone_number, is_active, role, tfa_method, created_at, profile_picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setString(1, user.getUserId().toString());
@@ -26,6 +26,7 @@ public class UserRepository {
             ps.setString(7, user.getRole().name());
             ps.setString(8, user.getTfaMethod() != null ? user.getTfaMethod().name() : null);
             ps.setTimestamp(9, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setString(10, user.getProfilePicture());
 
             ps.executeUpdate();
         }
@@ -68,7 +69,7 @@ public class UserRepository {
     }
 
     public void update(User user) throws SQLException {
-        String sql = "UPDATE users SET email = ?, password_hash = ?, full_name = ?, phone_number = ?, is_active = ?, role = ?, tfa_method = ? WHERE user_id = ?";
+        String sql = "UPDATE users SET email = ?, password_hash = ?, full_name = ?, phone_number = ?, is_active = ?, role = ?, tfa_method = ?, profile_picture = ? WHERE user_id = ?";
         try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPasswordHash());
@@ -77,7 +78,8 @@ public class UserRepository {
             ps.setBoolean(5, user.getIsActive());
             ps.setString(6, user.getRole().name());
             ps.setString(7, user.getTfaMethod() != null ? user.getTfaMethod().name() : null);
-            ps.setString(8, user.getUserId().toString());
+            ps.setString(8, user.getProfilePicture());
+            ps.setString(9, user.getUserId().toString());
 
             ps.executeUpdate();
         }
@@ -124,7 +126,8 @@ public class UserRepository {
                 rs.getBoolean("is_active"),
                 RoleEnum.valueOf(rs.getString("role")),
                 rs.getString("tfa_method") != null ? TFAMethod.valueOf(rs.getString("tfa_method")) : null,
-                rs.getTimestamp("created_at").toLocalDateTime()
+                rs.getTimestamp("created_at").toLocalDateTime(),
+                rs.getString("profile_picture")
         );
     }
 }
