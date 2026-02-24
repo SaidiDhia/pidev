@@ -393,7 +393,7 @@ public class ChatController {
 
                 if (isMine) {
                     bubble.getStyleClass().add("mine");
-                    bubble.setStyle("-fx-background-color: #dcf8c6; -fx-background-radius: 15 15 2 15; -fx-padding: 8;");
+                    bubble.setStyle("-fx-background-color: #86A7BF; -fx-background-radius: 15 15 2 15; -fx-padding: 8;");
                 } else {
                     bubble.getStyleClass().add("theirs");
                     bubble.setStyle("-fx-background-color: white; -fx-background-radius: 15 15 15 2; -fx-padding: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 15 15 15 2;");

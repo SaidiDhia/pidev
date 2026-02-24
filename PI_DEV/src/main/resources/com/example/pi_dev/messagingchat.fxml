@@ -13,17 +13,17 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.geometry.Insets?>
-
 <?import javafx.scene.control.MenuButton?>
-    <?import javafx.scene.control.MenuItem?>
-<VBox fx:id="mainContainer" style="-fx-background-color: linear-gradient(to bottom, #f0f8f0, #ffffff); -fx-padding: 0;"
+<?import javafx.scene.control.MenuItem?>
+
+<VBox fx:id="mainContainer" style="-fx-background-color: linear-gradient(to bottom, #CAD4DC, #ffffff); -fx-padding: 0;"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.pi_dev.messaging.messagecontroller.ChatController">
 
     <children>
         <!-- ==================== HEADER SECTION ==================== -->
-        <HBox fx:id="headerBox" alignment="CENTER_LEFT" style="-fx-background-color: #1a5f3f; -fx-padding: 20; -fx-spacing: 20;">
+        <HBox fx:id="headerBox" alignment="CENTER_LEFT" style="-fx-background-color: linear-gradient(to bottom right, #86A7BF, #2D70B3); -fx-padding: 20; -fx-spacing: 20;">
             <children>
                 <!-- Logo as text emoji -->
                 <Label fx:id="logoLabel" style="-fx-font-size: 40px; -fx-text-fill: white;" text="💬" />
@@ -32,7 +32,7 @@
                 <VBox fx:id="titleBox" spacing="5">
                     <children>
                         <Label fx:id="mainTitle" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="Wanderlust Chat" />
-                        <Label fx:id="subTitle" style="-fx-font-size: 14px; -fx-text-fill: #90ee90;" text="Connect with fellow adventurers" />
+                        <Label fx:id="subTitle" style="-fx-font-size: 14px; -fx-text-fill: #0F2C4F;" text="Connect with fellow adventurers" />
                     </children>
                 </VBox>
 
@@ -43,7 +43,7 @@
                     <children>
                         <Button fx:id="themeBtn"
                                 onAction="#toggleTheme"
-                                style="-fx-background-color: #2d7a2d; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 16; -fx-font-size: 16px; -fx-cursor: hand;"
+                                style="-fx-background-color: #1A4E85; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 8 16; -fx-font-size: 16px; -fx-cursor: hand;"
                                 text="🌙" />
                     </children>
                 </HBox>
@@ -53,13 +53,13 @@
         <!-- ==================== SEARCH AND ACTIONS BAR ==================== -->
         <HBox fx:id="searchBar" spacing="20" style="-fx-background-color: white; -fx-padding: 15 40; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;" alignment="CENTER">
             <children>
-                <Label fx:id="searchIcon" style="-fx-font-size: 20px; -fx-text-fill: #2d7a2d;" text="🔍" />
+                <Label fx:id="searchIcon" style="-fx-font-size: 20px; -fx-text-fill: #1A4E85;" text="🔍" />
                 <TextField fx:id="conversationSearchField"
                            promptText="Search conversations..."
-                           style="-fx-border-color: #5cb85c; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 10 20; -fx-font-size: 14px; -fx-pref-width: 300;"
+                           style="-fx-border-color: #2D70B3; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 10 20; -fx-font-size: 14px; -fx-pref-width: 300;"
                            HBox.hgrow="ALWAYS" />
                 <Button fx:id="newChatButton" onAction="#handleCreateConversation"
-                        style="-fx-background-color: #2d7a2d; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 24; -fx-font-size: 14px; -fx-cursor: hand;"
+                        style="-fx-background-color: #1A4E85; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 24; -fx-font-size: 14px; -fx-cursor: hand;"
                         text="➕ New Chat" />
             </children>
         </HBox>
@@ -77,7 +77,7 @@
                                 <VBox fx:id="leftPanel" spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e0e0e0; -fx-padding: 15;" prefWidth="300">
                                     <children>
                                         <!-- Conversations Header -->
-                                        <Label fx:id="conversationsHeader" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a5f3f;" text="Your Conversations"/>
+                                        <Label fx:id="conversationsHeader" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1A4E85;" text="Your Conversations"/>
 
                                         <!-- Conversations List -->
                                         <ListView fx:id="conversationList"
@@ -99,17 +99,17 @@
                                     </BorderPane.margin>
                                     <children>
                                         <!-- Conversation Header with Actions -->
-                                        <HBox fx:id="conversationHeaderBox" alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #f0f8f0; -fx-background-radius: 8; -fx-padding: 12;">
+                                        <HBox fx:id="conversationHeaderBox" alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #CAD4DC; -fx-background-radius: 8; -fx-padding: 12;">
                                             <children>
-                                                <Label fx:id="headerIcon" style="-fx-font-size: 18px; -fx-text-fill: #1a5f3f;" text="💬" />
+                                                <Label fx:id="headerIcon" style="-fx-font-size: 18px; -fx-text-fill: #1A4E85;" text="💬" />
                                                 <Label fx:id="conversationTitleLabel"
-                                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d7a2d;"
+                                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2D70B3;"
                                                        text="Select a conversation"/>
                                                 <Region HBox.hgrow="ALWAYS" />
                                                 <!-- Update/Delete buttons for selected conversation -->
                                                 <Button fx:id="updateConversationBtn"
                                                         onAction="#handleUpdateConversation"
-                                                        style="-fx-background-color: #5cb85c; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-size: 12px; -fx-cursor: hand; -fx-opacity: 0.9;"
+                                                        style="-fx-background-color: #2D70B3; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-size: 12px; -fx-cursor: hand; -fx-opacity: 0.9;"
                                                         text="✏️ Rename"
                                                         visible="false"/>
                                                 <Button fx:id="deleteConversationBtn"
@@ -141,7 +141,7 @@
                                             </content>
                                         </ScrollPane>
 
-                                        <HBox fx:id="messageInputContainer" spacing="5" style="-fx-background-color: #f0f8f0; -fx-background-radius: 30; -fx-padding: 5 10;" alignment="CENTER">
+                                        <HBox fx:id="messageInputContainer" spacing="5" style="-fx-background-color: #CAD4DC; -fx-background-radius: 30; -fx-padding: 5 10;" alignment="CENTER">
                                             <children>
                                                 <MenuButton fx:id="attachMenuBtn"
                                                             style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;"
@@ -156,13 +156,13 @@
 
                                                 <!-- Voice recording button -->
                                                 <Button fx:id="voiceRecordBtn"
-                                                        style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand; -fx-text-fill: black;"
+                                                        style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand; -fx-text-fill: #1A4E85;"
                                                         text="🎤"
                                                         onAction="#toggleVoiceRecording"/>
 
                                                 <!-- NEW: AI Smart Reply Button -->
                                                 <Button fx:id="smartReplyBtn"
-                                                        style="-fx-background-color: #2d7a2d; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 12; -fx-font-size: 13px; -fx-cursor: hand;"
+                                                        style="-fx-background-color: #1A4E85; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 12; -fx-font-size: 13px; -fx-cursor: hand;"
                                                         text="🤖 Smart Reply"
                                                         onAction="#handleSmartReply"/>
 
@@ -184,10 +184,10 @@
                                                 <TextField fx:id="messageInput"
                                                            promptText="Type a message..."
                                                            HBox.hgrow="ALWAYS"
-                                                           style="-fx-border-color: #5cb85c; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 10 15; -fx-font-size: 14px;"/>
+                                                           style="-fx-border-color: #2D70B3; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 10 15; -fx-font-size: 14px;"/>
 
                                                 <Button fx:id="sendButton" onAction="#sendMessage"
-                                                        style="-fx-background-color: #2d7a2d; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;"
+                                                        style="-fx-background-color: #1A4E85; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 20; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;"
                                                         text="Send"/>
                                             </children>
                                         </HBox>
@@ -202,19 +202,19 @@
                     <content>
                         <VBox style="-fx-background-color: #f8faf8; -fx-padding: 20;" spacing="15">
                             <children>
-                                <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: linear-gradient(to bottom right, #6c757d, #495057); -fx-background-radius: 12; -fx-padding: 20;">
+                                <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: linear-gradient(to bottom right, #86A7BF, #2D70B3); -fx-background-radius: 12; -fx-padding: 20;">
                                     <children>
                                         <Label style="-fx-font-size: 24px; -fx-text-fill: white;" text="📦" />
                                         <VBox spacing="5">
                                             <children>
                                                 <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Archived Conversations" />
-                                                <Label style="-fx-font-size: 14px; -fx-text-fill: #adb5bd;" text="Conversations you've hidden" />
+                                                <Label style="-fx-font-size: 14px; -fx-text-fill: #CAD4DC;" text="Conversations you've hidden" />
                                             </children>
                                         </VBox>
                                         <Region HBox.hgrow="ALWAYS" />
                                         <Button fx:id="unarchiveAllBtn"
                                                 text="Unarchive All"
-                                                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 16;"/>
+                                                style="-fx-background-color: #1A4E85; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 16;"/>
                                     </children>
                                 </HBox>
 
@@ -239,13 +239,13 @@
                                 <Insets top="30" right="30" bottom="30" left="30"/>
                             </padding>
                             <children>
-                                <HBox fx:id="contactsHeader" alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: linear-gradient(to bottom right, #2d7a2d, #1a5f3f); -fx-background-radius: 12; -fx-padding: 20;">
+                                <HBox fx:id="contactsHeader" alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: linear-gradient(to bottom right, #1A4E85, #0F2C4F); -fx-background-radius: 12; -fx-padding: 20;">
                                     <children>
                                         <Label fx:id="contactsIcon" style="-fx-font-size: 24px; -fx-text-fill: white;" text="👥" />
                                         <VBox fx:id="contactsTitleBox" spacing="5">
                                             <children>
                                                 <Label fx:id="contactsTitle" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Your Contacts" />
-                                                <Label fx:id="contactsSubtitle" style="-fx-font-size: 14px; -fx-text-fill: #90ee90;" text="Connect with fellow adventurers" />
+                                                <Label fx:id="contactsSubtitle" style="-fx-font-size: 14px; -fx-text-fill: #CAD4DC;" text="Connect with fellow adventurers" />
                                             </children>
                                         </VBox>
                                         <Region HBox.hgrow="ALWAYS" />
@@ -276,19 +276,19 @@
         </TabPane>
 
         <!-- ==================== FOOTER SECTION ==================== -->
-        <HBox fx:id="footerBox" alignment="CENTER" style="-fx-background-color: #1a5f3f; -fx-padding: 20; -fx-border-color: #2d7a2d; -fx-border-width: 2 0 0 0;">
+        <HBox fx:id="footerBox" alignment="CENTER" style="-fx-background-color: linear-gradient(to bottom right, #86A7BF, #2D70B3); -fx-padding: 20; -fx-border-color: #1A4E85; -fx-border-width: 2 0 0 0;">
             <children>
                 <VBox fx:id="footerText" alignment="CENTER" spacing="5">
                     <children>
                         <Label fx:id="footerTitle" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;" text="🌍 Wanderlust Chat" />
-                        <Label fx:id="footerSubtitle" style="-fx-font-size: 12px; -fx-text-fill: #90ee90;" text="Connect with travelers and adventurers" />
+                        <Label fx:id="footerSubtitle" style="-fx-font-size: 12px; -fx-text-fill: #CAD4DC;" text="Connect with travelers and adventurers" />
                     </children>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
                 <HBox fx:id="footerContacts" alignment="CENTER" spacing="20">
                     <children>
-                        <Label fx:id="footerEmail" style="-fx-font-size: 12px; -fx-text-fill: #90ee90;" text="📧 chat@wanderlust.tn" />
-                        <Label fx:id="footerSupport" style="-fx-font-size: 12px; -fx-text-fill: #90ee90;" text="💬 24/7 Support" />
+                        <Label fx:id="footerEmail" style="-fx-font-size: 12px; -fx-text-fill: #CAD4DC;" text="📧 chat@wanderlust.tn" />
+                        <Label fx:id="footerSupport" style="-fx-font-size: 12px; -fx-text-fill: #CAD4DC;" text="💬 24/7 Support" />
                     </children>
                 </HBox>
             </children>
