@@ -5,9 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/EventsMain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Controllers/BlogController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Commentaire.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Post.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Reaction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/GUI/MainApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IcommentaireServices.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IpostServices.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IreactionServices.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/AI_ModerationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Commentaire_Services.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/ModerationResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Posting_Services.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Reaction_Services.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/SaveService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/TranslationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Test/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Utils/BlogDataBase.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/EventsMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/EventsMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/ActiviteCard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/ActiviteCard.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/EventDetails.fxml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/SimpleTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/SimpleTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -41,6 +61,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.EventsMain.executor": "Run",
+    "Application.MainApp.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -48,6 +69,7 @@
     "git-widget-placeholder": "integration-sprint",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/MSI/Desktop/Ingégnerie/season 2/PI-DEV/PI_DEV/src/main/java/com/example/pi_dev/blog",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -57,7 +79,20 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\java\com\example\pi_dev\blog" />
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\resources\com\example\pi_dev\blog" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\resources\com\example\pi_dev" />
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\java\com\example\pi_dev\blog" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example.pi_dev" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.MainApp">
     <configuration name="EventsMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.EventsMain" />
       <module name="PI_DEV" />
@@ -71,8 +106,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MainApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.blog.GUI.MainApp" />
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.blog.GUI.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.MainApp" />
         <item itemvalue="Application.EventsMain" />
       </list>
     </recent_temporary>
@@ -92,7 +141,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1772306964434</updated>
-      <workItem from="1772306966771" duration="689000" />
+      <workItem from="1772306966771" duration="9222000" />
     </task>
     <servers />
   </component>

@@ -23,7 +23,8 @@ module com.example.pi_dev {
     requires com.google.zxing.javase;
     requires jdk.jsobject;
     requires java.net.http;
-    requires com.google.gson; // For JavaScript interop in WebView
+    requires com.google.gson;
+    requires javafx.media; // For JavaScript interop in WebView
 
     opens com.example.pi_dev to javafx.fxml;
     opens com.example.pi_dev.messaging.messagecontroller to javafx.fxml;
@@ -55,5 +56,9 @@ module com.example.pi_dev {
     opens com.example.pi_dev.venue.entities to javafx.base;
 
     exports com.example.pi_dev;
+
+    exports com.example.pi_dev.blog.GUI to javafx.graphics;
+    exports com.example.pi_dev.blog.Controllers to javafx.fxml;
+    opens com.example.pi_dev.blog.Controllers to javafx.fxml;
 
 }

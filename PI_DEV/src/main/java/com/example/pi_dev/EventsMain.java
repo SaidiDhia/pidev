@@ -12,7 +12,7 @@ public class EventsMain extends Application {
     public void start(Stage primaryStage) {
         try {
             // Charger le FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Catalogue.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Catalogue.fxml"));
             Parent root = loader.load();
 
             // Créer la scène

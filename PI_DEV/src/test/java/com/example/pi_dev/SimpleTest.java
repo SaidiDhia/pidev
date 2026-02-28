@@ -1,6 +1,6 @@
 package com.example.pi_dev;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SimpleTest {
