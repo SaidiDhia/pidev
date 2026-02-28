@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ChatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +72,7 @@
     &quot;Application.MessagingMain.executor&quot;: &quot;Run&quot;,
     &quot;Application.TestDB.executor&quot;: &quot;Run&quot;,
     &quot;Application.TestMessaging.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UserCrudConsole.executor&quot;: &quot;Run&quot;,
     &quot;Application.UserMain.executor&quot;: &quot;Run&quot;,
     &quot;Application.VenueMain.executor&quot;: &quot;Run&quot;,
     &quot;Application.com.example.pi_dev.user.UserMain.executor&quot;: &quot;Run&quot;,
@@ -223,6 +222,7 @@
       <workItem from="1771491323029" duration="1643000" />
       <workItem from="1771766058476" duration="13125000" />
       <workItem from="1771845011900" duration="1856000" />
+      <workItem from="1772289685565" duration="763000" />
     </task>
     <servers />
   </component>
