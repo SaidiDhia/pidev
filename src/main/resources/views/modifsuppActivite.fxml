@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
@@ -37,12 +38,29 @@
       </HBox>
       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
          <content>
-            <VBox alignment="TOP_CENTER" maxWidth="600" style="-fx-padding: 40; -fx-spacing: 25;">
+            <VBox alignment="TOP_CENTER" maxWidth="700" style="-fx-padding: 40; -fx-spacing: 25;">
                <children>
                   <VBox spacing="20" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 30;">
                      <children>
-                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="📋 Activité" />
+                        <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="📋 Modifier l'activité" />
                         <Separator style="-fx-background-color: #e0e0e0;" />
+                        
+                        <!-- Catégorie -->
+                        <VBox spacing="8">
+                           <children>
+                              <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="Catégorie" />
+                              <ComboBox fx:id="categorieCombo" prefHeight="40" prefWidth="300" promptText="Sélectionner une catégorie" style="-fx-border-color: #2D70B3; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10 14; -fx-font-size: 13px;" />
+                           </children>
+                        </VBox>
+                        
+                        <!-- Type d'activité -->
+                        <VBox spacing="8">
+                           <children>
+                              <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="Type d'activité" />
+                              <ComboBox fx:id="typeactField" prefHeight="40" prefWidth="300" promptText="Sélectionner un type" style="-fx-border-color: #2D70B3; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10 14; -fx-font-size: 13px;" />
+                           </children>
+                        </VBox>
+                        
                         <VBox spacing="8">
                            <children>
                               <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="Titre *" />
@@ -57,14 +75,13 @@
                         </VBox>
                         <VBox spacing="8">
                            <children>
-                              <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="Type *" />
-                           </children>
-                        </VBox>
-                        <TextField fx:id="typeactField" promptText="ex : Kayak,Camping,Paddel..." style="-fx-border-color: #2D70B3; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10 14; -fx-font-size: 13px;" />
-                        <VBox spacing="8">
-                           <children>
-                              <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="Chemin image" />
-                              <TextField fx:id="imageField1" promptText="C:/images/photo.jpg" style="-fx-border-color: #2D70B3; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10 14; -fx-font-size: 13px;" />
+                              <Label style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="Image de l'activité" />
+                              <HBox spacing="10" alignment="CENTER_LEFT">
+                                 <children>
+                                    <TextField fx:id="imageField1" promptText="Aucune image sélectionnée" editable="false" style="-fx-border-color: #2D70B3; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10 14; -fx-font-size: 13px; -fx-background-color: #f8f9fa;" HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="importImageButton" onAction="#importerImage" style="-fx-background-color: #2D70B3; -fx-text-fill: white; -fx-border-radius: 6; -fx-border-radius: 6; -fx-padding: 10 16; -fx-font-size: 12px; -fx-cursor: hand;" text="📁 Importer" />
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                         <HBox alignment="CENTER" spacing="15">

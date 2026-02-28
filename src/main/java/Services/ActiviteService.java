@@ -18,7 +18,7 @@ public class ActiviteService {
     // ================= ADD =================
     public void ajouter(Activite a) throws SQLException {
 
-        String sql = "INSERT INTO activite (titre, description, type_activite, image, date_creation, date_modification) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        String sql = "INSERT INTO activites (titre, description, type_activite, image, date_creation, date_modification) VALUES (?, ?, ?, ?, NOW(), NOW())";
 
         PreparedStatement ps = cnx.prepareStatement(sql);
 
@@ -34,7 +34,7 @@ public class ActiviteService {
     public List<Activite> afficher() throws SQLException {
 
         List<Activite> list = new ArrayList<>();
-        String sql = "SELECT * FROM activite";
+        String sql = "SELECT * FROM activites";
 
         Statement st = cnx.createStatement();
         ResultSet rs = st.executeQuery(sql);
@@ -60,7 +60,7 @@ public class ActiviteService {
     //  UPDATE
     public void modifier(Activite a) throws SQLException {
 
-        String sql = "UPDATE activite SET titre=?, description=?, type_activite=?, image=?, date_modification=NOW() WHERE id=?";
+        String sql = "UPDATE activites SET titre=?, description=?, type_activite=?, image=?, date_modification=NOW() WHERE id=?";
 
         PreparedStatement ps = cnx.prepareStatement(sql);
 
@@ -76,7 +76,7 @@ public class ActiviteService {
     //  DELETE
     public void supprimer(int id) throws SQLException {
 
-        String sql = "DELETE FROM activite WHERE id=?";
+        String sql = "DELETE FROM activites WHERE id=?";
 
         PreparedStatement ps = cnx.prepareStatement(sql);
         ps.setInt(1, id);

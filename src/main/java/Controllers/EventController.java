@@ -1,200 +1,159 @@
 package Controllers;
 
+import Services.WeatherService;
+import Utils.Mydatabase;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class EventController {
+public class EventController implements Initializable {
 
-    @FXML
-    private ComboBox<String> activiteCombo;
+    @FXML private ComboBox<String> activiteCombo;
+    @FXML private VBox activitesSelectionneesContainer;
+    @FXML private TextField nomorgField;
+    @FXML private TextField lieuField;
+    @FXML private TextField emailField;
+    @FXML private DatePicker dateDebutPicker;
+    @FXML private DatePicker dateFinPicker;
+    @FXML private TextField prixField;
+    @FXML private TextField capaciteField;
+    @FXML private TextField telephoneorgField;
+    @FXML private TextArea equipementField;
+    @FXML private TextArea descriptionField;
+    @FXML private Label imageStatusLabel;
+        @FXML private Button importerImageButton;
+    @FXML private ImageView imagePrincipaleView;
+    @FXML private HBox photosContainer;
+    @FXML private Button ajouterPhotoButton;
+    @FXML private TextField videoYoutubeField;
+    @FXML private CheckBox check1;
+    @FXML private CheckBox check2;
+    @FXML private CheckBox check3;
+    @FXML private CheckBox check4;
 
-    @FXML
-    private Button ajouterEventButton;
-
-    @FXML
-    private TextField capaciteField;
-
-    @FXML
-    private Button catalogue;
-
-    @FXML
-    private CheckBox check1;
-
-    @FXML
-    private CheckBox check2;
-
-    @FXML
-    private CheckBox check3;
-
-    @FXML
-    private CheckBox check4;
-
-    @FXML
-    private DatePicker dateDebutPicker;
-
-    @FXML
-    private DatePicker dateFinPicker;
-
-    @FXML
-    private TextArea descriptionField;
-
-    @FXML
-    private ComboBox<String> difficulteCombo;
-
-    @FXML
-    private TextField emailorgField;
-
-    @FXML
-    private TextArea equipementField;
-
-    @FXML
-    private TextField lieuField;
-
-    @FXML
-    private TextField nomorgField;
-
-    @FXML
-    private TextField prixField;
-
-    @FXML
-    private TextField telephoneorgField;
-
-    private Object currentActivite;
     private Connection connection;
-    private List<Object> activitesList;
+    private WeatherService weatherService;
+    private WeatherService.WeatherData currentWeather;
+    private List<Object> activitesList = new ArrayList<>();
+    private List<Object> activitesSelectionnees = new ArrayList<>();
+    private Object currentActivite;
+    private List<byte[]> photosData = new ArrayList<>();
+    private byte[] imagePrincipaleData;
 
-    public void initialize() {
-        initializeDatabase();
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        connection = Mydatabase.getInstance().getConnextion();
+        weatherService = new WeatherService();
+        loadWeatherData();
         loadActivites();
     }
 
-    private void initializeDatabase() {
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db", "root", "");
-        } catch (SQLException e) {
-            System.err.println("Database connection error: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
     private void loadActivites() {
-        activitesList = new ArrayList<>();
         try {
-            String sql = "SELECT id, titre, description, image FROM activites";
-            PreparedStatement pstmt = connection.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
+            String sql = "SELECT id, titre, type_activite, description, image FROM activites";
+            Statement st = connection.createStatement();
+            ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
-                Object activite = createActiviteObject(
-                    rs.getInt("id"),
-                    rs.getString("titre"),
-                    "Sport",
-                    rs.getString("description"),
-                    rs.getString("image")
-                );
-                activitesList.add(activite);
-            }
+                int id = rs.getInt("id");
+                String titre = rs.getString("titre");
+                String type = rs.getString("type_activite");
+                String description = rs.getString("description");
+                String imagePath = rs.getString("image");
 
-            activiteCombo.getItems().clear();
-            for (Object activite : activitesList) {
+                Object activite = createActiviteObject(id, titre, type, description, imagePath);
                 if (activite != null) {
-                    String titre = (String) activite.getClass().getMethod("getTitre").invoke(activite);
+                    activitesList.add(activite);
                     activiteCombo.getItems().add(titre);
+                    System.out.println("Activité ajoutée au combo: " + titre);
                 }
             }
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des activités: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private Object createActiviteObject(int id, String titre, String type, String description, String imagePath) {
         try {
-            Class<?> activiteClass = Class.forName("Entities.Activite");
-            java.lang.reflect.Constructor<?> constructor = activiteClass.getConstructor(
-                int.class, String.class, String.class, String.class, String.class
-            );
-            return constructor.newInstance(id, titre, type, description, imagePath);
+            Entities.Activite activite = new Entities.Activite();
+            activite.setId(id);
+            activite.setTitre(titre);
+            activite.setTypeActivite(type);
+            activite.setDescription(description);
+            activite.setImage(imagePath);
+            return activite;
         } catch (Exception e) {
+            System.err.println("Erreur création Activite: " + e.getMessage());
             e.printStackTrace();
             return null;
-        }
-    }
-
-    public void setActiviteData(Object activite) {
-        this.currentActivite = activite;
-
-        try {
-            String titre = (String) activite.getClass().getMethod("getTitre").invoke(activite);
-            String description = (String) activite.getClass().getMethod("getDescription").invoke(activite);
-
-            if (nomorgField != null) {
-                nomorgField.setText("Événement: " + titre);
-            }
-            if (descriptionField != null) {
-                descriptionField.setText(description);
-            }
-            if (lieuField != null) {
-                lieuField.setText("Lieu à définir");
-            }
-            if (prixField != null) {
-                prixField.setText("0");
-            }
-            if (capaciteField != null) {
-                capaciteField.setText("20");
-            }
-
-            if (activiteCombo != null && titre != null) {
-                activiteCombo.setValue(titre);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Erreur lors de la récupération des données de l'activité");
         }
     }
 
     @FXML
     void ajouterEvent(ActionEvent event) {
         try {
-            String selectedTitre = activiteCombo.getValue();
-            String nomEvent = nomorgField.getText().trim();
-            String description = descriptionField.getText().trim();
-            String lieu = lieuField.getText().trim();
-            String prix = prixField.getText().trim();
-            String capacite = capaciteField.getText().trim();
-
-            if (selectedTitre == null || selectedTitre.isEmpty()) {
-                showAlert("Veuillez sélectionner une activité");
+            if (!check1.isSelected() || !check2.isSelected() || !check3.isSelected() || !check4.isSelected()) {
+                showAlert("Veuillez cocher toutes les cases de validation avant de soumettre l'événement");
                 return;
             }
+
+            if (activitesSelectionnees.isEmpty()) {
+                showAlert("Veuillez ajouter au moins une activité pour cet événement");
+                return;
+            }
+
+            if (imagePrincipaleData == null || imagePrincipaleData.length == 0) {
+                showAlert("Veuillez sélectionner une image principale pour l'événement");
+                return;
+            }
+
+            String nomEvent = nomorgField.getText().trim();
+            String lieu = lieuField.getText().trim();
+            String email = emailField.getText().trim();
+            String description = descriptionField.getText().trim();
+            String equipement = equipementField.getText().trim();
+            String youtubeUrl = videoYoutubeField != null ? videoYoutubeField.getText().trim() : "";
+            if (!youtubeUrl.isEmpty() && !isValidYouTubeUrl(youtubeUrl)) {
+                showAlert("L'URL YouTube n'est pas valide");
+                return;
+            }
+            String prixText = prixField.getText().trim();
+            String capaciteText = capaciteField.getText().trim();
 
             if (nomEvent.isEmpty()) {
                 showAlert("Le nom de l'événement est obligatoire");
                 return;
             }
 
-            if (description.isEmpty()) {
-                showAlert("La description est obligatoire");
+            if (lieu.isEmpty()) {
+                showAlert("Le lieu de l'événement est obligatoire");
                 return;
             }
 
-            if (lieu.isEmpty()) {
-                showAlert("Le lieu est obligatoire");
+            if (email.isEmpty()) {
+                showAlert("L'email de l'événement est obligatoire");
                 return;
             }
 
@@ -203,86 +162,89 @@ public class EventController {
                 return;
             }
 
-            if (dateFinPicker.getValue() == null) {
-                showAlert("La date de fin est obligatoire");
-                return;
-            }
-
-            if (dateFinPicker.getValue().isBefore(dateDebutPicker.getValue())) {
-                showAlert("La date de fin doit être après la date de début");
-                return;
-            }
-
-            double prixValue = 0;
-            try {
-                prixValue = Double.parseDouble(prix.isEmpty() ? "0" : prix);
-                if (prixValue < 0) {
-                    showAlert("Le prix ne peut pas être négatif");
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                showAlert("Veuillez entrer un prix valide");
-                return;
-            }
-
-            int capaciteValue = 20;
-            try {
-                capaciteValue = Integer.parseInt(capacite.isEmpty() ? "20" : capacite);
-                if (capaciteValue <= 0) {
-                    showAlert("La capacité doit être supérieure à 0");
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                showAlert("Veuillez entrer une capacité valide");
-                return;
-            }
-
-            Object selectedActivite = null;
-            for (Object activite : activitesList) {
+            double prixValue = 0.0;
+            if (!prixText.isEmpty()) {
                 try {
-                    Method getTitreMethod = activite.getClass().getMethod("getTitre");
-                    String titre = (String) getTitreMethod.invoke(activite);
-                    if (titre.equals(activiteCombo.getValue())) {
-                        selectedActivite = activite;
-                        break;
+                    prixValue = Double.parseDouble(prixText);
+                    if (prixValue < 0) {
+                        showAlert("Le prix ne peut pas être négatif");
+                        return;
                     }
-                } catch (Exception e) {
-                    continue;
+                } catch (NumberFormatException e) {
+                    showAlert("Le prix doit être un nombre valide");
+                    return;
                 }
             }
 
-            if (selectedActivite == null) {
-                showAlert("Activité non trouvée");
-                return;
+            int capaciteValue = 0;
+            if (!capaciteText.isEmpty()) {
+                try {
+                    capaciteValue = Integer.parseInt(capaciteText);
+                    if (capaciteValue <= 0) {
+                        showAlert("La capacité doit être supérieure à 0");
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    showAlert("La capacité doit être un nombre valide");
+                    return;
+                }
             }
 
-            String sql = "INSERT INTO events (id_activite, organisateur, materiels_necessaires, lieu, prix, capacite_max, places_disponibles, date_debut, date_fin, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement pstmt = connection.prepareStatement(sql);
+            for (Object activite : activitesSelectionnees) {
+                Entities.Activite activiteEntity = (Entities.Activite) activite;
+                int activiteId = activiteEntity.getId();
+                
+        String sql = "INSERT INTO events (id_activite, lieu, organisateur, email, description, materiels_necessaires, prix, capacite_max, places_disponibles, date_debut, date_fin, image, video_youtube, statut, date_creation, date_modification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-            int activiteId = (Integer) selectedActivite.getClass().getMethod("getId").invoke(selectedActivite);
-            pstmt.setInt(1, activiteId);
-            pstmt.setString(2, nomEvent);
-            pstmt.setString(3, description);
-            pstmt.setString(4, lieu);
-            pstmt.setDouble(5, prixValue);
-            pstmt.setInt(6, capaciteValue);
-            pstmt.setInt(7, capaciteValue);
-            pstmt.setDate(8, dateDebutPicker.getValue() != null ? java.sql.Date.valueOf(dateDebutPicker.getValue()) : null);
-            pstmt.setDate(9, dateFinPicker.getValue() != null ? java.sql.Date.valueOf(dateFinPicker.getValue()) : null);
+                pstmt.setInt(1, activiteId);
+                pstmt.setString(2, lieu);
+                pstmt.setString(3, nomEvent);
+                pstmt.setString(4, email);
+                pstmt.setString(5, description);
+                pstmt.setString(6, equipement);
+                pstmt.setDouble(7, prixValue);
+                pstmt.setInt(8, capaciteValue);
+                pstmt.setInt(9, capaciteValue);
+                pstmt.setDate(10, dateDebutPicker.getValue() != null ? java.sql.Date.valueOf(dateDebutPicker.getValue()) : null);
+                pstmt.setDate(11, dateFinPicker.getValue() != null ? java.sql.Date.valueOf(dateFinPicker.getValue()) : null);
+                pstmt.setBytes(12, imagePrincipaleData); // Stocker l'image en BLOB
+                pstmt.setString(13, videoYoutubeField != null ? videoYoutubeField.getText().trim() : "");
+                pstmt.setString(14, "A_VENIR"); // statut par défaut
+                pstmt.setTimestamp(15, new Timestamp(System.currentTimeMillis())); // date_creation
+                pstmt.setTimestamp(16, new Timestamp(System.currentTimeMillis())); // date_modification
 
-            // Image non nécessaire pour les événements
-            pstmt.setString(10, null);
-
-            int rowsAffected = pstmt.executeUpdate();
-
-            if (rowsAffected > 0) {
-                showAlert("Événement créé avec succès!");
-                clearFields();
-                // Revenir automatiquement au catalogue
-                goToCatalogue(event);
-            } else {
-                showAlert("Erreur lors de la création de l'événement");
+                int rowsAffected = pstmt.executeUpdate();
+                
+                int eventId = -1;
+                ResultSet generatedKeys = pstmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    eventId = generatedKeys.getInt(1);
+                }
+                
+                if (eventId != -1 && !photosData.isEmpty()) {
+                    for (byte[] photoData : photosData) {
+                        String photoSql = "INSERT INTO event_photos (id_event, photo_data, description) VALUES (?, ?, ?)";
+                        PreparedStatement photoPstmt = connection.prepareStatement(photoSql);
+                        photoPstmt.setInt(1, eventId);
+                        photoPstmt.setBytes(2, photoData); // Stocker la photo en BLOB
+                        photoPstmt.setString(3, "Photo supplémentaire");
+                        photoPstmt.executeUpdate();
+                    }
+                }
+                
+                if (rowsAffected <= 0) {
+                    showAlert("Erreur lors de la création de l'événement pour une des activités");
+                    return;
+                }
             }
+
+            showAlert("Événement créé avec succès pour " + activitesSelectionnees.size() + " activité(s) !");
+            clearFields();
+            
+            // Rafraîchir le catalogue automatiquement
+            CatalogueRefreshManager.getInstance().requestRefresh();
+            fermerFenetre();
 
         } catch (Exception e) {
             System.err.println("ERREUR lors de la création de l'événement:");
@@ -291,39 +253,291 @@ public class EventController {
         }
     }
 
+    private boolean isValidYouTubeUrl(String youtubeUrl) {
+        if (youtubeUrl == null || youtubeUrl.trim().isEmpty()) {
+            return true; // Champ optionnel
+        }
+        
+        String url = youtubeUrl.trim().toLowerCase();
+        
+        // Formats YouTube valides
+        return url.contains("youtube.com/watch") || 
+               url.contains("youtu.be/") || 
+               url.contains("youtube.com/embed/") ||
+               url.contains("youtube.com/shorts/") ||
+               url.contains("m.youtube.com/watch") ||
+               url.contains("youtube.com/v/");
+    }
+
     private void clearFields() {
         nomorgField.clear();
-        descriptionField.clear();
         lieuField.clear();
+        emailField.clear();
+        descriptionField.clear();
+        equipementField.clear();
         prixField.clear();
         capaciteField.clear();
+        videoYoutubeField.clear();
         dateDebutPicker.setValue(null);
         dateFinPicker.setValue(null);
         activiteCombo.setValue(null);
-    }
-
-    
-    @FXML
-    void goToCatalogue(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Catalogue.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Catalogue");
-            stage.setWidth(1200);
-            stage.setHeight(800);
-            stage.centerOnScreen();
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Erreur lors du chargement du catalogue");
+        activitesSelectionnees.clear();
+        updateActivitesSelectionneesDisplay();
+        imagePrincipaleData = null;
+        if (imagePrincipaleView != null) {
+            imagePrincipaleView.setImage(null);
         }
+        if (imageStatusLabel != null) {
+            imageStatusLabel.setText("Aucune image sélectionnée");
+        }
+        photosData.clear();
+        if (photosContainer != null) {
+            photosContainer.getChildren().clear();
+        }
+        check1.setSelected(false);
+        check2.setSelected(false);
+        check3.setSelected(false);
+        check4.setSelected(false);
     }
 
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void fermerFenetre() {
+        Stage stage = (Stage) nomorgField.getScene().getWindow();
+        stage.close();
+    }
+
+    private void loadWeatherData() {
+        weatherService.getCurrentWeather("Tunis", new WeatherService.WeatherCallback() {
+            @Override
+            public void onWeatherReceived(WeatherService.WeatherData weather) {
+                currentWeather = weather;
+                System.out.println("Météo chargée: " + weather.getDescription() + " (" + weather.getTemperatureDisplay() + ")");
+            }
+            
+            @Override
+            public void onError(String error) {
+                System.err.println("Erreur lors du chargement météo: " + error);
+                currentWeather = null;
+            }
+        });
+    }
+
+    private void updateActivitesSelectionneesDisplay() {
+        activitesSelectionneesContainer.getChildren().clear();
+        
+        if (activitesSelectionnees.isEmpty()) {
+            Label emptyLabel = new Label("Aucune activité sélectionnée");
+            emptyLabel.setStyle("-fx-text-fill: #666; -fx-font-style: italic;");
+            activitesSelectionneesContainer.getChildren().add(emptyLabel);
+            return;
+        }
+
+        for (int i = 0; i < activitesSelectionnees.size(); i++) {
+            Object activite = activitesSelectionnees.get(i);
+            try {
+                Entities.Activite activiteEntity = (Entities.Activite) activite;
+                String titre = activiteEntity.getTitre();
+
+                HBox activiteBox = new HBox(10);
+                activiteBox.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 5; -fx-padding: 8;");
+                activiteBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+                Label label = new Label((i + 1) + ". " + titre);
+                label.setStyle("-fx-text-fill: #333; -fx-font-size: 12px;");
+
+                final int index = i;
+                Button removeButton = new Button("❌");
+                removeButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #999; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2;");
+                removeButton.setOnAction(e -> removeActivite(index));
+
+                activiteBox.getChildren().addAll(label, new javafx.scene.layout.Region(), removeButton);
+                activitesSelectionneesContainer.getChildren().add(activiteBox);
+
+            } catch (Exception e) {
+                System.err.println("Erreur lors de l'affichage de l'activité: " + e.getMessage());
+                continue;
+            }
+        }
+    }
+
+    private void removeActivite(int index) {
+        if (index >= 0 && index < activitesSelectionnees.size()) {
+            Object removed = activitesSelectionnees.remove(index);
+            updateActivitesSelectionneesDisplay();
+            
+            try {
+                Entities.Activite activiteEntity = (Entities.Activite) removed;
+                String titre = activiteEntity.getTitre();
+                showAlert("Activité '" + titre + "' retirée");
+            } catch (Exception e) {
+                showAlert("Activité retirée");
+            }
+        }
+    }
+
+    @FXML
+    void ajouterActivite(ActionEvent event) {
+        String selectedActiviteText = activiteCombo.getValue();
+        
+        if (selectedActiviteText == null || selectedActiviteText.isEmpty()) {
+            showAlert("Veuillez d'abord sélectionner une activité");
+            return;
+        }
+        
+        for (Object activite : activitesSelectionnees) {
+            try {
+                Entities.Activite activiteEntity = (Entities.Activite) activite;
+                String titre = activiteEntity.getTitre();
+                if (titre.equals(selectedActiviteText)) {
+                    showAlert("Cette activité est déjà sélectionnée");
+                    return;
+                }
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        
+        for (Object activite : activitesList) {
+            try {
+                Entities.Activite activiteEntity = (Entities.Activite) activite;
+                String titre = activiteEntity.getTitre();
+                if (titre.equals(selectedActiviteText)) {
+                    activitesSelectionnees.add(activite);
+                    updateActivitesSelectionneesDisplay();
+                    activiteCombo.setValue(null);
+                    showAlert("Activité ajoutée avec succès !");
+                    return;
+                }
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        
+        showAlert("Activité non trouvée");
+    }
+
+    @FXML
+    void importerImage(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une image principale pour l'événement");
+        
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+            "Fichiers images (*.jpg, *.jpeg, *.png, *.gif)", "*.jpg", "*.jpeg", "*.png", "*.gif");
+        fileChooser.getExtensionFilters().add(extFilter);
+        
+        File selectedFile = fileChooser.showOpenDialog(null);
+        
+        if (selectedFile != null) {
+            try {
+                // Lire le fichier en bytes pour le stocker en BLOB
+                byte[] imageBytes = Files.readAllBytes(selectedFile.toPath());
+                imagePrincipaleData = imageBytes;
+                
+                // Afficher l'image dans l'interface
+                Image image = new Image(selectedFile.toURI().toString());
+                if (imagePrincipaleView != null) {
+                    imagePrincipaleView.setImage(image);
+                }
+                
+                if (imageStatusLabel != null) {
+                    imageStatusLabel.setText("Image sélectionnée: " + selectedFile.getName());
+                }
+                
+                System.out.println("Image principale chargée en mémoire: " + selectedFile.getName() + " (" + imageBytes.length + " bytes)");
+                
+            } catch (IOException e) {
+                System.err.println("Erreur lors du chargement de l'image: " + e.getMessage());
+                showAlert("Erreur lors du chargement de l'image");
+            }
+        }
+    }
+
+    @FXML
+    void ajouterPhoto(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Ajouter des photos supplémentaires");
+        
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+            "Fichiers images (*.jpg, *.jpeg, *.png, *.gif)", "*.jpg", "*.jpeg", "*.png", "*.gif");
+        fileChooser.getExtensionFilters().add(extFilter);
+        
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(null);
+        
+        if (selectedFiles != null && !selectedFiles.isEmpty()) {
+            for (File selectedFile : selectedFiles) {
+                try {
+                    // Lire le fichier en bytes pour le stocker en BLOB
+                    byte[] photoBytes = Files.readAllBytes(selectedFile.toPath());
+                    photosData.add(photoBytes);
+                    
+                    // Créer une miniature pour l'affichage
+                    createPhotoThumbnail(photoBytes, selectedFile);
+                    
+                    System.out.println("Photo supplémentaire chargée en mémoire: " + selectedFile.getName() + " (" + photoBytes.length + " bytes)");
+                    
+                } catch (IOException e) {
+                    System.err.println("Erreur lors du chargement de la photo: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    private void createPhotoThumbnail(byte[] photoBytes, File originalFile) {
+        try {
+            HBox photoContainer = new HBox(5);
+            photoContainer.setStyle("-fx-background-color: #f0f0f0; -fx-border-radius: 5; -fx-padding: 5;");
+            
+            // Créer une image à partir des bytes
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(photoBytes);
+            Image image = new Image(inputStream, 80, 80, true, true);
+            inputStream.close();
+            
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(80);
+            imageView.setFitHeight(80);
+            imageView.setPreserveRatio(true);
+            imageView.setStyle("-fx-border-radius: 5; -fx-background-radius: 5;");
+            
+            Label nameLabel = new Label(originalFile.getName());
+            nameLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
+            nameLabel.setPrefWidth(80);
+            nameLabel.setWrapText(true);
+            
+            Button removeButton = new Button("❌");
+            removeButton.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-cursor: hand; -fx-font-size: 12px;");
+            removeButton.setOnAction(e -> {
+                photosContainer.getChildren().remove(photoContainer);
+                photosData.remove(photoBytes);
+                System.out.println("Photo supprimée: " + originalFile.getName());
+            });
+            
+            VBox imageBox = new VBox(2);
+            imageBox.getChildren().addAll(imageView, nameLabel);
+            
+            photoContainer.getChildren().addAll(imageBox, removeButton);
+            photosContainer.getChildren().add(photoContainer);
+            
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la création de la miniature: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void annulerEvent(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Annuler la création");
+        alert.setHeaderText("Êtes-vous sûr de vouloir annuler ?");
+        alert.setContentText("Toutes les informations non sauvegardées seront perdues.");
+        
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                fermerFenetre();
+            }
+        });
     }
 }

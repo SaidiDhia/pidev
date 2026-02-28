@@ -10,9 +10,12 @@ public class Reservation {
     private String email;
     private String telephone;
     private Integer nombrePersonnes;
+    private Double prixTotal;
+    private java.time.LocalDateTime dateReservation;
+    private String demandesSpeciales;
     private StatutReservation statut;
-    private Timestamp dateCreation;
-    private Timestamp dateModification;
+    private java.sql.Timestamp dateCreation;
+    private java.sql.Timestamp dateModification;
 
     // Pour affichage
     private Event event;
@@ -59,17 +62,30 @@ public class Reservation {
     public Integer getNombrePersonnes() { return nombrePersonnes; }
     public void setNombrePersonnes(Integer nombrePersonnes) { this.nombrePersonnes = nombrePersonnes; }
 
+    public Double getPrixTotal() { return prixTotal; }
+    public void setPrixTotal(Double prixTotal) { this.prixTotal = prixTotal; }
+
+    public java.time.LocalDateTime getDateReservation() { return dateReservation; }
+    public void setDateReservation(java.time.LocalDateTime dateReservation) { this.dateReservation = dateReservation; }
+
+    public String getDemandesSpeciales() { return demandesSpeciales; }
+    public void setDemandesSpeciales(String demandesSpeciales) { this.demandesSpeciales = demandesSpeciales; }
+
     public StatutReservation getStatut() { return statut; }
     public void setStatut(StatutReservation statut) { this.statut = statut; }
 
-    public Timestamp getDateCreation() { return dateCreation; }
-    public void setDateCreation(Timestamp dateCreation) { this.dateCreation = dateCreation; }
+    public java.sql.Timestamp getDateCreation() { return dateCreation; }
+    public void setDateCreation(java.sql.Timestamp dateCreation) { this.dateCreation = dateCreation; }
 
-    public Timestamp getDateModification() { return dateModification; }
-    public void setDateModification(Timestamp dateModification) { this.dateModification = dateModification; }
+    public java.sql.Timestamp getDateModification() { return dateModification; }
+    public void setDateModification(java.sql.Timestamp dateModification) { this.dateModification = dateModification; }
 
     public Event getEvent() { return event; }
     public void setEvent(Event event) { this.event = event; }
+
+    // Alias pour compatibilité avec le controller
+    public String getNom() { return nomComplet; }
+    public void setNom(String nom) { this.nomComplet = nom; }
 
     public Double getPrixUnitaire() {
         if (event != null && event.getPrix() != null) {
