@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="Controllers.Admin.AdminReservationsController"
+      stylesheets="@../../style.css"
+      spacing="20"
+      style="-fx-background-color: white; -fx-padding: 24 32 32 32;">
+
+    <VBox spacing="4">
+        <Label styleClass="text-h2" text="Pending Booking Approvals"/>
+        <Label styleClass="section-subtitle" text="Confirm or reject pending booking reservations"/>
+    </VBox>
+
+    <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+        <columns>
+            <TableColumn fx:id="colProperty" text="Property"    prefWidth="200"/>
+            <TableColumn fx:id="colDates"    text="Dates"       prefWidth="200"/>
+            <TableColumn fx:id="colGuests"   text="Guests"      prefWidth="80"/>
+            <TableColumn fx:id="colTotal"    text="Total ($)"   prefWidth="100"/>
+            <TableColumn fx:id="colStatus"   text="Status"      prefWidth="100"/>
+            <TableColumn fx:id="colActions"  text="Actions"     prefWidth="180"/>
+        </columns>
+        <placeholder>
+            <Label styleClass="section-subtitle" text="No pending reservations."/>
+        </placeholder>
+    </TableView>
+
+</VBox>

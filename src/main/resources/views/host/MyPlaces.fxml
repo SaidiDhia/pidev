@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controllers.Host.MyPlacesController"
+            stylesheets="@../../style.css">
+
+    <VBox spacing="24" style="-fx-background-color: #F9FAFB; -fx-padding: 32 40 40 40;"
+          AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+
+        <!-- Header -->
+        <VBox spacing="4">
+            <Label styleClass="text-h1" text="My Places"/>
+            <Label styleClass="section-subtitle" text="Manage your property listings"/>
+        </VBox>
+
+        <!-- Table -->
+        <TableView fx:id="placesTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+            <columns>
+                <TableColumn fx:id="colTitle"   text="Title"       prefWidth="250"/>
+                <TableColumn fx:id="colCity"    text="City"        prefWidth="150"/>
+                <TableColumn fx:id="colPrice"   text="Price/Day"   prefWidth="100"/>
+                <TableColumn fx:id="colStatus"  text="Status"      prefWidth="100"/>
+                <TableColumn fx:id="colActions" text="Actions"     prefWidth="160"/>
+            </columns>
+            <placeholder>
+                <Label styleClass="section-subtitle" text="No places listed yet."/>
+            </placeholder>
+        </TableView>
+
+    </VBox>
+
+</AnchorPane>

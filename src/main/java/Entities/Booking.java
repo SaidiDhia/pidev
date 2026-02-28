@@ -1,0 +1,116 @@
+package Entities;
+
+import java.time.LocalDate;
+
+public class Booking {
+    private int id;
+    private int userId;
+    private int placeId;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private double totalPrice;
+    private int guestsCount;
+    private Status status;
+    private String pdfPath;
+
+    public enum Status {
+        PENDING, CONFIRMED, REJECTED, CANCELLED, COMPLETED
+    }
+
+    public Booking() {
+    }
+
+    public Booking(LocalDate endDate, double totalPrice, Status status, LocalDate startDate, int placeId, int id,
+            int userId, int guestsCount) {
+        this.endDate = endDate;
+        this.totalPrice = totalPrice;
+        this.status = status;
+        this.startDate = startDate;
+        this.placeId = placeId;
+        this.id = id;
+        this.userId = userId;
+        this.guestsCount = guestsCount;
+    }
+
+    public Booking(int guestsCount, LocalDate endDate, int placeId, LocalDate startDate, Status status,
+            double totalPrice) {
+        this.guestsCount = guestsCount;
+        this.endDate = endDate;
+        this.placeId = placeId;
+        this.startDate = startDate;
+        this.status = status;
+        this.totalPrice = totalPrice;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getGuestsCount() {
+        return guestsCount;
+    }
+
+    public void setGuestsCount(int guestsCount) {
+        this.guestsCount = guestsCount;
+    }
+
+    public int getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(int placeId) {
+        this.placeId = placeId;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public String getPdfPath() {
+        return pdfPath;
+    }
+
+    public void setPdfPath(String pdfPath) {
+        this.pdfPath = pdfPath;
+    }
+}
