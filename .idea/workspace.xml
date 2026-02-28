@@ -4,7 +4,39 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4228510b-532f-4335-9c8a-5af8b06c4a43" name="Changes" comment="" />
+    <list default="true" id="4228510b-532f-4335-9c8a-5af8b06c4a43" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Entites/Personne.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Iservices/IpersonneServices.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Services/PersonneService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/fxml/ajouterPersonne.fxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/Services/PersonneServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/test/PersonneServiceTestTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controllers/CartController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controllers/CartController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controllers/FactureDetailsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controllers/FactureDetailsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controllers/FactureListController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controllers/FactureListController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controllers/LivraisonController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controllers/LivraisonController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controllers/OrdersManagementController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controllers/OrdersManagementController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controllers/ProductAvailableController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controllers/ProductAvailableController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controllers/ProductManagementController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controllers/ProductManagementController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Entites/Cart.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Entites/Cart.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Entites/Personne.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Entites/Personne.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Entites/Product.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Entites/Product.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Services/CartService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Services/CartService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Services/EmailService$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Services/EmailService$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Services/EmailService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Services/EmailService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Services/FactureService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Services/FactureService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Services/PanierService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Services/PanierService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Services/ProductService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Services/ProductService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/MainFx.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/MainFx.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,43 +75,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Application.MainFx.executor": "Run",
-    "Application.MainFx2.executor": "Run",
-    "JUnit.CartServiceTest.executor": "Run",
-    "JUnit.FactureProductServiceTest.executor": "Run",
-    "JUnit.FactureServiceTest.executor": "Run",
-    "JUnit.PersonneServiceTest.executor": "Run",
-    "JUnit.ProductServiceTest.executor": "Run",
-    "JUnit.ProductServiceTest.testAddProduct.executor": "Run",
-    "Maven.pidev-3a19 [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor": "Run",
-    "Maven.pidev-3a19 [org.openjfx:javafx-maven-plugin:0.0.8:run].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
-    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "git-widget-placeholder": "marketplace",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_directory_selection": "C:/Users/bayou/IdeaProjects/Projet Dev/pidev-3a19/src/main/java",
-    "last_opened_file_path": "C:/Users/bayou/IdeaProjects/Projet Dev/pidev-3a19",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "C:/Users/bayou/IdeaProjects/td/pidev-3a19/src/main/java/org/example/Main.java",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainFx.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainFx2.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.CartServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.FactureProductServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.FactureServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PersonneServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.testAddProduct.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.pidev-3a19 [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.pidev-3a19 [org.openjfx:javafx-maven-plugin:0.0.8:run].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;marketplace&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_directory_selection&quot;: &quot;C:/Users/bayou/IdeaProjects/Projet Dev/pidev-3a19/src/main/java&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/bayou/IdeaProjects/Projet Dev/pidev-3a19&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/bayou/IdeaProjects/td/pidev-3a19/src/main/java/org/example/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.Recents.Supers">
       <recent name="" />
@@ -147,6 +179,8 @@
       <workItem from="1771228007624" duration="1544000" />
       <workItem from="1771692521486" duration="22942000" />
       <workItem from="1771787578508" duration="8207000" />
+      <workItem from="1771971949404" duration="321000" />
+      <workItem from="1772291126885" duration="1193000" />
     </task>
     <servers />
   </component>
