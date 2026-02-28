@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -88,7 +87,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/messaging&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;integration-sprint&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
@@ -116,7 +115,7 @@
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MessagingMain">
+  <component name="RunManager" selected="Application.VenueMain">
     <configuration name="GeminiDirectTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.GeminiDirectTest" />
       <module name="PI_DEV" />
@@ -184,10 +183,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.MessagingMain" />
-        <item itemvalue="Application.GeminiDirectTest" />
         <item itemvalue="Application.VenueMain" />
         <item itemvalue="Application.UserMain" />
+        <item itemvalue="Application.MessagingMain" />
+        <item itemvalue="Application.GeminiDirectTest" />
         <item itemvalue="Application.com.example.pi_dev.user.UserMain" />
       </list>
     </recent_temporary>
