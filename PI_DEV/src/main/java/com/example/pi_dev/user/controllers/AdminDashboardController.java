@@ -366,7 +366,8 @@ public class AdminDashboardController {
 
     private void handleBanUser(User user) {
         if (UserSession.getInstance().getCurrentUser() != null &&
-            user.getUserId() == UserSession.getInstance().getCurrentUser().getUserId()) {
+            user.getUserId() != null &&
+            user.getUserId().equals(UserSession.getInstance().getCurrentUser().getUserId())) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Action Denied");
             alert.setHeaderText("Cannot Ban Self");
@@ -432,7 +433,7 @@ public class AdminDashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/user/settings.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -444,7 +445,7 @@ public class AdminDashboardController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/hello-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -461,7 +462,7 @@ public class AdminDashboardController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

@@ -71,7 +71,7 @@ public class LoginController {
                     controller.initData(false); // Verify Mode (auto-detects method)
 
                     Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                    stage.setScene(new Scene(root));
+                    stage.getScene().setRoot(root);
                     stage.show();
                 } else {
                     // Admin -> dashboard; Host/Participant -> settings
@@ -81,14 +81,14 @@ public class LoginController {
                             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
                             Parent root = loader.load();
                             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                            stage.setScene(new Scene(root));
+                            stage.getScene().setRoot(root);
                             stage.show();
                         } else {
                             String path = "/com/example/pi_dev/user/settings.fxml";
                             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
                             Parent root = loader.load();
                             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                            stage.setScene(new Scene(root));
+                            stage.getScene().setRoot(root);
                             stage.show();
                         }
                     } catch (IOException e) {
@@ -121,7 +121,7 @@ public class LoginController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/hello-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -133,7 +133,7 @@ public class LoginController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

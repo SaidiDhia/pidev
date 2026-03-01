@@ -17,6 +17,7 @@ public class UserMain extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 900, 600);
         stage.setTitle("WonderLust");
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
