@@ -34,6 +34,7 @@ import java.util.List;
 
 import com.example.pi_dev.events.Entities.Event;
 import com.example.pi_dev.events.Entities.Activite;
+import com.example.pi_dev.events.Utils.Mydatabase;
 
 public class catalogueController {
 
@@ -156,8 +157,8 @@ public class catalogueController {
 
     private void initializeDatabase() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db", "root", "saididhia");
-        } catch (SQLException e) {
+            connection = Mydatabase.getInstance().getConnextion();
+        } catch (Exception e) {
             System.err.println("Database connection error: " + e.getMessage());
         }
     }
@@ -224,7 +225,7 @@ public class catalogueController {
     @FXML
     void goToEventDetails(MouseEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("//com/example/pi_dev/events/EventDetails.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/EventDetails.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Détails de l'événement");
@@ -286,7 +287,7 @@ public class catalogueController {
     void ouvrirGoogleCalendar(ActionEvent event) {
         try {
             System.out.println(" Ouverture de l'interface Google Calendar...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("//com/example/pi_dev/events/googleCalendar.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/googleCalendar.fxml"));
             Parent root = loader.load();
             
             Stage stage = new Stage();

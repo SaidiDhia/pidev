@@ -746,7 +746,7 @@ public class ReservationController {
 
     private void ouvrirPanierAutomatiquement() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/panier.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Panier.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("🛒 Mon Panier");

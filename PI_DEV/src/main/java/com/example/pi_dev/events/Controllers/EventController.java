@@ -58,8 +58,17 @@
         private List<Object> activitesList = new ArrayList<>();
         private List<Object> activitesSelectionnees = new ArrayList<>();
         private Object currentActivite;
+        
+        // Stockage des fichiers sélectionnés
+        private File selectedImageFile;
+        private List<File> selectedPhotosFiles = new ArrayList<>();
+        
+        // On conserve ces champs au cas où ils seraient utilisés ailleurs pour le moment, 
+        // mais on va privilégier le stockage par fichiers
         private List<byte[]> photosData = new ArrayList<>();
         private byte[] imagePrincipaleData;
+        
+        private static final String UPLOADS_DIR = "uploads/events/";
 
         @Override
         public void initialize(URL url, ResourceBundle rb) {
@@ -67,6 +76,33 @@
             weatherService = new WeatherService();
             loadWeatherData();
             loadActivites();
+            createUploadsDirectory();
+        }
+
+        private void createUploadsDirectory() {
+            try {
+                Path path = Paths.get(UPLOADS_DIR);
+                if (!Files.exists(path)) {
+                    Files.createDirectories(path);
+                    System.out.println("Répertoire uploads créé: " + path.toAbsolutePath());
+                }
+            } catch (IOException e) {
+                System.err.println("Erreur lors de la création du répertoire uploads: " + e.getMessage());
+            }
+        }
+
+        private String saveImageToFile(File file) {
+            if (file == null) return null;
+            
+            try {
+                String fileName = System.currentTimeMillis() + "_" + file.getName();
+                Path targetPath = Paths.get(UPLOADS_DIR, fileName);
+                Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                return fileName; // Retourner le nom relatif du fichier
+            } catch (IOException e) {
+                System.err.println("Erreur lors de la sauvegarde du fichier: " + e.getMessage());
+                return null;
+            }
         }
 
         private void loadActivites() {
@@ -193,6 +229,9 @@
                 for (Object activite : activitesSelectionnees) {
                     com.example.pi_dev.events.Entities.Activite activiteEntity = (com.example.pi_dev.events.Entities.Activite) activite;
                     int activiteId = activiteEntity.getId();
+                    
+                    // Sauvegarder l'image principale si elle existe
+                    String mainImageFileName = saveImageToFile(selectedImageFile);
 
             String sql = "INSERT INTO events (id_activite, lieu, organisateur, email, description, materiels_necessaires, prix, capacite_max, places_disponibles, date_debut, date_fin, image, video_youtube, statut, date_creation, date_modification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -208,7 +247,10 @@
                     pstmt.setInt(9, capaciteValue);
                     pstmt.setDate(10, dateDebutPicker.getValue() != null ? java.sql.Date.valueOf(dateDebutPicker.getValue()) : null);
                     pstmt.setDate(11, dateFinPicker.getValue() != null ? java.sql.Date.valueOf(dateFinPicker.getValue()) : null);
-                    pstmt.setBytes(12, imagePrincipaleData); // Stocker l'image en BLOB
+                    
+                    // Stocker le nom du fichier au lieu des bytes
+                    pstmt.setString(12, mainImageFileName != null ? mainImageFileName : ""); 
+                    
                     pstmt.setString(13, videoYoutubeField != null ? videoYoutubeField.getText().trim() : "");
                     pstmt.setString(14, "A_VENIR"); // statut par défaut
                     pstmt.setTimestamp(15, new Timestamp(System.currentTimeMillis())); // date_creation
@@ -222,14 +264,17 @@
                         eventId = generatedKeys.getInt(1);
                     }
 
-                    if (eventId != -1 && !photosData.isEmpty()) {
-                        for (byte[] photoData : photosData) {
-                            String photoSql = "INSERT INTO event_photos (id_event, photo_data, description) VALUES (?, ?, ?)";
-                            PreparedStatement photoPstmt = connection.prepareStatement(photoSql);
-                            photoPstmt.setInt(1, eventId);
-                            photoPstmt.setBytes(2, photoData); // Stocker la photo en BLOB
-                            photoPstmt.setString(3, "Photo supplémentaire");
-                            photoPstmt.executeUpdate();
+                    if (eventId != -1 && !selectedPhotosFiles.isEmpty()) {
+                        for (File photoFile : selectedPhotosFiles) {
+                            String photoFileName = saveImageToFile(photoFile);
+                            if (photoFileName != null) {
+                                String photoSql = "INSERT INTO event_photos (id_event, photo_data, description) VALUES (?, ?, ?)";
+                                PreparedStatement photoPstmt = connection.prepareStatement(photoSql);
+                                photoPstmt.setInt(1, eventId);
+                                photoPstmt.setString(2, photoFileName); // Stocker le nom du fichier au lieu des bytes
+                                photoPstmt.setString(3, "Photo supplémentaire");
+                                photoPstmt.executeUpdate();
+                            }
                         }
                     }
 
@@ -290,6 +335,11 @@
             if (imageStatusLabel != null) {
                 imageStatusLabel.setText("Aucune image sélectionnée");
             }
+            
+            // Réinitialiser les fichiers sélectionnés
+            selectedImageFile = null;
+            selectedPhotosFiles.clear();
+            
             photosData.clear();
             if (photosContainer != null) {
                 photosContainer.getChildren().clear();
@@ -434,7 +484,10 @@
 
             if (selectedFile != null) {
                 try {
-                    // Lire le fichier en bytes pour le stocker en BLOB
+                    // Stocker le fichier
+                    selectedImageFile = selectedFile;
+                    
+                    // On conserve imageBytes pour l'affichage immédiat si besoin
                     byte[] imageBytes = Files.readAllBytes(selectedFile.toPath());
                     imagePrincipaleData = imageBytes;
 
@@ -448,7 +501,7 @@
                         imageStatusLabel.setText("Image sélectionnée: " + selectedFile.getName());
                     }
 
-                    System.out.println("Image principale chargée en mémoire: " + selectedFile.getName() + " (" + imageBytes.length + " bytes)");
+                    System.out.println("Image principale sélectionnée: " + selectedFile.getName());
 
                 } catch (IOException e) {
                     System.err.println("Erreur lors du chargement de l'image: " + e.getMessage());
@@ -471,14 +524,17 @@
             if (selectedFiles != null && !selectedFiles.isEmpty()) {
                 for (File selectedFile : selectedFiles) {
                     try {
-                        // Lire le fichier en bytes pour le stocker en BLOB
+                        // Stocker le fichier
+                        selectedPhotosFiles.add(selectedFile);
+                        
+                        // Lire le fichier en bytes pour la miniature
                         byte[] photoBytes = Files.readAllBytes(selectedFile.toPath());
                         photosData.add(photoBytes);
 
                         // Créer une miniature pour l'affichage
                         createPhotoThumbnail(photoBytes, selectedFile);
 
-                        System.out.println("Photo supplémentaire chargée en mémoire: " + selectedFile.getName() + " (" + photoBytes.length + " bytes)");
+                        System.out.println("Photo supplémentaire ajoutée: " + selectedFile.getName());
 
                     } catch (IOException e) {
                         System.err.println("Erreur lors du chargement de la photo: " + e.getMessage());

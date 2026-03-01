@@ -337,6 +337,11 @@ public class TwoFactorController {
     private void navigateToHome(ActionEvent event) {
         User user = UserSession.getInstance().getCurrentUser();
         
+        // Ensure messaging session is initialized
+        if (user != null) {
+            com.example.pi_dev.messaging.messagingsession.Session.login(user.getUserId().toString());
+        }
+
         if (isInsideHomeView(event)) {
             closeHomeOverlay(event);
             return;

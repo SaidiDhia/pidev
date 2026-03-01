@@ -11,7 +11,7 @@ public class Mydatabase {
     private Mydatabase(){
 
         try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db","root","saididhia");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db","root","");
             System.out.println("connexion etablie");
         } catch (SQLException e) {
             throw new RuntimeException(e);

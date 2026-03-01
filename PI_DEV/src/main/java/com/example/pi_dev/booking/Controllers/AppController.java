@@ -1,8 +1,12 @@
 package com.example.pi_dev.booking.Controllers;
 
+import com.example.pi_dev.user.enums.RoleEnum;
+import com.example.pi_dev.user.models.User;
+import com.example.pi_dev.user.utils.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
@@ -13,8 +17,49 @@ public class AppController {
     private StackPane contentPane;
 
     @FXML
+    private Button browseBtn;
+
+    @FXML
+    private Button listPlaceBtn;
+
+    @FXML
+    private Button myBookingsBtn;
+
+    @FXML
+    private Button myPlacesBtn;
+
+    @FXML
+    private Button adminBtn;
+
+    @FXML
     public void initialize() {
+        checkUserRoles();
         loadView("/com/example/pi_dev/booking/views/front/PlaceBrowse.fxml");
+    }
+
+    private void checkUserRoles() {
+        if (UserSession.getInstance().isLoggedIn()) {
+            User user = UserSession.getInstance().getCurrentUser();
+            boolean isAdmin = user.getRole() == RoleEnum.ADMIN;
+            boolean isHost = user.getRole() == RoleEnum.HOST;
+
+            // Show admin tab only for admins
+            if (adminBtn != null) {
+                adminBtn.setVisible(isAdmin);
+                adminBtn.setManaged(isAdmin);
+            }
+
+            // Host features
+            if (myPlacesBtn != null) {
+                myPlacesBtn.setVisible(isHost || isAdmin);
+                myPlacesBtn.setManaged(isHost || isAdmin);
+            }
+            
+            if (listPlaceBtn != null) {
+                listPlaceBtn.setVisible(isHost || isAdmin || user.getRole() == RoleEnum.PARTICIPANT);
+                listPlaceBtn.setManaged(isHost || isAdmin || user.getRole() == RoleEnum.PARTICIPANT);
+            }
+        }
     }
 
     @FXML

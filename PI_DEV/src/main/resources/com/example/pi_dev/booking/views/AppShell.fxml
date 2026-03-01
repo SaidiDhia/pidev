@@ -12,17 +12,22 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.pi_dev.booking.Controllers.AppController"
       stylesheets="@../style.css"
-      prefWidth="1200.0" prefHeight="750.0">
+      prefWidth="1200.0" prefHeight="750.0"
+      style="-fx-background-color: #F9FAFB;">
+    
+    <padding>
+        <Insets top="10" />
+    </padding>
 
     <!-- Navbar -->
     <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="8">
-        <Label styleClass="navbar-brand" text="✈ Wanderlust"/>
+        <Label styleClass="navbar-brand" text="✈ Booking"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button styleClass="nav-btn" text="Browse" onAction="#handleHome"/>
-        <Button styleClass="nav-btn" text="List Your Place" onAction="#handleListYourPlace"/>
-        <Button styleClass="nav-btn" text="My Bookings" onAction="#handleMyBookings"/>
-        <Button styleClass="nav-btn" text="My Places" onAction="#handleMyPlaces"/>
-        <Button styleClass="nav-btn" text="Admin" onAction="#handleAdminDashboard"/>
+        <Button fx:id="browseBtn" styleClass="nav-btn" text="Browse" onAction="#handleHome"/>
+        <Button fx:id="listPlaceBtn" styleClass="nav-btn" text="List Your Place" onAction="#handleListYourPlace"/>
+        <Button fx:id="myBookingsBtn" styleClass="nav-btn" text="My Bookings" onAction="#handleMyBookings"/>
+        <Button fx:id="myPlacesBtn" styleClass="nav-btn" text="My Places" onAction="#handleMyPlaces"/>
+        <Button fx:id="adminBtn" styleClass="nav-btn" text="Admin" onAction="#handleAdminDashboard"/>
     </HBox>
 
     <!-- Content Area -->

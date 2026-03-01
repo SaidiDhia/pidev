@@ -17,7 +17,7 @@ public class HelloController {
         try {
             Parent root;
             if (UserSession.getInstance().isLoggedIn()) {
-                root = FXMLLoader.load(getClass().getResource("/views/Catalogue.fxml"));
+                root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/events/Catalogue.fxml"));
             } else {
                 root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
             }

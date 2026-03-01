@@ -45,20 +45,20 @@ import java.util.concurrent.CompletableFuture;
 
 public class BlogController implements Initializable {
 
-    @FXML private TextArea         newPostContent;
-    @FXML private TextField        newPostMediaPath;
-    @FXML private Label            postErrorLabel;
-    @FXML private Button           publishBtn;
-    @FXML private ComboBox<String> visibilityCombo;
-    @FXML private VBox             postsFeedContainer;
-    @FXML private VBox             emptyStateBox;
-    @FXML private Label            postCountLabel;
-    @FXML private Label            currentUsernameLabel;
-    @FXML private ScrollPane       mainScrollPane;
-    @FXML private VBox             archiveView;
-    @FXML private VBox             archiveFeedContainer;
-    @FXML private VBox             archiveEmptyBox;
-    @FXML private Label            archiveCountLabel;
+    @FXML public TextArea         newPostContent;
+    @FXML public TextField        newPostMediaPath;
+    @FXML public Label            postErrorLabel;
+    @FXML public Button           publishBtn;
+    @FXML public ComboBox<String> visibilityCombo;
+    @FXML public VBox             postsFeedContainer;
+    @FXML public VBox             emptyStateBox;
+    @FXML public Label            postCountLabel;
+    @FXML public Label            currentUsernameLabel;
+    @FXML public ScrollPane       mainScrollPane;
+    @FXML public VBox             archiveView;
+    @FXML public VBox             archiveFeedContainer;
+    @FXML public VBox             archiveEmptyBox;
+    @FXML public Label            archiveCountLabel;
 
     private final Posting_Services     postService        = new Posting_Services();
     private final Commentaire_Services commentService     = new Commentaire_Services();
