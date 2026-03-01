@@ -6,7 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.example</groupId>
-    <artifactId>PiDev_3A19</artifactId>
+    <artifactId>PI_DEV</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -113,7 +113,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>GUI.MainApp</mainClass>
+                    <mainClass>com.example.pi_dev.blog.GUI.MainApp</mainClass>
                     <options>
                         <option>--add-opens=javafx.base/com.sun.javafx=ALL-UNNAMED</option>
                         <option>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</option>
