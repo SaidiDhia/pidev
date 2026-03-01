@@ -8,7 +8,8 @@
 <BorderPane xmlns="http://javafx.com/javafx/18" 
             xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.example.pi_dev.marketplace.Controllers.FactureListController"
-            stylesheets="@/com/example/pi_dev/marketplace/css/example/pi_dev/marketplace/css/style.css"
+            stylesheets="@../css/style.css"
+
             styleClass="root">
 
     <!-- Top Bar -->

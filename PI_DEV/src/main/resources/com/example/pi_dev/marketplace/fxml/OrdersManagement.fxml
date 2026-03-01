@@ -6,7 +6,8 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.pi_dev.marketplace.Controllers.OrdersManagementController"
-            stylesheets="@/com/example/pi_dev/marketplace/css/example/pi_dev/marketplace/css/style.css" styleClass="root" minHeight="650">
+            stylesheets="@../css/style.css"
+            styleClass="root" minHeight="650">
 
     <top>
         <HBox spacing="15" alignment="CENTER_LEFT" styleClass="top-bar">

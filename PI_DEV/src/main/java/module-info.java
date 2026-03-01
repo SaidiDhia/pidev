@@ -141,4 +141,10 @@ module com.example.pi_dev {
     exports com.example.pi_dev.booking.Controllers.Front;
     exports com.example.pi_dev.common.services;
     exports com.example.pi_dev.common.models;
+
+    //marketplace
+    exports com.example.pi_dev.marketplace.test to javafx.graphics;
+    opens   com.example.pi_dev.marketplace.test to javafx.fxml;
+    opens   com.example.pi_dev.marketplace.Controllers to javafx.fxml;
+    exports com.example.pi_dev.marketplace.Controllers;
 }

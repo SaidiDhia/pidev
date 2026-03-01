@@ -13,7 +13,7 @@
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.pi_dev.marketplace.Controllers.ProductManagementController"
-            stylesheets="@/com/example/pi_dev/marketplace/css/example/pi_dev/marketplace/css/style.css"
+            stylesheets="@../css/style.css"
             styleClass="root">
 
     <!-- TOP BAR -->
