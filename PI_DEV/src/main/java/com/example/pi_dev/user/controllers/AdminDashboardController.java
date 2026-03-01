@@ -420,7 +420,7 @@ public class AdminDashboardController {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle(user == null ? "Add User" : "Edit User");
-            stage.getScene().setRoot(root);
+            stage.setScene(new Scene(root));
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
