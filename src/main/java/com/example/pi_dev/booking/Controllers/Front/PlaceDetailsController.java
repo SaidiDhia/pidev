@@ -1,7 +1,9 @@
 package com.example.pi_dev.booking.Controllers.Front;
 
 import com.example.pi_dev.booking.Entities.Place;
+import com.example.pi_dev.booking.Entities.PlaceImage;
 import com.example.pi_dev.booking.Entities.Review;
+import com.example.pi_dev.booking.Services.PlaceImageService;
 import com.example.pi_dev.booking.Services.PlaceService;
 import com.example.pi_dev.booking.Services.ReviewService;
 import com.example.pi_dev.booking.Utils.Session;
@@ -20,12 +22,16 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+
 import java.util.List;
 
 public class PlaceDetailsController {
 
+    // ── FXML bindings ─────────────────────────────────────────────────────────
     @FXML
     private ImageView placeImage;
+    @FXML
+    private HBox thumbnailsContainer;
     @FXML
     private Label titleLabel;
     @FXML
@@ -52,18 +58,21 @@ public class PlaceDetailsController {
     private WebView mapWebView;
     @FXML
     private Label mapStatusLabel;
-
-    // Reviews section
     @FXML
     private VBox reviewsContainer;
 
+    // ── Services ──────────────────────────────────────────────────────────────
     private Place currentPlace;
     private final PlaceService placeService = new PlaceService();
+    private final PlaceImageService placeImageService = new PlaceImageService();
     private final ReviewService reviewService = new ReviewService();
+
+    // ── Entry point ───────────────────────────────────────────────────────────
 
     public void setPlace(Place place) {
         this.currentPlace = place;
         populateUI(place);
+        loadGallery(place);
         loadMap(place);
         loadReviewState(place);
         loadReviews(place);
@@ -75,7 +84,7 @@ public class PlaceDetailsController {
             setPlace(p);
     }
 
-    // ─── UI Population ────────────────────────────────────────────────────────
+    // ── UI Population ─────────────────────────────────────────────────────────
 
     private void populateUI(Place p) {
         titleLabel.setText(p.getTitle());
@@ -97,15 +106,90 @@ public class PlaceDetailsController {
             }
         }
 
+        // Main image: will be overridden by loadGallery, but set a default here
+        // to avoid blank while loading
+        loadMainImage(p.getImageUrl());
+    }
+
+    // ── Gallery ───────────────────────────────────────────────────────────────
+
+    /**
+     * Loads the image gallery for a place:
+     * - Sets the big main image to the primary image (or first, or legacy imageUrl)
+     * - Builds clickable thumbnails in thumbnailsContainer
+     */
+    private void loadGallery(Place place) {
+        if (thumbnailsContainer != null) {
+            thumbnailsContainer.getChildren().clear();
+        }
+
+        List<PlaceImage> images;
         try {
-            if (p.getImageUrl() != null && !p.getImageUrl().isBlank()) {
-                placeImage.setImage(new Image(p.getImageUrl(), true));
+            images = placeImageService.getImagesForPlace(place.getId());
+        } catch (Exception e) {
+            // Table might not exist yet — gracefully fall through
+            System.err.println("Warn: could not load place_images: " + e.getMessage());
+            return;
+        }
+
+        if (images.isEmpty()) {
+            // No images in new table → use legacy imageUrl
+            loadMainImage(place.getImageUrl());
+            return;
+        }
+
+        // Set main image to primary (first in list after ORDER BY is_primary DESC)
+        loadMainImage(images.get(0).getUrl());
+
+        // Build thumbnails
+        if (thumbnailsContainer != null) {
+            for (PlaceImage img : images) {
+                thumbnailsContainer.getChildren().add(buildThumbnail(img));
             }
-        } catch (Exception ignored) {
         }
     }
 
-    // ─── Reviews list ─────────────────────────────────────────────────────────
+    private void loadMainImage(String url) {
+        if (placeImage == null || url == null || url.isBlank())
+            return;
+        try {
+            placeImage.setImage(loadLocalFile(url));
+        } catch (Exception e) {
+            System.err.println("❌ loadMainImage error: " + e.getMessage());
+        }
+    }
+
+    /** Builds a clickable thumbnail ImageView for the gallery. */
+    private ImageView buildThumbnail(PlaceImage img) {
+        ImageView thumb = new ImageView();
+        thumb.setFitWidth(90);
+        thumb.setFitHeight(65);
+        thumb.setPreserveRatio(false);
+        thumb.setStyle(
+                "-fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 4, 0, 0, 2);" +
+                        (img.isPrimary()
+                                ? " -fx-border-color: #2563EB; -fx-border-width: 2; -fx-border-radius: 6;"
+                                : " -fx-border-color: transparent; -fx-border-width: 2;"));
+
+        try {
+            String url = img.getUrl();
+            if (url != null && !url.isBlank()) {
+                Image loaded = loadLocalFile(url);
+                if (loaded != null)
+                    thumb.setImage(loaded);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ thumbnail load error: " + e.getMessage());
+        }
+
+        // Click → swap main image (UI only, no DB change)
+        thumb.setOnMouseClicked(e -> loadMainImage(img.getUrl()));
+
+        Tooltip.install(thumb, new Tooltip(img.isPrimary() ? "⭐ Primary image" : "Click to preview"));
+        return thumb;
+    }
+
+    // ── Reviews list ──────────────────────────────────────────────────────────
 
     private void loadReviews(Place p) {
         if (reviewsContainer == null)
@@ -116,8 +200,7 @@ public class PlaceDetailsController {
         try {
             reviews = reviewService.getReviewsForPlace(p.getId());
         } catch (Exception e) {
-            reviewsContainer.getChildren().add(
-                    makeLabel("Could not load reviews.", "#6B7280", false));
+            reviewsContainer.getChildren().add(makeLabel("Could not load reviews.", "#6B7280", false));
             return;
         }
 
@@ -132,15 +215,12 @@ public class PlaceDetailsController {
         }
     }
 
-    /** Build a card node for a single review. */
     private VBox buildReviewCard(Review r) {
         VBox card = new VBox(6);
-        card.setStyle(
-                "-fx-background-color: #FFFFFF; " +
-                        "-fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-border-radius: 10; " +
-                        "-fx-background-radius: 10; -fx-padding: 14 18 14 18;");
+        card.setStyle("-fx-background-color: #FFFFFF; " +
+                "-fx-border-color: #E5E7EB; -fx-border-width: 1; -fx-border-radius: 10; " +
+                "-fx-background-radius: 10; -fx-padding: 14 18 14 18;");
 
-        // Row 1: stars + user id
         HBox topRow = new HBox(10);
         topRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         String stars = "★".repeat(r.getRating()) + "☆".repeat(5 - r.getRating());
@@ -150,14 +230,12 @@ public class PlaceDetailsController {
         topRow.getChildren().addAll(starsLbl, userLbl);
         card.getChildren().add(topRow);
 
-        // Row 2: comment
         if (r.getComment() != null && !r.getComment().isBlank()) {
             Label commentLbl = makeLabel(r.getComment(), "#374151", false);
             commentLbl.setWrapText(true);
             card.getChildren().add(commentLbl);
         }
 
-        // Row 3: AI insights (only if available)
         if (r.getSentiment() != null || r.getAiSummary() != null) {
             VBox aiBox = new VBox(4);
             aiBox.setStyle("-fx-background-color: #F0F9FF; -fx-background-radius: 8; " +
@@ -181,10 +259,9 @@ public class PlaceDetailsController {
                     default -> "😐 ";
                 };
                 Label sentLbl = new Label(icon + sentiment);
-                sentLbl.setStyle(
-                        "-fx-text-fill: white; -fx-background-color: " + color + "; " +
-                                "-fx-background-radius: 10; -fx-padding: 2 10 2 10; " +
-                                "-fx-font-weight: bold; -fx-font-size: 12px;");
+                sentLbl.setStyle("-fx-text-fill: white; -fx-background-color: " + color + "; " +
+                        "-fx-background-radius: 10; -fx-padding: 2 10 2 10; " +
+                        "-fx-font-weight: bold; -fx-font-size: 12px;");
                 aiBox.getChildren().add(sentLbl);
             }
 
@@ -194,14 +271,11 @@ public class PlaceDetailsController {
                 sumLbl.setStyle("-fx-text-fill: #374151; -fx-font-size: 12px;");
                 aiBox.getChildren().add(sumLbl);
             }
-
             card.getChildren().add(aiBox);
         }
 
-        // Row 4: date
         if (r.getCreatedAt() != null) {
-            String dateStr = r.getCreatedAt().toLocalDate().toString();
-            Label dateLbl = makeLabel(dateStr, "#9CA3AF", false);
+            Label dateLbl = makeLabel(r.getCreatedAt().toLocalDate().toString(), "#9CA3AF", false);
             dateLbl.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 11px;");
             card.getChildren().add(dateLbl);
         }
@@ -211,12 +285,11 @@ public class PlaceDetailsController {
 
     private Label makeLabel(String text, String color, boolean bold) {
         Label l = new Label(text);
-        String weight = bold ? "bold" : "normal";
-        l.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: " + weight + ";");
+        l.setStyle("-fx-text-fill: " + color + "; -fx-font-weight: " + (bold ? "bold" : "normal") + ";");
         return l;
     }
 
-    // ─── Map ──────────────────────────────────────────────────────────────────
+    // ── Map ───────────────────────────────────────────────────────────────────
 
     private void loadMap(Place p) {
         if (mapWebView == null)
@@ -257,14 +330,15 @@ public class PlaceDetailsController {
                 "</script></body></html>";
     }
 
-    // ─── Actions ──────────────────────────────────────────────────────────────
+    // ── Actions ───────────────────────────────────────────────────────────────
 
     @FXML
     private void handleAddReview() {
         if (currentPlace == null)
             return;
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/booking/views/front/ReviewDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pi_dev/booking/views/front/ReviewDialog.fxml"));
             Node root = loader.load();
             ReviewDialogController ctrl = loader.getController();
             ctrl.setContext(currentPlace.getId(), Session.currentUserId);
@@ -275,7 +349,6 @@ public class PlaceDetailsController {
             dialog.setScene(new Scene((javafx.scene.Parent) root));
             dialog.showAndWait();
 
-            // Refresh everything after dialog closes
             Place refreshed = placeService.getPlaceById(currentPlace.getId());
             if (refreshed != null) {
                 currentPlace = refreshed;
@@ -293,7 +366,8 @@ public class PlaceDetailsController {
         if (currentPlace == null)
             return;
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/booking/views/front/BookingDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pi_dev/booking/views/front/BookingDialog.fxml"));
             Node root = loader.load();
             BookingDialogController ctrl = loader.getController();
             ctrl.setPlace(currentPlace);
@@ -311,7 +385,8 @@ public class PlaceDetailsController {
     @FXML
     private void handleBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/booking/views/front/PlaceBrowse.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pi_dev/booking/views/front/PlaceBrowse.fxml"));
             Node view = loader.load();
             StackPane parent = (StackPane) titleLabel.getScene().lookup("#contentPane");
             if (parent != null)
@@ -319,5 +394,38 @@ public class PlaceDetailsController {
         } catch (IOException e) {
             new Alert(Alert.AlertType.ERROR, "Cannot go back: " + e.getMessage(), ButtonType.OK).showAndWait();
         }
+    }
+
+    /**
+     * Loads an image from a URL/URI/path.
+     * Uses FileInputStream for local files to bypass JavaFX URI encoding issues on
+     * Windows.
+     */
+    private Image loadLocalFile(String url) {
+        if (url == null || url.isBlank())
+            return null;
+        try {
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                return new Image(url, true);
+            } else {
+                java.io.File file;
+                if (url.startsWith("file:")) {
+                    file = new java.io.File(java.net.URI.create(url));
+                } else {
+                    file = new java.io.File(url);
+                }
+                System.out.println("DEBUG details loading: " + file.getAbsolutePath() + " exists=" + file.exists());
+                if (file.exists()) {
+                    try (java.io.FileInputStream fis = new java.io.FileInputStream(file)) {
+                        return new Image(fis);
+                    }
+                } else {
+                    System.err.println("❌ File not found (details): " + file.getAbsolutePath());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("❌ loadLocalFile error url=" + url + ": " + e.getMessage());
+        }
+        return null;
     }
 }

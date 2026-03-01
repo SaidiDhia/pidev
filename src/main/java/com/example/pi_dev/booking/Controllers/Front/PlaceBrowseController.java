@@ -1,6 +1,7 @@
 package com.example.pi_dev.booking.Controllers.Front;
 
 import com.example.pi_dev.booking.Entities.Place;
+import com.example.pi_dev.booking.Services.PlaceImageService;
 import com.example.pi_dev.booking.Services.PlaceService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +16,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,7 @@ public class PlaceBrowseController {
     private Label resultCountLabel;
 
     private final PlaceService placeService = new PlaceService();
+    private final PlaceImageService placeImageService = new PlaceImageService();
     private List<Place> allPlaces;
 
     @FXML
@@ -77,18 +80,27 @@ public class PlaceBrowseController {
         card.setPrefWidth(300);
         card.setMaxWidth(300);
 
-        // Image
+        // ── Image: primary from place_images, fallback to place.imageUrl ──
         ImageView imageView = new ImageView();
         imageView.setFitWidth(300);
         imageView.setFitHeight(180);
         imageView.setPreserveRatio(false);
         imageView.getStyleClass().add("card-image");
+
+        String imageUrl = null;
         try {
-            if (place.getImageUrl() != null && !place.getImageUrl().isBlank()) {
-                imageView.setImage(new Image(place.getImageUrl(), true));
-            }
-        } catch (Exception ignored) {
+            imageUrl = placeImageService.getPrimaryImageUrl(place.getId());
+        } catch (Exception e) {
+            System.err.println("WARN getPrimaryImageUrl placeId=" + place.getId() + ": " + e.getMessage());
         }
+
+        if (imageUrl == null || imageUrl.isBlank()) {
+            imageUrl = place.getImageUrl();
+        }
+
+        System.out.println("DEBUG card placeId=" + place.getId() + " imageUrl=" + imageUrl);
+
+        loadImageIntoView(imageView, imageUrl);
 
         // Chips row
         HBox chips = new HBox(8);
@@ -122,8 +134,8 @@ public class PlaceBrowseController {
         HBox meta = new HBox(16);
         meta.setPadding(new Insets(4, 12, 8, 12));
         Label cap = new Label("🏠 " + place.getCapacity() + " rooms");
-        cap.getStyleClass().add("card-meta");
         Label guests = new Label("👥 " + place.getMaxGuests() + " guests");
+        cap.getStyleClass().add("card-meta");
         guests.getStyleClass().add("card-meta");
         meta.getChildren().addAll(cap, guests);
 
@@ -148,11 +160,11 @@ public class PlaceBrowseController {
 
     private void openDetails(Place place) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/booking/views/front/PlaceDetails.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pi_dev/booking/views/front/PlaceDetails.fxml"));
             Node view = loader.load();
             PlaceDetailsController ctrl = loader.getController();
             ctrl.setPlace(place);
-            // Replace content in parent shell
             StackPane parent = (StackPane) cardsPane.getScene().lookup("#contentPane");
             if (parent != null) {
                 parent.getChildren().setAll(view);
@@ -164,7 +176,8 @@ public class PlaceBrowseController {
 
     private void openBookingDialog(Place place) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/booking/views/front/BookingDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pi_dev/booking/views/front/BookingDialog.fxml"));
             Node root = loader.load();
             BookingDialogController ctrl = loader.getController();
             ctrl.setPlace(place);
@@ -180,7 +193,52 @@ public class PlaceBrowseController {
     }
 
     private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
-        alert.showAndWait();
+        new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK).showAndWait();
+    }
+
+    /**
+     * Loads an image into an ImageView.
+     * For local files (file:// URIs or absolute paths): uses FileInputStream to
+     * bypass
+     * JavaFX URI encoding issues on Windows (spaces, special chars in paths).
+     * For http:// URLs: standard Image loading.
+     */
+    private void loadImageIntoView(ImageView iv, String url) {
+        if (url == null || url.isBlank())
+            return;
+        try {
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                // Remote URL — load normally
+                Image img = new Image(url, true);
+                img.errorProperty().addListener((obs, o, isErr) -> {
+                    if (isErr)
+                        System.err.println("❌ Remote image error: " + url + " — " + img.getException());
+                });
+                iv.setImage(img);
+
+            } else {
+                // Local file — convert file:// URI or plain path → File → FileInputStream
+                java.io.File file;
+                if (url.startsWith("file:")) {
+                    // Parse the file:// URI to get the actual file path
+                    file = new java.io.File(java.net.URI.create(url));
+                } else {
+                    // Legacy absolute path (Windows: C:\... or Unix: /home/...)
+                    file = new java.io.File(url);
+                }
+
+                System.out.println("DEBUG loading local file: " + file.getAbsolutePath() + " exists=" + file.exists());
+
+                if (file.exists()) {
+                    try (java.io.FileInputStream fis = new java.io.FileInputStream(file)) {
+                        iv.setImage(new Image(fis));
+                    }
+                } else {
+                    System.err.println("❌ File not found: " + file.getAbsolutePath());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("❌ loadImageIntoView error for url=" + url + " : " + e.getMessage());
+        }
     }
 }
