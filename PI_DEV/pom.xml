@@ -4,20 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.wonderlust</groupId>
-    <artifactId>projet_integre</artifactId>
+    <groupId>com.example</groupId>
+    <artifactId>PI_DEV</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
+        <javafx.version>17.0.14</javafx.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>17.0.6</javafx.version>
         <junit.version>5.10.1</junit.version>
     </properties>
 
     <dependencies>
-
         <!-- ==================== DATABASE ==================== -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -42,12 +41,7 @@
             <version>2.0.11</version>
         </dependency>
 
-        <!-- ==================== JSON / PROTOBUF ==================== -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>4.28.3</version>
-        </dependency>
+        <!-- ==================== JSON PROCESSING ==================== -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -85,7 +79,6 @@
             <artifactId>javafx-media</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-        <!-- Add javafx-base, etc. if needed, but they are transitive -->
 
         <!-- ==================== JAVAFX UI LIBRARIES ==================== -->
         <dependency>
@@ -131,7 +124,7 @@
             <version>3.5.1</version>
         </dependency>
 
-        <!-- ==================== GOOGLE APIs ==================== -->
+        <!-- ==================== GOOGLE APIS ==================== -->
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
@@ -185,10 +178,12 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.14</version>
         </dependency>
+
+        <!-- ==================== AUTH / TOTP ==================== -->
         <dependency>
             <groupId>com.warrenstrange</groupId>
             <artifactId>googleauth</artifactId>
-            <version>1.4.0</version>
+            <version>1.5.0</version> <!-- Updated from 1.4.0 -->
         </dependency>
 
         <!-- ==================== PDF ==================== -->
@@ -217,7 +212,7 @@
             <version>0.3.12</version>
         </dependency>
 
-        <!-- ==================== AUDIO TAGGING ==================== -->
+        <!-- ==================== AUDIO/MEDIA ==================== -->
         <dependency>
             <groupId>org</groupId>
             <artifactId>jaudiotagger</artifactId>
@@ -232,6 +227,18 @@
         <!-- ==================== TESTING ==================== -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
@@ -243,18 +250,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.12.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.12.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
             <version>0.12.5</version>
@@ -264,6 +259,18 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>0.12.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>6.1.0-M1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.12.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -279,12 +286,13 @@
                     <target>17</target>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>test.Main</mainClass>
+                    <mainClass>com.example.pi_dev.booking.test.MainFX</mainClass>
                 </configuration>
             </plugin>
         </plugins>

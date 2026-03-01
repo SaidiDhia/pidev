@@ -42,7 +42,7 @@ module com.example.pi_dev {
     requires webcam.capture;
 
 // Audio/Media libraries
-    requires jaudiotagger;          // JAR: jaudiotagger
+    requires jaudiotagger;        // JAR: jaudiotagger-2.0.3.jar
     requires mp3spi;
     // Cloudinary (if used)
     requires cloudinary.http44;
@@ -128,8 +128,24 @@ module com.example.pi_dev {
     exports com.example.pi_dev.blog.Services;
     exports com.example.pi_dev.blog.GUI;
 
-    // Common exports
+    //booking exports
+    exports com.example.pi_dev.booking.test to javafx.graphics;
+    opens   com.example.pi_dev.booking.test to javafx.fxml;
 
+    // Booking module exports and opens
+    opens com.example.pi_dev.booking.Controllers to javafx.fxml;
+    exports com.example.pi_dev.booking.Controllers;
+
+    // ADDED: Host package opens and exports
+    opens com.example.pi_dev.booking.Controllers.Host to javafx.fxml;
+    exports com.example.pi_dev.booking.Controllers.Host;
+
+    // Booking controllers - open ALL subpackages
+    opens com.example.pi_dev.booking.Controllers.Front to javafx.fxml;
+    opens com.example.pi_dev.booking.Controllers.Admin to javafx.fxml; // if exists
+
+// Export them as needed
+    exports com.example.pi_dev.booking.Controllers.Front;
     exports com.example.pi_dev.common.services;
     exports com.example.pi_dev.common.models;
 }

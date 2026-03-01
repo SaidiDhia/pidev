@@ -12,9 +12,9 @@ public class Mydatabase {
     private Mydatabase() {
         try {
             con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/wonderlustt_db",
+                    "jdbc:mysql://localhost:3306/wonderlust_db",
                     "root",
-                    ""
+                    "saididhia"
             );
             System.out.println("connexion etablie");
         } catch (SQLException e) {
