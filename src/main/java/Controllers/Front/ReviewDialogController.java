@@ -33,7 +33,7 @@ public class ReviewDialogController {
     private ProgressIndicator aiProgress;
 
     private int placeId;
-    private int userId;
+    private String userId;
     private final ReviewService reviewService = new ReviewService();
     private final BookingService bookingService = new BookingService();
 
@@ -54,7 +54,7 @@ public class ReviewDialogController {
     }
 
     /** Must be called before showing the dialog. */
-    public void setContext(int placeId, int userId) {
+    public void setContext(int placeId, String userId) {
         this.placeId = placeId;
         this.userId = userId;
     }

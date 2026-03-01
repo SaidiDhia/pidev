@@ -20,7 +20,7 @@ public interface IBookingService {
     // Extra methods for UI
     boolean isAvailable(int placeId, LocalDate start, LocalDate end);
 
-    List<Booking> findByUser(int userId);
+    List<Booking> findByUser(String userId);
 
     List<Booking> findPending();
 

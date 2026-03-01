@@ -3,7 +3,7 @@ package Entities;
 public class Place {
 
     private int id;
-    private int hostId;
+    private String hostId;
     private String title;
     private String description;
     private double pricePerDay;
@@ -26,7 +26,7 @@ public class Place {
     public Place() {
     }
 
-    public Place(String address, int capacity, String category, String city, String description, int id, int hostId,
+    public Place(String address, int capacity, String category, String city, String description, int id, String hostId,
             String imageUrl, int maxGuests, double pricePerDay, String title, Status status) {
         this.address = address;
         this.capacity = capacity;
@@ -90,11 +90,11 @@ public class Place {
         this.id = id;
     }
 
-    public int getHostId() {
+    public String getHostId() {
         return hostId;
     }
 
-    public void setHostId(int hostId) {
+    public void setHostId(String hostId) {
         this.hostId = hostId;
     }
 

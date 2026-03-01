@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Review {
     private int id;
     private int placeId;
-    private int userId;
+    private String userId;
     private int rating; // 1..5
     private String comment;
     private LocalDateTime createdAt;
@@ -36,11 +36,11 @@ public class Review {
         this.placeId = placeId;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

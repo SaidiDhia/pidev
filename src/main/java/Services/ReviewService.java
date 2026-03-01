@@ -25,7 +25,7 @@ public class ReviewService {
      * Inserts a new review (or updates if user already reviewed this place).
      * Returns the review ID (generated or existing).
      */
-    public int addReview(int placeId, int userId, int rating, String comment) {
+    public int addReview(int placeId, String userId, int rating, String comment) {
         if (rating < 1 || rating > 5)
             throw new IllegalArgumentException("Rating must be between 1 and 5.");
 
@@ -35,7 +35,7 @@ public class ReviewService {
 
         try (PreparedStatement ps = con.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, placeId);
-            ps.setInt(2, userId);
+            ps.setString(2, userId);
             ps.setInt(3, rating);
             ps.setString(4, comment);
             ps.executeUpdate();
@@ -56,7 +56,7 @@ public class ReviewService {
             String selectSql = "SELECT id FROM review WHERE place_id=? AND user_id=?";
             try (PreparedStatement ps2 = con.prepareStatement(selectSql)) {
                 ps2.setInt(1, placeId);
-                ps2.setInt(2, userId);
+                ps2.setString(2, userId);
                 try (ResultSet rs = ps2.executeQuery()) {
                     if (rs.next()) {
                         int id = rs.getInt(1);
@@ -170,7 +170,7 @@ public class ReviewService {
                     Review r = new Review();
                     r.setId(rs.getInt("id"));
                     r.setPlaceId(rs.getInt("place_id"));
-                    r.setUserId(rs.getInt("user_id"));
+                    r.setUserId(rs.getString("user_id"));
                     r.setRating(rs.getInt("rating"));
                     r.setComment(rs.getString("comment"));
                     r.setSentiment(rs.getString("sentiment"));
@@ -192,11 +192,11 @@ public class ReviewService {
     /**
      * Checks if a user has already reviewed a place.
      */
-    public boolean hasReviewed(int placeId, int userId) {
+    public boolean hasReviewed(int placeId, String userId) {
         String sql = "SELECT COUNT(*) FROM review WHERE place_id=? AND user_id=?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, placeId);
-            ps.setInt(2, userId);
+            ps.setString(2, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }

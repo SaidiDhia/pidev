@@ -24,7 +24,7 @@ public class PlaceService implements IPlaceService {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, p.getHostId());
+            ps.setString(1, p.getHostId());
             ps.setString(2, p.getTitle());
             ps.setString(3, p.getDescription());
             ps.setDouble(4, p.getPricePerDay());
@@ -59,7 +59,7 @@ public class PlaceService implements IPlaceService {
                 "WHERE id=?";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, p.getHostId());
+            ps.setString(1, p.getHostId());
             ps.setString(2, p.getTitle());
             ps.setString(3, p.getDescription());
             ps.setDouble(4, p.getPricePerDay());
@@ -165,12 +165,12 @@ public class PlaceService implements IPlaceService {
     }
 
     @Override
-    public List<Place> findByHost(int hostId) {
+    public List<Place> findByHost(String hostId) {
         List<Place> list = new ArrayList<>();
         String sql = "SELECT * FROM place WHERE host_id=? ORDER BY id DESC";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, hostId);
+            ps.setString(1, hostId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapPlace(rs));
@@ -219,7 +219,7 @@ public class PlaceService implements IPlaceService {
     private Place mapPlace(ResultSet rs) throws SQLException {
         Place p = new Place();
         p.setId(rs.getInt("id"));
-        p.setHostId(rs.getInt("host_id"));
+        p.setHostId(rs.getString("host_id"));
         p.setTitle(rs.getString("title"));
         p.setDescription(rs.getString("description"));
         p.setPricePerDay(rs.getDouble("price_per_day"));

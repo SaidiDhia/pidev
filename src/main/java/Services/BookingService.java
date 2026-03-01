@@ -67,7 +67,7 @@ public class BookingService implements IBookingService {
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, b.getPlaceId());
-            ps.setInt(2, b.getUserId());
+            ps.setString(2, b.getUserId());
             ps.setDate(3, java.sql.Date.valueOf(b.getStartDate()));
             ps.setDate(4, java.sql.Date.valueOf(b.getEndDate()));
             ps.setDouble(5, b.getTotalPrice());
@@ -108,7 +108,7 @@ public class BookingService implements IBookingService {
                 "WHERE id=?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, b.getPlaceId());
-            ps.setInt(2, b.getUserId());
+            ps.setString(2, b.getUserId());
             ps.setDate(3, Date.valueOf(b.getStartDate()));
             ps.setDate(4, Date.valueOf(b.getEndDate()));
             ps.setDouble(5, b.getTotalPrice());
@@ -182,12 +182,12 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public List<Booking> findByUser(int userId) {
+    public List<Booking> findByUser(String userId) {
         String sql = "SELECT * FROM booking WHERE user_id=? ORDER BY id DESC";
         List<Booking> list = new ArrayList<>();
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+            ps.setString(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapBooking(rs));
@@ -250,12 +250,12 @@ public class BookingService implements IBookingService {
      * - status = COMPLETED
      * - OR status = CONFIRMED AND end_date < CURDATE()
      */
-    public boolean canReview(int userId, int placeId) {
+    public boolean canReview(String userId, int placeId) {
         String sql = "SELECT COUNT(*) FROM booking " +
                 "WHERE user_id=? AND place_id=? " +
                 "AND (status='COMPLETED' OR (status='CONFIRMED' AND end_date < CURDATE()))";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+            ps.setString(1, userId);
             ps.setInt(2, placeId);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
@@ -266,7 +266,7 @@ public class BookingService implements IBookingService {
     }
 
     // Fetch bookings with place title (JOIN) for a specific user
-    public List<BookingView> findByUserWithTitle(int userId) {
+    public List<BookingView> findByUserWithTitle(String userId) {
         String sql = "SELECT b.*, p.title AS place_title " +
                 "FROM booking b " +
                 "JOIN place p ON b.place_id = p.id " +
@@ -274,7 +274,7 @@ public class BookingService implements IBookingService {
         List<BookingView> list = new ArrayList<>();
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+            ps.setString(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(new BookingView(mapBooking(rs), rs.getString("place_title")));
@@ -309,7 +309,7 @@ public class BookingService implements IBookingService {
         Booking b = new Booking();
         b.setId(rs.getInt("id"));
         b.setPlaceId(rs.getInt("place_id"));
-        b.setUserId(rs.getInt("user_id"));
+        b.setUserId(rs.getString("user_id"));
         b.setStartDate(rs.getDate("start_date").toLocalDate());
         b.setEndDate(rs.getDate("end_date").toLocalDate());
         b.setTotalPrice(rs.getDouble("total_price"));

@@ -27,7 +27,7 @@ public class AdminAllPlacesController {
     @FXML
     private TableColumn<Place, String> colStatus;
     @FXML
-    private TableColumn<Place, Integer> colHost;
+    private TableColumn<Place, String> colHost;
     @FXML
     private TableColumn<Place, Void> colActions;
 
@@ -45,7 +45,7 @@ public class AdminAllPlacesController {
         colCity.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getCity()));
         colPrice.setCellValueFactory(d -> new SimpleDoubleProperty(d.getValue().getPricePerDay()).asObject());
         colStatus.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getStatus().name()));
-        colHost.setCellValueFactory(d -> new SimpleIntegerProperty(d.getValue().getHostId()).asObject());
+        colHost.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getHostId()));
 
         colActions.setCellFactory(col -> new TableCell<>() {
             private final Button approveBtn = new Button("Approve");

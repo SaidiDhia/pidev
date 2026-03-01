@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class Booking {
     private int id;
-    private int userId;
+    private String userId;
     private int placeId;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -21,7 +21,7 @@ public class Booking {
     }
 
     public Booking(LocalDate endDate, double totalPrice, Status status, LocalDate startDate, int placeId, int id,
-            int userId, int guestsCount) {
+            String userId, int guestsCount) {
         this.endDate = endDate;
         this.totalPrice = totalPrice;
         this.status = status;
@@ -58,11 +58,11 @@ public class Booking {
         this.id = id;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

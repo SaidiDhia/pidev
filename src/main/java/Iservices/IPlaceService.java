@@ -19,7 +19,7 @@ public interface IPlaceService {
     // Extra methods for UI
     List<Place> findApproved();
 
-    List<Place> findByHost(int hostId);
+    List<Place> findByHost(String hostId);
 
     List<Place> findPending();
 
