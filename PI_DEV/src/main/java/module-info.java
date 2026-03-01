@@ -58,6 +58,7 @@ module com.example.pi_dev {
     requires googleauth;
     requires jdk.jsobject;
     requires itextpdf;
+    requires io;
 
     // Open the entire module for FXGL and other reflective libraries
     opens com.example.pi_dev to javafx.fxml, com.almasb.fxgl.all;
