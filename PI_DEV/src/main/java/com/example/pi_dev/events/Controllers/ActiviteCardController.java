@@ -114,7 +114,7 @@ public class ActiviteCardController {
 
     private void loadDefaultImage() {
         try {
-            Image defaultImage = new Image(getClass().getResourceAsStream("/views/images/default-placeholder.png"));
+            Image defaultImage = new Image(getClass().getResourceAsStream("/com/example/pi_dev/images/wanderlust-logo.png"));
             if (defaultImage != null) {
                 activiteImageView.setImage(defaultImage);
             }
