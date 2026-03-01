@@ -37,7 +37,7 @@ public class ActiviteCardController {
 
     public void setActiviteData(Object activite) {
         this.currentActivite = activite;
-        
+
         // Utiliser reflection pour accéder aux méthodes de l'activité
         try {
             // Récupérer les données via reflection avec les bonnes méthodes
@@ -45,17 +45,17 @@ public class ActiviteCardController {
             String type = (String) activite.getClass().getMethod("getTypeActivite").invoke(activite);
             String description = (String) activite.getClass().getMethod("getDescription").invoke(activite);
             String imagePath = (String) activite.getClass().getMethod("getImage").invoke(activite);
-            
+
             System.out.println("DEBUG ActiviteCard - Titre: " + titre);
             System.out.println("DEBUG ActiviteCard - Type: " + type);
             System.out.println("DEBUG ActiviteCard - Description: " + description);
             System.out.println("DEBUG ActiviteCard - Image: " + imagePath);
-            
+
             // Remplir les champs avec les données de l'activité
             titreLabel.setText(titre);
             typeLabel.setText(type);
             descriptionLabel.setText(description);
-            
+
             // Charger l'image si le chemin est valide
             if (imagePath != null && !imagePath.isEmpty()) {
                 try {
@@ -75,7 +75,7 @@ public class ActiviteCardController {
                 // Image par défaut si pas de chemin
                 activiteImageView.setImage(new Image("/images/default-activity.jpg"));
             }
-            
+
             // Afficher la catégorie si disponible
             try {
                 Object categorie = activite.getClass().getMethod("getCategorie").invoke(activite);
@@ -85,7 +85,7 @@ public class ActiviteCardController {
             } catch (Exception e) {
                 // Pas de catégorie, ce n'est pas grave
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,19 +130,19 @@ public class ActiviteCardController {
             String titre = (String) currentActivite.getClass().getMethod("getTitre").invoke(currentActivite);
             String type = (String) currentActivite.getClass().getMethod("getTypeActivite").invoke(currentActivite);
             String description = (String) currentActivite.getClass().getMethod("getDescription").invoke(currentActivite);
-            
+
             // Créer le message de partage
             String partageMessage = "🌟 *Wanderlust Activity* 🌟\n\n" +
                     "📋 Titre: " + titre + "\n" +
                     "🏷️ Type: " + type + "\n" +
                     "📝 Description: " + (description.length() > 100 ? description.substring(0, 100) + "..." : description) + "\n\n" +
                     "Découvrez cette amazing activity sur Wanderlust ! 🚀";
-            
+
             // Copier dans le presse-papiers
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             StringSelection selection = new StringSelection(partageMessage);
             clipboard.setContents(selection, null);
-            
+
             // Afficher la confirmation
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Partage réussi");
@@ -150,7 +150,7 @@ public class ActiviteCardController {
             alert.setContentText("Les détails de l'activité ont été copiés dans le presse-papiers.\n\n" +
                     "Vous pouvez maintenant les coller où vous voulez partager !");
             alert.showAndWait();
-            
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erreur de partage");
@@ -171,7 +171,7 @@ public class ActiviteCardController {
         try {
             // Récupérer les informations de l'activité
             String titre = (String) currentActivite.getClass().getMethod("getTitre").invoke(currentActivite);
-            
+
             // Afficher la confirmation
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Disponibilité");
@@ -179,7 +179,7 @@ public class ActiviteCardController {
             alert.setContentText("L'activité '" + titre + "' est maintenant marquée comme disponible.\n\n" +
                     "Les utilisateurs pourront maintenant réserver cette activité !");
             alert.showAndWait();
-            
+
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erreur");
@@ -195,7 +195,7 @@ public class ActiviteCardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Reservation.fxml"));
             Parent root = loader.load();
-            
+
             Stage stage = new Stage();
             stage.setTitle("Réserver");
             stage.setScene(new Scene(root));
@@ -205,7 +205,7 @@ public class ActiviteCardController {
             stage.setMinHeight(500);
             stage.centerOnScreen();
             stage.show();
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Erreur lors de l'ouverture de l'interface de réservation");

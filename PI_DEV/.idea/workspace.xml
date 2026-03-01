@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ai_review_migration.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migration_features.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Mydatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/test/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/SimpleTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/SimpleTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/ActiviteCardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/ActiviteCardController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +77,7 @@
       <recent name="com.example.pi_dev" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MainFX">
+  <component name="RunManager" selected="Application.EventsMain">
     <configuration name="EventsMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.EventsMain" />
       <module name="PI_DEV" />
@@ -136,11 +130,25 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TestEventFeatures" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.events.Controllers.TestEventFeatures" />
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.events.Controllers.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.EventsMain" />
+        <item itemvalue="Application.TestEventFeatures" />
         <item itemvalue="Application.MainFX" />
         <item itemvalue="Application.MessagingMain" />
-        <item itemvalue="Application.EventsMain" />
         <item itemvalue="Application.MainApp" />
       </list>
     </recent_temporary>
@@ -162,7 +170,7 @@
       <updated>1772306964434</updated>
       <workItem from="1772306966771" duration="13458000" />
       <workItem from="1772322167152" duration="4145000" />
-      <workItem from="1772326359342" duration="3452000" />
+      <workItem from="1772326359342" duration="5093000" />
     </task>
     <servers />
   </component>
