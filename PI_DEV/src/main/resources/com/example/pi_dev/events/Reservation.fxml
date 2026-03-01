@@ -20,7 +20,7 @@
          <children>
             <ImageView fitHeight="72.0" fitWidth="69.0">
                <image>
-                  <Image url="@/com/example/pi_dev/images/wanderlust-logo.png" />
+                  <Image url="@/com/example/pi_dev/images/wanderlust-logo.png"/>
                </image>
             </ImageView>
             <VBox spacing="5">

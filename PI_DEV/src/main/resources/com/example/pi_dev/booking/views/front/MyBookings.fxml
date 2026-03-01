@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.pi_dev.booking.Controllers.Front.MyBookingsController"
+            stylesheets="@../../style.css">
+
+    <VBox spacing="24" style="-fx-background-color: #F9FAFB; -fx-padding: 32 40 40 40;"
+          AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+
+        <!-- Header -->
+        <VBox spacing="4">
+            <Label styleClass="text-h1" text="My Bookings"/>
+            <Label styleClass="section-subtitle" text="Manage your reservations"/>
+        </VBox>
+
+        <!-- Table -->
+        <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+            <columns>
+                <TableColumn fx:id="colProperty" text="Property" prefWidth="180"/>
+                <TableColumn fx:id="colDates"    text="Dates"    prefWidth="180"/>
+                <TableColumn fx:id="colGuests"   text="Guests"   prefWidth="70"/>
+                <TableColumn fx:id="colTotal"    text="Total ($)" prefWidth="90"/>
+                <TableColumn fx:id="colStatus"   text="Status"   prefWidth="100"/>
+                <TableColumn fx:id="colPdf"      text="Receipt"   prefWidth="85"/>
+                <TableColumn fx:id="colActions"  text="Actions"  prefWidth="160"/>
+            </columns>
+            <placeholder>
+                <Label styleClass="section-subtitle" text="No bookings found."/>
+            </placeholder>
+        </TableView>
+
+    </VBox>
+
+</AnchorPane>
