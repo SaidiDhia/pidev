@@ -7,7 +7,9 @@ import Services.EventService;
 import Services.ReservationService;
 import Services.GoogleCalendarService;
 import Services.EmailService;
+import Utils.Mydatabase;
 
+import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.web.WebView;
 import javafx.scene.web.WebEngine;
-import java.util.regex.Pattern;
 import Services.GoogleCalendarService;
 
 public class ReservationController {
@@ -100,6 +101,8 @@ public class ReservationController {
 
     // ================= INITIALISATION =================
     public void initialize() {
+        System.out.println("✅ ReservationController initialisé");
+
         // Initialiser Google Calendar Service
         googleCalendarService = new GoogleCalendarService();
         boolean calendarInitialized = googleCalendarService.initialize();
@@ -585,14 +588,17 @@ public class ReservationController {
             // Créer la réservation
             Reservation reservation = new Reservation();
             reservation.setIdEvent(currentEvent.getId());
+            
+            // Utiliser les informations du formulaire
             reservation.setNom(nomField.getText());
             reservation.setEmail(emailField.getText());
             reservation.setTelephone(telephoneField.getText());
+            
             reservation.setNombrePersonnes(Integer.parseInt(nombrePersonnesField.getText()));
             reservation.setDemandesSpeciales(demandesp.getText() != null && !demandesp.getText().trim().isEmpty() ? demandesp.getText().trim() : "");
             reservation.setEvent(currentEvent);
             reservation.setStatut(Reservation.StatutReservation.CONFIRMEE);
-
+            
             // Calculer le prix total
             double prixUnitaire = currentEvent.getPrix().doubleValue();
             int nbPersonnes = Integer.parseInt(nombrePersonnesField.getText());

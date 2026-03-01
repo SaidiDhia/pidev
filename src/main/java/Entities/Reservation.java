@@ -46,7 +46,7 @@ public class Reservation {
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-
+    
     public int getIdEvent() { return idEvent; }
     public void setIdEvent(int idEvent) { this.idEvent = idEvent; }
 

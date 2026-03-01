@@ -112,35 +112,39 @@ public class GoogleMapsService {
         }
 
         try {
-            // Mode réel avec API Google Maps
             System.out.println("🗺️ Génération de la carte statique pour: " + address);
             
             // Obtenir les coordonnées d'abord
             CompletableFuture<Coordinates> coordsFuture = getCoordinates(address);
-            Coordinates coords = coordsFuture.get(); // Attendre le résultat
+            Coordinates coords = coordsFuture.join(); // Utiliser join() au lieu de get()
             
             if (coords != null) {
                 // Générer l'URL avec les vraies coordonnées
-                return String.format(
-                    "https://maps.googleapis.com/maps/api/staticmap?center=%.6f,%.6f&zoom=15&size=%dx%d&markers=color:red|%.6f,%.6f&key=%s",
+                String url = String.format(
+                    "https://maps.googleapis.com/maps/api/staticmap?center=%.4f,%.4f&zoom=15&size=%dx%d&markers=color:red|%.4f,%.4f&key=%s",
                     coords.getLatitude(), coords.getLongitude(),
                     width, height,
                     coords.getLatitude(), coords.getLongitude(),
-                    API_KEY.equals("AIzaSyDWvi3ZewbLDWLkkPlFtNg1iV7hcbdHyE4") || API_KEY.length() < 30 ? "demo" : API_KEY
+                    API_KEY
                 );
+                System.out.println("DEBUG: URL générée avec coordonnées: " + url);
+                return url;
             } else {
                 // Fallback avec l'adresse textuelle
-                return String.format(
+                String url = String.format(
                     "https://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=15&size=%dx%d&markers=color:red|%s&key=%s",
                     address.replace(" ", "+"),
                     width, height,
                     address.replace(" ", "+"),
-                    API_KEY.equals("AIzaSyDWvi3ZewbLDWLkkPlFtNg1iV7hcbdHyE4") || API_KEY.length() < 30 ? "demo" : API_KEY
+                    API_KEY
                 );
+                System.out.println("DEBUG: URL générée avec adresse: " + url);
+                return url;
             }
             
         } catch (Exception e) {
-            System.err.println("Erreur lors de la génération de la carte: " + e.getMessage());
+            System.err.println("❌ Erreur lors de la génération de la carte: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -302,7 +306,7 @@ public class GoogleMapsService {
     /**
      * Simule les coordonnées pour des lieux connus en Tunisie
      */
-    private Coordinates simulateCoordinates(String address) {
+    public Coordinates simulateCoordinates(String address) {
         // Coordonnées approximatives pour des lieux connus
         if (address.toLowerCase().contains("tunis")) {
             return new Coordinates(36.8065, 10.1815);
@@ -324,6 +328,14 @@ public class GoogleMapsService {
             return new Coordinates(33.9252, 8.1344);
         } else if (address.toLowerCase().contains("douz")) {
             return new Coordinates(33.4500, 9.0100);
+        } else if (address.toLowerCase().contains("ariana")) {
+            return new Coordinates(36.8625, 10.1956); // Ariana
+        } else if (address.toLowerCase().contains("ben arous")) {
+            return new Coordinates(36.7475, 10.2086); // Ben Arous
+        } else if (address.toLowerCase().contains("manouba")) {
+            return new Coordinates(36.8065, 10.0956); // Manouba
+        } else if (address.toLowerCase().contains("mourouj")) {
+            return new Coordinates(36.8665, 10.2556); // Mourouj
         } else if (address.toLowerCase().contains("plage")) {
             return new Coordinates(35.8000, 10.6000); // Plage générique
         } else if (address.toLowerCase().contains("desert")) {

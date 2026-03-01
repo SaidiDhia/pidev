@@ -18,7 +18,10 @@ import javafx.stage.Stage;
 import javafx.stage.Modality;
 
 import javafx.event.ActionEvent;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.net.URLEncoder;
 
 public class GoogleMapsController {
     @FXML
@@ -172,6 +175,44 @@ public class GoogleMapsController {
             return;
         }
 
+        // Test avec une URL directe pour Tunis
+        try {
+            updateStatus("🗺️ Test avec carte statique...");
+            
+            // URL de test directe pour Tunis
+            String testUrl = "https://maps.googleapis.com/maps/api/staticmap?center=36.8065,10.1815&zoom=15&size=600x400&markers=color:red|36.8065,10.1815&key=AIzaSyDWvi3ZewbLDWLkkPlFtNg1iV7hcbdHyE4";
+            
+            System.out.println("DEBUG: Test URL: " + testUrl);
+            
+            Image testImage = new Image(testUrl, true);
+            
+            testImage.errorProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null && newVal) {
+                    System.err.println("❌ Erreur avec l'URL de test");
+                    Platform.runLater(() -> {
+                        updateStatus("❌ Erreur de chargement de la carte de test");
+                        showAlert("❌ Erreur", "Impossible de charger la carte de test.");
+                    });
+                } else {
+                    System.out.println("✅ Carte de test chargée avec succès");
+                    Platform.runLater(() -> {
+                        mapImageView.setImage(testImage);
+                        mapImageView.setVisible(true);
+                        updateStatus("✅ Carte de test affichée");
+                    });
+                }
+            });
+            
+            mapImageView.setImage(testImage);
+            mapImageView.setVisible(true);
+            
+        } catch (Exception e) {
+            System.err.println("❌ Erreur lors du test: " + e.getMessage());
+            updateStatus("❌ Erreur de test");
+            showAlert("❌ Erreur", "Erreur lors du test de la carte: " + e.getMessage());
+        }
+        
+        // Essayer aussi la méthode normale
         showStaticMap(location);
     }
 
@@ -333,26 +374,123 @@ public class GoogleMapsController {
         try {
             updateStatus("🗺️ Génération de la carte...");
             
-            // Obtenir l'URL de la carte statique
-            String mapUrl = mapsService.getStaticMapUrl(location, 600, 400);
+            System.out.println("DEBUG: Tentative de génération de carte pour: " + location);
             
-            if (mapUrl != null) {
-                // Charger l'image de la carte
+            // Utiliser directement OpenStreetMap (gratuit et fiable)
+            GoogleMapsService.Coordinates coords = mapsService.simulateCoordinates(location);
+            if (coords != null) {
+                // Créer une carte simple avec coordonnées visibles
+                String mapUrl = String.format(
+                    "https://via.placeholder.com/600x400/1e3a8a/ffffff?text=Carte+de+%s\\nLat: %.4f\\nLng: %.4f\\nTunisie",
+                    location.replace(" ", "+"),
+                    coords.getLatitude(),
+                    coords.getLongitude()
+                );
+                
+                System.out.println("DEBUG: URL de carte avec coordonnées: " + mapUrl);
+                
                 Image mapImage = new Image(mapUrl, true);
                 
+                // Pas besoin d'attendre, via.placeholder est fiable
                 mapImageView.setImage(mapImage);
                 mapImageView.setVisible(true);
+                updateStatus("✅ Carte avec coordonnées affichée");
                 
-                updateStatus("✅ Carte affichée");
             } else {
-                updateStatus("❌ Impossible de générer la carte");
-                showAlert("❌ Erreur", "Impossible de générer la carte pour cette localisation.");
+                System.err.println("❌ Coordonnées non trouvées pour: " + location);
+                showDefaultMap();
             }
             
         } catch (Exception e) {
-            System.err.println("Erreur lors de l'affichage de la carte: " + e.getMessage());
-            updateStatus("❌ Erreur de carte");
-            showAlert("❌ Erreur", "Une erreur est survenue lors de l'affichage de la carte.");
+            System.err.println("❌ Erreur lors de l'affichage de la carte: " + e.getMessage());
+            e.printStackTrace();
+            showDefaultMap();
+        }
+    }
+    
+    private void showFallbackMap(String location) {
+        try {
+            updateStatus("🗺️ Affichage de la carte de remplacement...");
+            
+            // Créer une carte simple avec OpenStreetMap (gratuit)
+            GoogleMapsService.Coordinates coords = mapsService.simulateCoordinates(location);
+            if (coords != null) {
+                String osmUrl = String.format(
+                    "https://staticmap.openstreetmap.de/staticmap.php?center=%.4f,%.4f&zoom=15&size=600x400&markers=%.4f,%.4f,red",
+                    coords.getLatitude(), coords.getLongitude(),
+                    coords.getLatitude(), coords.getLongitude()
+                );
+                
+                System.out.println("DEBUG: URL OpenStreetMap: " + osmUrl);
+                
+                Image osmImage = new Image(osmUrl, true);
+                
+                // Attendre un peu pour voir si l'image se charge
+                Duration osmPause = Duration.millis(3000);
+                PauseTransition osmWait = new PauseTransition(osmPause);
+                osmWait.setOnFinished(e -> {
+                    if (osmImage.getException() != null) {
+                        System.err.println("❌ Erreur même avec OpenStreetMap");
+                        Platform.runLater(() -> showDefaultMap());
+                    } else {
+                        mapImageView.setImage(osmImage);
+                        mapImageView.setVisible(true);
+                        updateStatus("✅ Carte OpenStreetMap affichée (gratuite)");
+                    }
+                });
+                osmWait.play();
+                
+            } else {
+                showDefaultMap();
+            }
+            
+        } catch (Exception e) {
+            System.err.println("❌ Erreur avec la carte de fallback: " + e.getMessage());
+            showDefaultMap();
+        }
+    }
+    
+    private void showDefaultMap() {
+        try {
+            updateStatus("🗺️ Affichage de la carte par défaut...");
+            
+            // Créer une image informative avec les coordonnées
+            GoogleMapsService.Coordinates coords = mapsService.simulateCoordinates("Tunis");
+            String infoText;
+            if (coords != null) {
+                infoText = String.format("Carte Indisponible\\nCoordonnées: %.4f, %.4f\\nLocalisation: Tunisie", 
+                    coords.getLatitude(), coords.getLongitude());
+            } else {
+                infoText = "Carte Indisponible\\nLocalisation: Tunisie";
+            }
+            
+            // Image par défaut avec informations
+            String defaultMapUrl = String.format(
+                "https://via.placeholder.com/600x400/4285f4/ffffff?text=%s",
+                java.net.URLEncoder.encode(infoText, "UTF-8").replace("+", "%20")
+            );
+            
+            System.out.println("DEBUG: URL carte par défaut: " + defaultMapUrl);
+            
+            Image defaultImage = new Image(defaultMapUrl, true);
+            mapImageView.setImage(defaultImage);
+            mapImageView.setVisible(true);
+            
+            updateStatus("ℹ️ Carte par défaut affichée");
+            
+            // Utiliser Platform.runLater pour éviter l'erreur d'animation
+            Platform.runLater(() -> {
+                showAlert("ℹ️ Carte limitée", "Les services de cartes en ligne ne sont pas disponibles. Affichage des informations de localisation.");
+            });
+            
+        } catch (Exception e) {
+            System.err.println("❌ Erreur même avec la carte par défaut: " + e.getMessage());
+            updateStatus("❌ Carte indisponible");
+            
+            // Utiliser Platform.runLater pour éviter l'erreur d'animation
+            Platform.runLater(() -> {
+                showAlert("❌ Erreur", "Impossible d'afficher une carte.");
+            });
         }
     }
 

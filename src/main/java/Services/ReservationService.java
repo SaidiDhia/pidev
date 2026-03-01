@@ -29,10 +29,9 @@ public class ReservationService {
         ps.setInt(5, r.getNombrePersonnes());
         ps.setString(6, r.getDemandesSpeciales());
         ps.setString(7, r.getStatut().toString());
-
+        
         ps.executeUpdate();
-
-        // Récupérer l'ID généré
+        
         ResultSet generatedKeys = ps.getGeneratedKeys();
         if (generatedKeys.next()) {
             r.setId(generatedKeys.getInt(1));

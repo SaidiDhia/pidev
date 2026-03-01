@@ -13,7 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
@@ -21,7 +21,6 @@ import java.io.File;
 public class ActiviteCardController {
 
     @FXML private Button catalog;
-    @FXML private Button disponibleButton;
     @FXML private Button partagerButton;
     @FXML private ImageView activiteImageView;
     @FXML private Label titreLabel;
@@ -164,30 +163,6 @@ public class ActiviteCardController {
     @FXML
     void goToCatalogue(ActionEvent event) {
         fermerFenetre();
-    }
-
-    @FXML
-    void marquerDisponible(ActionEvent event) {
-        try {
-            // Récupérer les informations de l'activité
-            String titre = (String) currentActivite.getClass().getMethod("getTitre").invoke(currentActivite);
-            
-            // Afficher la confirmation
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Disponibilité");
-            alert.setHeaderText("✅ Activité marquée comme disponible");
-            alert.setContentText("L'activité '" + titre + "' est maintenant marquée comme disponible.\n\n" +
-                    "Les utilisateurs pourront maintenant réserver cette activité !");
-            alert.showAndWait();
-            
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erreur");
-            alert.setHeaderText("❌ Erreur lors du marquage");
-            alert.setContentText("Une erreur est survenue: " + e.getMessage());
-            alert.showAndWait();
-            e.printStackTrace();
-        }
     }
 
     @FXML
