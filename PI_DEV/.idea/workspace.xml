@@ -5,65 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/dashboard/DashboardMain.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/CartController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/FactureDetailsController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/FactureListController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/LivraisonController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/OrdersManagementController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductAvailableController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductDetailsController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductManagementController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/RoleSelectionController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/StatsDashboardController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ajouterPersonneController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Cart.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/DeliveryAddress.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Facture.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/FactureProduct.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Panier.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Product.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Iservices/IPanierService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Iservices/IproductServices.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/CartService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/CurrencyService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/DeliveryAddressService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/EmailService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/FactureProductService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/FactureService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/PanierService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/ProductService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/CloudinaryConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/ImageUploader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/Mydatabase.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/QRCodeGenerator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/example/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/MainFx.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/css/style.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/BuyerHome.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/Cart.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/FactureDetails.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/FactureList.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/Livraison.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/OrdersManagement.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/ProductAvailable.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/ProductDetails.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/RoleSelection.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/SellerHome.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/StatsDashboard.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/product_management.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/AjoutActiviteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/AjoutActiviteController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/EventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/EventController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/catalogueController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/catalogueController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/modifierActiviteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/modifierActiviteController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/ActiviteCard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/ActiviteCard.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/AjoutActivite.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/AjoutActivite.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Event.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Event.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Reservation.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Reservation.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/modifsuppActivite.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/modifsuppActivite.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Utils/BlogDataBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Utils/BlogDataBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Mydatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Utils/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Utils/Mydatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/main/controllers/MainLayoutController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/main/controllers/MainLayoutController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/MainFx.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/MainFx.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingdatabase/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingdatabase/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,13 +51,14 @@
     "Application.EventsMain.executor": "Run",
     "Application.MainApp.executor": "Run",
     "Application.MainFX.executor": "Run",
+    "Application.MainFx.executor": "Run",
     "Application.MessagingMain.executor": "Run",
     "Application.UserMain.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "Merging integration-sprint",
+    "git-widget-placeholder": "integration-sprint",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/MSI/Desktop/Ingégnerie/season 2/PI-DEV/PI_DEV",
@@ -119,7 +69,7 @@
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "preferences.lookFeel",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
@@ -166,12 +116,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MessagingMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.MessagingMain" />
+    <configuration name="MainFx" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.marketplace.test.MainFx" />
       <module name="PI_DEV" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.example.pi_dev.*" />
+          <option name="PATTERN" value="com.example.pi_dev.marketplace.test.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -208,10 +158,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.UserMain" />
+        <item itemvalue="Application.MainFx" />
         <item itemvalue="Application.EventsMain" />
         <item itemvalue="Application.TestEventFeatures" />
         <item itemvalue="Application.MainFX" />
-        <item itemvalue="Application.MessagingMain" />
       </list>
     </recent_temporary>
   </component>

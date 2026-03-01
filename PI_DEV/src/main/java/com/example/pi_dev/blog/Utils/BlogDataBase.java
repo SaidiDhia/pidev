@@ -12,7 +12,7 @@ public class BlogDataBase {
     // Paramètres de connexion
     private static final String URL = "jdbc:mysql://localhost:3306/wonderlust_db";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "saididhia";
 
     // Constructeur privé (Singleton)
     private BlogDataBase() {

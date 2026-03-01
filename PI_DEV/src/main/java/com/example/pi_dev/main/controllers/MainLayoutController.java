@@ -149,14 +149,26 @@ public class MainLayoutController {
         if (checkLogin()) loadView("/com/example/pi_dev/BlogView.fxml");
     }
 
+
     @FXML
     private void handleMarketplace() {
         if (checkLogin()) {
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-            alert.setTitle("Coming Soon");
-            alert.setHeaderText("Marketplace Integration");
-            alert.setContentText("The Marketplace module is currently under development and will be available soon!");
-            alert.showAndWait();
+            try {
+                // Initialize MainFx for integration
+                com.example.pi_dev.marketplace.test.MainFx.initForIntegration(contentArea);
+
+                // Load the RoleSelection.fxml
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/marketplace/fxml/RoleSelection.fxml"));
+                Node marketplaceView = loader.load();
+
+                // Display it
+                contentArea.getChildren().setAll(marketplaceView);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Label errorLabel = new Label("Error loading marketplace: " + e.getMessage());
+                contentArea.getChildren().setAll(errorLabel);
+            }
         }
     }
 
