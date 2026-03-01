@@ -2,22 +2,35 @@ package com.example.pi_dev.marketplace.Services;
 
 import com.example.pi_dev.marketplace.Entites.Product;
 import com.example.pi_dev.marketplace.Utils.Mydatabase;
+import com.example.pi_dev.user.utils.UserSession;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ProductService {
     private Connection con;
-    public static String CURRENT_USER_ID = "123e4567-e89b-12d3-a456-426614174000"; // temporary
+    public static String CURRENT_USER_ID; // Not hardcoded anymore, gets from session
 
     public ProductService() {
         con = Mydatabase.getInstance().getConnection();
+        // Initialize CURRENT_USER_ID from UserSession
+        if (UserSession.getInstance().isLoggedIn()) {
+            UUID userId = UserSession.getInstance().getCurrentUser().getUserId();
+            CURRENT_USER_ID = userId != null ? userId.toString() : null;
+        } else {
+            CURRENT_USER_ID = null;
+        }
     }
 
     // ─── Add a new product ────────────────────────────────────────────────────
 
     public void addProduct(Product p) {
+        if (CURRENT_USER_ID == null) {
+            throw new RuntimeException("No user logged in");
+        }
+
         String req = """
         INSERT INTO products 
         (title, description, type, price, quantity, category, image, created_date, userId) 
@@ -46,6 +59,10 @@ public class ProductService {
     // ─── Update product ───────────────────────────────────────────────────────
 
     public void updateProduct(Product p) {
+        if (CURRENT_USER_ID == null) {
+            throw new RuntimeException("No user logged in");
+        }
+
         String req = """
     UPDATE products 
     SET title=?, description=?, type=?, price=?, quantity=?, category=?, image=?, created_date=?
@@ -73,9 +90,13 @@ public class ProductService {
     // ─── Delete product ───────────────────────────────────────────────────────
 
     public void deleteProduct(int id) {
+        if (CURRENT_USER_ID == null) {
+            throw new RuntimeException("No user logged in");
+        }
+
         try {
             PreparedStatement ps = con.prepareStatement(
-                "DELETE FROM products WHERE id=? AND userId=?");
+                    "DELETE FROM products WHERE id=? AND userId=?");
             ps.setInt(1, id);
             ps.setString(2, CURRENT_USER_ID);
             ps.executeUpdate();
@@ -113,23 +134,20 @@ public class ProductService {
     }
 
     // ─── Get all available products (buyer view) ──────────────────────────────
-    //
-    // FIX: The original query used "quantity > 0" which is wrong.
-    // A product with quantity=5 and reserved=5 has 0 available — it should be hidden.
-    //
-    // Correct filter: (quantity - reserved_quantity) > 0
-    // Using COALESCE in case reserved_quantity column is NULL in older rows.
 
     public List<Product> getAllAvailableProducts(String currentUserId) {
+        if (CURRENT_USER_ID == null) {
+            return new ArrayList<>(); // Return empty list if not logged in
+        }
+
         List<Product> products = new ArrayList<>();
         try {
-            // FIX: filter by available quantity, not just physical quantity
             String sql = "SELECT * FROM products " +
-                         "WHERE userId != ? " +
-                         "AND (quantity - COALESCE(reserved_quantity, 0)) > 0 " +
-                         "ORDER BY created_date DESC";
+                    "WHERE userId != ? " +
+                    "AND (quantity - COALESCE(reserved_quantity, 0)) > 0 " +
+                    "ORDER BY created_date DESC";
             PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, currentUserId);
+            stmt.setString(1, CURRENT_USER_ID);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) products.add(mapProduct(rs));
         } catch (SQLException e) {
@@ -142,11 +160,15 @@ public class ProductService {
     // ─── Get all products (seller/management view) ────────────────────────────
 
     public List<Product> getAllProducts(String currentUserId) {
+        if (CURRENT_USER_ID == null) {
+            return new ArrayList<>(); // Return empty list if not logged in
+        }
+
         List<Product> products = new ArrayList<>();
         try {
             String sql = "SELECT * FROM products WHERE userId = ? ORDER BY created_date DESC";
             PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, currentUserId);
+            stmt.setString(1, CURRENT_USER_ID);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) products.add(mapProduct(rs));
         } catch (SQLException e) {
@@ -160,15 +182,15 @@ public class ProductService {
 
     private Product mapProduct(ResultSet rs) throws SQLException {
         Product product = new Product(
-            rs.getString("title"),
-            rs.getString("description"),
-            rs.getString("type"),
-            rs.getFloat("price"),
-            rs.getInt("quantity"),
-            rs.getString("category"),
-            rs.getString("image"),
-            rs.getTimestamp("created_date"),
-            rs.getString("userId")
+                rs.getString("title"),
+                rs.getString("description"),
+                rs.getString("type"),
+                rs.getFloat("price"),
+                rs.getInt("quantity"),
+                rs.getString("category"),
+                rs.getString("image"),
+                rs.getTimestamp("created_date"),
+                rs.getString("userId")
         );
         product.setId(rs.getInt("id"));
         try {

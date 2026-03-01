@@ -19,7 +19,7 @@ public class Main extends Application {
             Scene scene = new Scene(root);
 
             // Configurer le stage
-            primaryStage.setTitle("Wanderlust - Catalogue");
+            primaryStage.setTitle("Wonderlust - Catalogue");
             primaryStage.setScene(scene);
             primaryStage.setWidth(1400);
             primaryStage.setHeight(900);

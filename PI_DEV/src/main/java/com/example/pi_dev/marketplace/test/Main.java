@@ -145,16 +145,4 @@ public class Main {
     }
 
 
-    // Simple display function
-    public static void displayProducts(ProductService ps) {
-        List<Product> products = ps.getAllProducts("123e4567-e89b-12d3-a456-426614174000");
-        if (products.isEmpty()) {
-            System.out.println("No products in database.");
-        } else {
-            System.out.println("\n--- Products in database ---");
-            for (Product pr : products) {
-                System.out.println(pr);
-            }
-        }
-    }
 }

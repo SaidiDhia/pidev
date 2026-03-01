@@ -6,13 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Utils/BlogDataBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Utils/BlogDataBase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Mydatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Utils/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Utils/Mydatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/main/controllers/MainLayoutController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/main/controllers/MainLayoutController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/MainFx.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/MainFx.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingdatabase/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingdatabase/DatabaseConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/test/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/test/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/ProductService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,35 +41,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.EventsMain.executor": "Run",
-    "Application.MainApp.executor": "Run",
-    "Application.MainFX.executor": "Run",
-    "Application.MainFx.executor": "Run",
-    "Application.MessagingMain.executor": "Run",
-    "Application.UserMain.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "integration-sprint",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/MSI/Desktop/Ingégnerie/season 2/PI-DEV/PI_DEV",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.EventsMain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainFX.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainFx.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MessagingMain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UserMain.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;integration-sprint&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/MSI/Desktop/Ingégnerie/season 2/PI-DEV/PI_DEV&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV" />
@@ -183,6 +178,7 @@
       <workItem from="1772306966771" duration="13458000" />
       <workItem from="1772322167152" duration="4145000" />
       <workItem from="1772326359342" duration="5093000" />
+      <workItem from="1772372901376" duration="5023000" />
     </task>
     <servers />
   </component>
