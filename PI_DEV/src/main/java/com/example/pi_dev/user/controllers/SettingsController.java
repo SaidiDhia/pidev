@@ -131,10 +131,14 @@ public class SettingsController {
         boolean isTfaEnabled = currentUser.getTfaMethod() != null;
         if (isTfaEnabled) {
             tfaStatusLabel.setText("ON (" + currentUser.getTfaMethod() + ")");
-            tfaStatusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+            tfaStatusLabel.getStyleClass().clear();
+            tfaStatusLabel.getStyleClass().add("badge-tfa-on");
+            tfaStatusLabel.setStyle(""); // remove inline styling 
         } else {
             tfaStatusLabel.setText("OFF");
-            tfaStatusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            tfaStatusLabel.getStyleClass().clear();
+            tfaStatusLabel.getStyleClass().add("badge-tfa-on");
+            tfaStatusLabel.setStyle("-fx-background-color: #EF4444;"); // Error RED
         }
     }
 
@@ -240,7 +244,12 @@ public class SettingsController {
     
     @FXML
     void handleBack(ActionEvent event) {
-        navigateTo("/com/example/pi_dev/venue/views/home-view.fxml", event);
+        User user = UserSession.getInstance().getCurrentUser();
+        if (user != null && user.getRole() == RoleEnum.ADMIN) {
+            navigateTo("/com/example/pi_dev/user/admin_dashboard.fxml", event);
+        } else {
+            navigateTo("/com/example/pi_dev/hello-view.fxml", event);
+        }
     }
 
     @FXML

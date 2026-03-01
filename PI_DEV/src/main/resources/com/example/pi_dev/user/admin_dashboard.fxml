@@ -11,20 +11,23 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.control.Separator?>
 
 <BorderPane prefHeight="800.0" prefWidth="1100.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.user.controllers.AdminDashboardController">
     <top>
-        <VBox styleClass="navbar">
+        <VBox styleClass="navbar" style="-fx-background-color: #2563eb;">
             <children>
                 <HBox alignment="CENTER_LEFT" spacing="25.0">
                     <children>
-                        <Label styleClass="text-h2" text="WonderLust Admin" style="-fx-text-fill: #4F46E5;" />
+                        <Label styleClass="text-h2" text="WonderLust Admin" style="-fx-text-fill: white;" />
                         <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" spacing="15.0">
                             <children>
-                                <Button onAction="#handleBackToHome" styleClass="btn, btn-secondary" text="View Site" />
+                                <Button onAction="#handleBackToHome" styleClass="btn, btn-secondary" text="Home" />
                                 <Button onAction="#handleSettings" styleClass="btn, btn-secondary" text="Settings" />
                                 <Button onAction="#handleLogout" styleClass="btn, btn-danger" text="Logout" />
                             </children>
@@ -34,143 +37,152 @@
             </children>
         </VBox>
     </top>
-    
     <center>
         <VBox spacing="25.0" style="-fx-background-color: #F9FAFB;">
             <padding>
                 <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
             </padding>
             <children>
-                <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                <TabPane fx:id="adminTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                     <tabs>
-                        <Tab text="Users Management">
-                            <VBox spacing="20.0" style="-fx-padding: 25 0 0 0;">
-                                <children>
-                                    <HBox alignment="CENTER_LEFT" spacing="15.0">
-                                        <children>
-                                            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card" style="-fx-padding: 5 15; -fx-background-radius: 8;">
-                                                <children>
-                                                    <TextField fx:id="searchField" prefWidth="300.0" promptText="Search users by name or email..." style="-fx-background-color: transparent;" />
-                                                </children>
-                                            </HBox>
-                                            <ComboBox fx:id="roleFilter" prefWidth="180.0" promptText="Filter by Role" />
-                                            <Button onAction="#handleResetFilters" styleClass="btn, btn-secondary" text="Reset Filters" />
-                                            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                                                <children>
-                                                    <Button onAction="#handleAddUser" styleClass="btn, btn-primary" text="+ Add New User" />
-                                                </children>
-                                            </HBox>
-                                        </children>
-                                    </HBox>
-                                    
-                                    <VBox styleClass="card" VBox.vgrow="ALWAYS">
-                                        <children>
-                                            <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
-                                                <columns>
-                                                    <TableColumn fx:id="colAvatar" prefWidth="60.0" text="PHOTO" />
-                                                    <TableColumn fx:id="colName" prefWidth="180.0" text="FULL NAME" />
-                                                    <TableColumn fx:id="colEmail" prefWidth="220.0" text="EMAIL ADDRESS" />
-                                                    <TableColumn fx:id="colPhone" prefWidth="140.0" text="PHONE" />
-                                                    <TableColumn fx:id="colRole" prefWidth="120.0" text="ROLE" />
-                                                    <TableColumn fx:id="colStatus" prefWidth="100.0" text="STATUS" />
-                                                    <TableColumn fx:id="colActions" prefWidth="180.0" text="ACTIONS" />
-                                                </columns>
-                                                <columnResizePolicy>
-                                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                                </columnResizePolicy>
-                                            </TableView>
-                                        </children>
-                                    </VBox>
-                                </children>
-                            </VBox>
+                        <!-- Dashboard Overview to replicate Image 2 -->
+                        <Tab text="Dashboard Overview">
+                            <content>
+                                <StackPane>
+                                    <padding>
+                                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                                    </padding>
+                                    <children>
+                                        <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+                                            <children>
+                                                <!-- Recent Activity Column -->
+                                                <VBox styleClass="card" spacing="15.0" HBox.hgrow="ALWAYS" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                                                    <children>
+                                                        <Label styleClass="text-h3" text="Recent Activity" />
+                                                        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                                            <content>
+                                                                <VBox fx:id="dashboardActivityLogContainer" spacing="12.0" />
+                                                            </content>
+                                                        </ScrollPane>
+                                                    </children>
+                                                </VBox>
+                                                <!-- Right Sidebar: Quick Actions & Distribution -->
+                                                <VBox spacing="20.0" style="-fx-pref-width: 300;">
+                                                    <children>
+                                                        <VBox styleClass="card" spacing="15.0" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                                                            <children>
+                                                                <Label styleClass="text-h3" text="Quick Actions" />
+                                                                <Button onAction="#showUserManagement" styleClass="btn-solid-blue" text="Manage Users" maxWidth="Infinity" />
+                                                                <Button onAction="#handleShowActivityLogs" styleClass="btn-solid-green" text="View Activity Log" maxWidth="Infinity" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox styleClass="card" spacing="15.0" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                                                            <children>
+                                                                <Label styleClass="text-h3" text="User Distribution" />
+                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                     <Label text="•" style="-fx-text-fill: #3B82F6; -fx-font-size: 24px;" />
+                                                                     <Label text="Admins" />
+                                                                     <Region HBox.hgrow="ALWAYS" />
+                                                                     <Label fx:id="adminCountLabel" text="0" style="-fx-font-weight: bold;" />
+                                                                </HBox>
+                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                     <Label text="•" style="-fx-text-fill: #10B981; -fx-font-size: 24px;" />
+                                                                     <Label text="Hosts" />
+                                                                     <Region HBox.hgrow="ALWAYS" />
+                                                                     <Label fx:id="hostCountLabel" text="0" style="-fx-font-weight: bold;" />
+                                                                </HBox>
+                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                     <Label text="•" style="-fx-text-fill: #6B7280; -fx-font-size: 24px;" />
+                                                                     <Label text="Participants" />
+                                                                     <Region HBox.hgrow="ALWAYS" />
+                                                                     <Label fx:id="participantCountLabel" text="0" style="-fx-font-weight: bold;" />
+                                                                </HBox>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </StackPane>
+                            </content>
                         </Tab>
                         
-                        <Tab text="Venue Requests">
-                            <VBox spacing="20.0" style="-fx-padding: 25 0 0 0;">
-                                <children>
-                                    <VBox spacing="8.0">
-                                        <children>
-                                            <Label styleClass="text-h2" text="Venue Requests" />
-                                            <Label styleClass="text-p" text="Review and manage venue listing requests" style="-fx-text-fill: #6B7280;" />
-                                        </children>
-                                    </VBox>
-                                    
-                                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
-                                        <content>
-                                            <FlowPane fx:id="venueRequestsFlowPane" hgap="20.0" vgap="20.0" style="-fx-padding: 10;">
-                                                <!-- Cards will be added here dynamically -->
-                                            </FlowPane>
-                                        </content>
-                                    </ScrollPane>
-                                </children>
-                            </VBox>
+                        <!-- Manage Users Tab -->
+                        <Tab fx:id="tabManageUsers" text="Manage Users">
+                            <content>
+                                <StackPane>
+                                    <padding>
+                                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                                    </padding>
+                                    <children>
+                                        <VBox spacing="20.0" styleClass="card" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                                    <children>
+                                                        <Label styleClass="text-h3" text="Enrolled Users" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="input-container-box">
+                                                            <children>
+                                                                 <Label text="🔍" style="-fx-text-fill: #6B7280;" />
+                                                                 <TextField fx:id="searchField" promptText="Search users..." styleClass="input-container-field" />
+                                                            </children>
+                                                        </HBox>
+                                                        <ComboBox fx:id="roleFilter" promptText="Filter by Role" style="-fx-background-color: white; -fx-border-color: #D1D5DB; -fx-border-radius: 6;" />
+                                                        <Button onAction="#handleResetFilters" styleClass="btn-outline-gray" text="Reset Filters" />
+                                                        <Button onAction="#handleAddUser" styleClass="btn-solid-blue" text="Add User" />
+                                                    </children>
+                                                </HBox>
+                                                
+                                                <TableView fx:id="userTable" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+                                                    <columns>
+                                                        <TableColumn fx:id="colAvatar" prefWidth="60.0" sortable="false" text="Avatar" />
+                                                        <TableColumn fx:id="colName" prefWidth="180.0" text="Full Name" />
+                                                        <TableColumn fx:id="colEmail" prefWidth="250.0" text="Email Address" />
+                                                        <TableColumn fx:id="colPhone" prefWidth="150.0" text="Phone Number" />
+                                                        <TableColumn fx:id="colRole" prefWidth="120.0" text="Role" />
+                                                        <TableColumn fx:id="colStatus" prefWidth="100.0" text="Status" />
+                                                        <TableColumn fx:id="colActions" prefWidth="250.0" sortable="false" text="Actions" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </StackPane>
+                            </content>
                         </Tab>
 
-                        <Tab text="All Places">
-                            <VBox spacing="20.0" style="-fx-padding: 25 0 0 0;">
-                                <children>
-                                    <VBox spacing="8.0">
-                                        <children>
-                                            <Label styleClass="text-h2" text="Platform Places" />
-                                            <Label styleClass="text-p" text="Manage all existing venues on the platform" style="-fx-text-fill: #6B7280;" />
-                                        </children>
-                                    </VBox>
-                                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
-                                        <content>
-                                            <FlowPane fx:id="allPlacesFlowPane" hgap="20.0" vgap="20.0" style="-fx-padding: 10;">
-                                                <!-- Cards will be added here dynamically -->
-                                            </FlowPane>
-                                        </content>
-                                    </ScrollPane>
-                                </children>
-                            </VBox>
-                        </Tab>
-
-                        <Tab text="Reservations">
-                            <VBox spacing="20.0" style="-fx-padding: 25 0 0 0;">
-                                <children>
-                                    <VBox spacing="8.0">
-                                        <children>
-                                            <Label styleClass="text-h2" text="All Reservations" />
-                                            <Label styleClass="text-p" text="Monitor all bookings across the platform" style="-fx-text-fill: #6B7280;" />
-                                        </children>
-                                    </VBox>
-                                    
-                                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
-                                        <content>
-                                            <FlowPane fx:id="reservationsFlowPane" hgap="20.0" vgap="20.0" style="-fx-padding: 10;">
-                                                <!-- Cards will be added here dynamically -->
-                                            </FlowPane>
-                                        </content>
-                                    </ScrollPane>
-                                </children>
-                            </VBox>
-                        </Tab>
-
-                        <Tab text="Activity Log">
-                            <VBox spacing="20.0" style="-fx-padding: 25 0 0 0;">
-                                <children>
-                                    <HBox alignment="CENTER_LEFT" spacing="15.0">
-                                        <children>
-                                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                                                <children>
-                                                    <Label styleClass="text-h2" text="Platform Activity" />
-                                                    <Label styleClass="text-p" text="Real-time notifications of system events and user actions" style="-fx-text-fill: #6B7280;" />
-                                                </children>
-                                            </VBox>
-                                            <Button onAction="#loadActivityLogs" styleClass="btn, btn-secondary" text="Refresh Logs" />
-                                        </children>
-                                    </HBox>
-                                    
-                                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
-                                        <content>
-                                            <VBox fx:id="activityLogContainer" spacing="12.0" style="-fx-padding: 10;">
-                                                <!-- Notification cards will be added here dynamically -->
-                                            </VBox>
-                                        </content>
-                                    </ScrollPane>
-                                </children>
-                            </VBox>
+                        <!-- Activity Log to match Image 1 -->
+                        <Tab fx:id="tabActivityLogs" text="Activity Log">
+                            <content>
+                                <StackPane>
+                                    <padding>
+                                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                                    </padding>
+                                    <children>
+                                        <VBox spacing="20.0" styleClass="card" style="-fx-padding: 20; -fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                                    <children>
+                                                        <Label styleClass="text-h3" text="System Activity Log" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <Button onAction="#exportLogsToPDF" styleClass="btn-outline-blue" text="Export to PDF" />
+                                                        <Button onAction="#loadActivityLogs" styleClass="btn-outline-gray" text="Refresh" />
+                                                    </children>
+                                                </HBox>
+                                                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                                    <content>
+                                                        <VBox fx:id="activityLogContainer" spacing="15.0" />
+                                                    </content>
+                                                </ScrollPane>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </StackPane>
+                            </content>
                         </Tab>
                     </tabs>
                 </TabPane>

@@ -22,10 +22,10 @@ module com.example.pi_dev {
     requires com.google.zxing;
     requires com.google.zxing.javase;
     requires jdk.jsobject; // For JavaScript interop in WebView
+    requires itextpdf;     // For PDF Export
 
     opens com.example.pi_dev to javafx.fxml;
-    opens com.example.pi_dev.messaging.messagecontroller to javafx.fxml;
-    opens com.example.pi_dev.messaging.messagingmodel to javafx.base;
+
 
     // User Module Opens/Exports
     opens com.example.pi_dev.user.models to javafx.base;
@@ -38,19 +38,10 @@ module com.example.pi_dev {
 
     opens com.example.pi_dev.user.controllers to javafx.fxml;
 
-    // Venue Module Opens/Exports
-    exports com.example.pi_dev.venue;
-    exports com.example.pi_dev.venue.controllers;
-
-    opens com.example.pi_dev.venue.controllers to javafx.fxml;
-    // opens com.example.pi_dev.venue.views to javafx.fxml; // Removed as it's not a
-    // package
-
-    exports com.example.pi_dev.venue.entities;
-    exports com.example.pi_dev.venue.services;
     exports com.example.pi_dev.common.services;
 
-    opens com.example.pi_dev.venue.entities to javafx.base;
+
+
 
     exports com.example.pi_dev;
 

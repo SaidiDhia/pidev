@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.scene.input.MouseEvent;
 
 import java.io.IOException;
 
@@ -69,15 +70,11 @@ public class LoginController {
                     TwoFactorController controller = loader.getController();
                     controller.initData(false); // Verify Mode (auto-detects method)
 
-                    if (isInsideHomeView(event)) {
-                        replaceInHomeView(root, event);
-                    } else {
-                        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                        stage.setScene(new Scene(root));
-                        stage.show();
-                    }
+                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                    stage.setScene(new Scene(root));
+                    stage.show();
                 } else {
-                    // Navigate to appropriate dashboard
+                    // Admin -> dashboard; Host/Participant -> settings
                     try {
                         if (user.getRole() == RoleEnum.ADMIN) {
                             String path = "/com/example/pi_dev/user/admin_dashboard.fxml";
@@ -87,16 +84,12 @@ public class LoginController {
                             stage.setScene(new Scene(root));
                             stage.show();
                         } else {
-                            if (isInsideHomeView(event)) {
-                                closeHomeOverlay(event);
-                            } else {
-                                String path = "/com/example/pi_dev/venue/views/home-view.fxml";
-                                FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
-                                Parent root = loader.load();
-                                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                                stage.setScene(new Scene(root));
-                                stage.show();
-                            }
+                            String path = "/com/example/pi_dev/user/settings.fxml";
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+                            Parent root = loader.load();
+                            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                            stage.setScene(new Scene(root));
+                            stage.show();
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -123,54 +116,28 @@ public class LoginController {
         navigateTo("/com/example/pi_dev/user/forgot_password.fxml", event);
     }
 
-    private void navigateTo(String fxmlPath, ActionEvent event) {
+    @FXML
+    void goToMainHome(MouseEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
-            if (isInsideHomeView(event)) {
-                replaceInHomeView(root, event);
-            } else {
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.show();
-            }
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/hello-view.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
             errorLabel.setText("Navigation error: " + e.getMessage());
         }
     }
 
-    private boolean isInsideHomeView(ActionEvent event) {
-        Node source = (Node) event.getSource();
-        Scene scene = source.getScene();
-        if (scene != null && scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
-            javafx.scene.layout.BorderPane root = (javafx.scene.layout.BorderPane) scene.getRoot();
-            return root.getCenter() instanceof javafx.scene.layout.StackPane && 
-                   root.getCenter().getId() != null && 
-                   root.getCenter().getId().equals("mainContentArea");
-        }
-        return false;
-    }
-
-    private void replaceInHomeView(Parent root, ActionEvent event) {
-        Node source = (Node) event.getSource();
-        javafx.scene.layout.StackPane mainContentArea = (javafx.scene.layout.StackPane) source.getScene().lookup("#mainContentArea");
-        if (mainContentArea != null) {
-            root.setStyle("-fx-background-color: rgba(249, 250, 251, 0.98);");
-            mainContentArea.getChildren().remove(mainContentArea.getChildren().size() - 1);
-            mainContentArea.getChildren().add(root);
-        }
-    }
-
-    private void closeHomeOverlay(ActionEvent event) {
-        Node source = (Node) event.getSource();
-        javafx.scene.layout.StackPane mainContentArea = (javafx.scene.layout.StackPane) source.getScene().lookup("#mainContentArea");
-        if (mainContentArea != null) {
-            mainContentArea.getChildren().remove(mainContentArea.getChildren().size() - 1);
-            // Trigger refresh on the controller if possible
-            Object controller = mainContentArea.getScene().getUserData();
-            if (controller instanceof com.example.pi_dev.venue.controllers.HomeController) {
-                ((com.example.pi_dev.venue.controllers.HomeController) controller).refresh();
-            }
+    private void navigateTo(String fxmlPath, ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            errorLabel.setText("Navigation error: " + e.getMessage());
         }
     }
 }

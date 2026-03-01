@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -73,9 +74,17 @@ public class ForgotPasswordController {
                 statusLabel.setStyle("-fx-text-fill: green;");
                 
             } catch (Exception e) {
-                statusLabel.setText("Error sending email: " + e.getMessage());
+                String msg = e.getMessage() != null ? e.getMessage() : e.toString();
+                statusLabel.setText("Email could not be sent. See message below.");
                 statusLabel.setStyle("-fx-text-fill: red;");
                 e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Email not sent");
+                alert.setHeaderText("Could not send password reset email");
+                alert.setContentText(msg);
+                alert.setResizable(true);
+                alert.getDialogPane().setPrefWidth(500);
+                alert.showAndWait();
             }
         } else {
             // Stage 2: Reset Password
