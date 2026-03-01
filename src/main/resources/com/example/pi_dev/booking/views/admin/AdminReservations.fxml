@@ -14,8 +14,8 @@
       style="-fx-background-color: white; -fx-padding: 24 32 32 32;">
 
     <VBox spacing="4">
-        <Label styleClass="text-h2" text="Pending Booking Approvals"/>
-        <Label styleClass="section-subtitle" text="Confirm or reject pending booking reservations"/>
+        <Label styleClass="text-h2" text="Booking Management"/>
+        <Label styleClass="section-subtitle" text="Confirm, reject, or cancel any reservation"/>
     </VBox>
 
     <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
@@ -25,7 +25,7 @@
             <TableColumn fx:id="colGuests"   text="Guests"      prefWidth="80"/>
             <TableColumn fx:id="colTotal"    text="Total ($)"   prefWidth="100"/>
             <TableColumn fx:id="colStatus"   text="Status"      prefWidth="100"/>
-            <TableColumn fx:id="colActions"  text="Actions"     prefWidth="180"/>
+            <TableColumn fx:id="colActions"  text="Actions"     prefWidth="300"/>
         </columns>
         <placeholder>
             <Label styleClass="section-subtitle" text="No pending reservations."/>

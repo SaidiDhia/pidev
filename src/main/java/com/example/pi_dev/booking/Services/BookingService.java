@@ -6,6 +6,8 @@ import com.example.pi_dev.booking.Utils.Mydatabase;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,6 +165,11 @@ public class BookingService implements IBookingService {
         }
     }
 
+    /** Alias for getBookingById, used by cancellation logic. */
+    public Booking getById(int bookingId) {
+        return getBookingById(bookingId);
+    }
+
     @Override
     public List<Booking> afficherBookingsParPlace(int placeId) {
         String sql = "SELECT * FROM booking WHERE place_id=? ORDER BY id DESC";
@@ -246,9 +253,6 @@ public class BookingService implements IBookingService {
 
     /**
      * Checks if a user is eligible to review a place.
-     * Returns true if there exists a booking for this user+place where:
-     * - status = COMPLETED
-     * - OR status = CONFIRMED AND end_date < CURDATE()
      */
     public boolean canReview(String userId, int placeId) {
         String sql = "SELECT COUNT(*) FROM booking " +
@@ -265,7 +269,7 @@ public class BookingService implements IBookingService {
         }
     }
 
-    // Fetch bookings with place title (JOIN) for a specific user
+    /** Fetch bookings with place title (JOIN) for a specific user. */
     public List<BookingView> findByUserWithTitle(String userId) {
         String sql = "SELECT b.*, p.title AS place_title " +
                 "FROM booking b " +
@@ -286,7 +290,7 @@ public class BookingService implements IBookingService {
         return list;
     }
 
-    // Fetch pending bookings with place title (JOIN) for admin
+    /** Fetch PENDING bookings with place title (JOIN) for admin. */
     public List<BookingView> findPendingWithTitle() {
         String sql = "SELECT b.*, p.title AS place_title " +
                 "FROM booking b " +
@@ -305,6 +309,136 @@ public class BookingService implements IBookingService {
         return list;
     }
 
+    /** Fetch ALL bookings with place title (JOIN) for admin view. */
+    public List<BookingView> findAllWithTitle() {
+        String sql = "SELECT b.*, p.title AS place_title " +
+                "FROM booking b " +
+                "JOIN place p ON b.place_id = p.id " +
+                "ORDER BY b.id DESC";
+        List<BookingView> list = new ArrayList<>();
+
+        try (Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(new BookingView(mapBooking(rs), rs.getString("place_title")));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur findAllWithTitle", e);
+        }
+        return list;
+    }
+
+    // =====================================================================
+    // CANCELLATION LOGIC
+    // =====================================================================
+
+    /**
+     * Cancellation by the user.
+     * - PENDING → CANCELLED, refund = 0
+     * - CONFIRMED → CANCELLED, refund calculated by date policy
+     * - REJECTED / COMPLETED → throws RuntimeException (shown in UI)
+     *
+     * @return the refund amount (0 if none)
+     */
+    public double cancelByUser(int bookingId) {
+        Booking booking = getById(bookingId);
+        if (booking == null) {
+            throw new RuntimeException("Réservation introuvable (id=" + bookingId + ").");
+        }
+
+        Booking.Status status = booking.getStatus();
+
+        if (status == Booking.Status.REJECTED) {
+            throw new RuntimeException("Annulation impossible : cette réservation a déjà été rejetée.");
+        }
+        if (status == Booking.Status.COMPLETED) {
+            throw new RuntimeException("Annulation impossible : le séjour est déjà terminé.");
+        }
+        if (status == Booking.Status.CANCELLED) {
+            throw new RuntimeException("Cette réservation est déjà annulée.");
+        }
+
+        double refund = 0.0;
+        if (status == Booking.Status.CONFIRMED) {
+            refund = calculateRefundAmount(booking.getStartDate(), booking.getTotalPrice());
+        }
+        // PENDING → refund = 0 (no payment was made)
+
+        applyCancellation(bookingId, "USER", refund, null);
+        return refund;
+    }
+
+    /**
+     * Cancellation by the admin (with optional reason).
+     * - PENDING or CONFIRMED → CANCELLED, same refund policy
+     * - COMPLETED → throws RuntimeException
+     *
+     * @return the refund amount
+     */
+    public double cancelByAdmin(int bookingId, String reason) {
+        Booking booking = getById(bookingId);
+        if (booking == null) {
+            throw new RuntimeException("Réservation introuvable (id=" + bookingId + ").");
+        }
+
+        Booking.Status status = booking.getStatus();
+
+        if (status == Booking.Status.COMPLETED) {
+            throw new RuntimeException("Annulation impossible : le séjour est déjà terminé (COMPLETED).");
+        }
+        if (status == Booking.Status.CANCELLED) {
+            throw new RuntimeException("Cette réservation est déjà annulée.");
+        }
+        if (status == Booking.Status.REJECTED) {
+            throw new RuntimeException("Annulation impossible : réservation déjà rejetée.");
+        }
+
+        double refund = 0.0;
+        if (status == Booking.Status.CONFIRMED) {
+            refund = calculateRefundAmount(booking.getStartDate(), booking.getTotalPrice());
+        }
+        // PENDING → refund = 0
+
+        applyCancellation(bookingId, "ADMIN", refund, reason);
+        return refund;
+    }
+
+    /**
+     * Calculates the refund based on days before start_date.
+     * ≥ 7 days → 100% | 3–6 days → 50% | < 3 days → 0%
+     */
+    private double calculateRefundAmount(LocalDate startDate, double totalPrice) {
+        long daysBefore = ChronoUnit.DAYS.between(LocalDate.now(), startDate);
+
+        if (daysBefore >= 7) {
+            return totalPrice; // 100%
+        } else if (daysBefore >= 3) {
+            return totalPrice * 0.5; // 50%
+        } else {
+            return 0.0; // 0%
+        }
+    }
+
+    /**
+     * Internal helper: persists cancellation data to DB.
+     */
+    private void applyCancellation(int bookingId, String cancelledBy, double refundAmount, String reason) {
+        String sql = "UPDATE booking SET status='CANCELLED', cancelled_at=?, refund_amount=?, cancelled_by=?, cancel_reason=? WHERE id=?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setDouble(2, refundAmount);
+            ps.setString(3, cancelledBy);
+            ps.setString(4, reason);
+            ps.setInt(5, bookingId);
+            ps.executeUpdate();
+            System.out.println("Booking annulé id=" + bookingId + " by=" + cancelledBy + " refund=" + refundAmount);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur annulation booking", e);
+        }
+    }
+
+    // =====================================================================
+
     private Booking mapBooking(ResultSet rs) throws SQLException {
         Booking b = new Booking();
         b.setId(rs.getInt("id"));
@@ -316,11 +450,23 @@ public class BookingService implements IBookingService {
         b.setGuestsCount(rs.getInt("guests_count"));
         b.setStatus(Booking.Status.valueOf(rs.getString("status").toUpperCase()));
 
-        // pdf_path column (may be null or not yet added in DB)
+        // pdf_path column (may be null)
         try {
             b.setPdfPath(rs.getString("pdf_path"));
         } catch (SQLException ignored) {
             /* column not yet in DB */ }
+
+        // Cancellation columns (gracefully handle if ALTER not yet run)
+        try {
+            Timestamp cancelledAt = rs.getTimestamp("cancelled_at");
+            if (cancelledAt != null) {
+                b.setCancelledAt(cancelledAt.toLocalDateTime());
+            }
+            b.setRefundAmount(rs.getDouble("refund_amount"));
+            b.setCancelledBy(rs.getString("cancelled_by"));
+            b.setCancelReason(rs.getString("cancel_reason"));
+        } catch (SQLException ignored) {
+            /* columns not yet in DB */ }
 
         return b;
     }

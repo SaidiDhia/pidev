@@ -31,7 +31,7 @@
                 <TableColumn fx:id="colTotal"    text="Total ($)" prefWidth="90"/>
                 <TableColumn fx:id="colStatus"   text="Status"   prefWidth="100"/>
                 <TableColumn fx:id="colPdf"      text="Receipt"   prefWidth="85"/>
-                <TableColumn fx:id="colActions"  text="Actions"  prefWidth="160"/>
+                <TableColumn fx:id="colActions"  text="Actions"  prefWidth="250"/>
             </columns>
             <placeholder>
                 <Label styleClass="section-subtitle" text="No bookings found."/>
