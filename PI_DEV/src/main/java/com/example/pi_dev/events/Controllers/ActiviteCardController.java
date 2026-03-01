@@ -193,7 +193,7 @@ public class ActiviteCardController {
     @FXML
     void reserver(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Reservation.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Reservation.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();

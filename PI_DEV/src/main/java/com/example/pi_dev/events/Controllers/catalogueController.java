@@ -156,7 +156,7 @@ public class catalogueController {
 
     private void initializeDatabase() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db", "root", "saididhia");
         } catch (SQLException e) {
             System.err.println("Database connection error: " + e.getMessage());
         }
@@ -224,7 +224,7 @@ public class catalogueController {
     @FXML
     void goToEventDetails(MouseEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/EventDetails.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("//com/example/pi_dev/events/EventDetails.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Détails de l'événement");
@@ -268,7 +268,7 @@ public class catalogueController {
     @FXML
     void ouvrirGestionActivites(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/AjoutActivite.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/AjoutActivite.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Ajouter Activité");
@@ -286,7 +286,7 @@ public class catalogueController {
     void ouvrirGoogleCalendar(ActionEvent event) {
         try {
             System.out.println(" Ouverture de l'interface Google Calendar...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/googleCalendar.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("//com/example/pi_dev/events/googleCalendar.fxml"));
             Parent root = loader.load();
             
             Stage stage = new Stage();
@@ -309,7 +309,7 @@ public class catalogueController {
     void ouvrirGoogleMaps(ActionEvent event) {
         try {
             System.out.println(" Ouverture de l'interface Google Maps...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/googleMaps.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/googleMaps.fxml"));
             Parent root = loader.load();
             
             Stage stage = new Stage();
@@ -332,7 +332,7 @@ public class catalogueController {
     void ouvrirOrganisation(ActionEvent event) {
         try {
             System.out.println("Tentative d'ouverture de l'interface d'organisation d'événement...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Event.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Event.fxml"));
             Parent root = loader.load();
             
             Stage stage = new Stage();
@@ -367,7 +367,7 @@ public class catalogueController {
 
     private void ouvrirModificationActivite(Activite activite) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/modifsuppActivite.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/modifsuppActivite.fxml"));
             Parent root = loader.load();
             modifierActiviteController controller = loader.getController();
             controller.setActiviteData(activite);
@@ -488,7 +488,7 @@ public class catalogueController {
 
     private void ouvrirDetailsActivite(Activite activite) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ActiviteCard.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/ActiviteCard.fxml"));
             Parent root = loader.load();
             ActiviteCardController controller = loader.getController();
             controller.setActiviteData(activite);
@@ -556,7 +556,7 @@ public class catalogueController {
 
     private void ouvrirReservation(Event event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Reservation.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Reservation.fxml"));
             Parent root = loader.load();
             ReservationController controller = loader.getController();
             controller.loadEvent(event.getId());
@@ -576,7 +576,7 @@ public class catalogueController {
         try {
             System.out.println("DEBUG: Ouverture modification pour l'événement ID: " + event.getId());
             
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/modifierEvent.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/modifierEvent.fxml"));
             if (loader.getLocation() == null) {
                 System.err.println("ERREUR: Fichier modifierEvent.fxml introuvable");
                 showAlert("Fichier de modification d'événement introuvable");

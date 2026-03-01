@@ -660,7 +660,7 @@ public class ReservationController {
 
     private void afficherQRCode(Reservation reservation) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/QRCode.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/QRCode.fxml"));
             Parent root = loader.load();
 
             QRCodeController qrController = loader.getController();
@@ -746,7 +746,7 @@ public class ReservationController {
 
     private void ouvrirPanierAutomatiquement() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/panier.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/panier.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("🛒 Mon Panier");

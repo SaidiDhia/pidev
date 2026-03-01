@@ -134,6 +134,8 @@ module com.example.pi_dev {
     opens com.example.pi_dev.booking.Controllers.Front to javafx.fxml;
     opens com.example.pi_dev.booking.Controllers.Admin to javafx.fxml; // if exists
 
+    opens com.example.pi_dev.events.Controllers to javafx.fxml;
+
 // Export them as needed
     exports com.example.pi_dev.booking.Controllers.Front;
     exports com.example.pi_dev.common.services;

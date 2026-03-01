@@ -37,7 +37,7 @@ public class AjoutActiviteController {
 
     private void initializeDatabase() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db", "root", "saididhia");
         } catch (SQLException e) {
             System.err.println("Database connection error: " + e.getMessage());
             e.printStackTrace();

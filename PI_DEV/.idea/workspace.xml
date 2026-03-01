@@ -6,7 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile.deepface" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/run-deepface-api.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/run-deepface-api.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/AjoutActiviteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/AjoutActiviteController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/catalogueController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/catalogueController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/ActiviteCard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/ActiviteCard.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/AjoutActivite.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/AjoutActivite.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Catalogue.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Catalogue.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Event.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Event.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Reservation.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/Reservation.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/modifsuppActivite.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/modifsuppActivite.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +39,10 @@
     &quot;accountId&quot;: &quot;06d5cee7-d1fe-4df7-8f93-7ba9aef44fb2&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -78,7 +93,7 @@
       <recent name="com.example.pi_dev" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.UserMain">
+  <component name="RunManager" selected="Application.EventsMain">
     <configuration name="EventsMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.EventsMain" />
       <module name="PI_DEV" />
@@ -146,8 +161,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.UserMain" />
         <item itemvalue="Application.EventsMain" />
+        <item itemvalue="Application.UserMain" />
         <item itemvalue="Application.TestEventFeatures" />
         <item itemvalue="Application.MainFX" />
         <item itemvalue="Application.MessagingMain" />

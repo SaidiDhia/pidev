@@ -15,11 +15,7 @@
       <!-- Header cohérent avec les autres fenêtres -->
       <HBox alignment="CENTER_LEFT" style="-fx-background-color: linear-gradient(to bottom right, #86A7BF, #2D70B3); -fx-padding: 20; -fx-spacing: 20;">
          <children>
-            <ImageView fitHeight="50" fitWidth="50">
-               <image>
-                  <Image url="@/com/example/pi_dev/images/wanderlust-logo.png" />
-               </image>
-            </ImageView>
+
             <VBox spacing="5">
                <children>
                   <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="Wanderlust" />
