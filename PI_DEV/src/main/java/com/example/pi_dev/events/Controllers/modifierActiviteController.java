@@ -1,22 +1,29 @@
 package com.example.pi_dev.events.Controllers;
 
 import com.example.pi_dev.events.Entities.Activite;
+import com.example.pi_dev.events.Entities.CategorieActivite;
+import com.example.pi_dev.events.Entities.TypeActivite;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 public class modifierActiviteController {
 
     @FXML private TextField titreField;
     @FXML private TextArea descriptionArea;
-    @FXML private TextField typeactField;
+    @FXML private ComboBox<CategorieActivite> categorieCombo;
+    @FXML private ComboBox<TypeActivite> typeactField;
     @FXML private TextField imageField1;
+    @FXML private Button importImageButton;
     @FXML private Button modifierButton;
     @FXML private Button supprimerButton;
     @FXML private Button annulerButton;
@@ -24,9 +31,12 @@ public class modifierActiviteController {
 
     private Activite currentActivite;
     private Connection connection;
+    private String selectedImagePath = "";
 
     public void initialize() {
         initializeDatabase();
+        initializeCategories();
+        initializeTypes();
     }
 
     private void initializeDatabase() {
@@ -35,6 +45,41 @@ public class modifierActiviteController {
         } catch (SQLException e) {
             System.err.println("Database connection error: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void initializeCategories() {
+        categorieCombo.getItems().addAll(CategorieActivite.values());
+        categorieCombo.setOnAction(e -> updateTypes());
+    }
+
+    private void updateTypes() {
+        CategorieActivite selectedCategorie = categorieCombo.getValue();
+        if (selectedCategorie != null) {
+            typeactField.getItems().clear();
+            typeactField.getItems().addAll(TypeActivite.getTypesByCategorie(selectedCategorie));
+        }
+    }
+
+    private void initializeTypes() {
+        // Initialiser avec une liste vide
+        typeactField.setPromptText("Veuillez d'abord sélectionner une catégorie");
+    }
+
+    @FXML
+    void importerImage(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une image pour l'activité");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp")
+        );
+        
+        File selectedFile = fileChooser.showOpenDialog(new Stage());
+        
+        if (selectedFile != null) {
+            selectedImagePath = selectedFile.getAbsolutePath();
+            imageField1.setText(selectedFile.getName());
+            showAlert("Image sélectionnée : " + selectedFile.getName());
         }
     }
 
@@ -50,8 +95,23 @@ public class modifierActiviteController {
         // Pré-remplir les champs avec les données existantes
         titreField.setText(activite.getTitre());
         descriptionArea.setText(activite.getDescription());
-        typeactField.setText(activite.getTypeActivite() != null ? activite.getTypeActivite() : "");
         imageField1.setText(activite.getImage() != null ? activite.getImage() : "");
+        
+        // Gérer la catégorie et le type
+        if (activite.getCategorie() != null) {
+            categorieCombo.setValue(activite.getCategorie());
+            updateTypes(); // Mettre à jour les types selon la catégorie
+            
+            // Sélectionner le type correspondant
+            if (activite.getTypeActivite() != null) {
+                for (TypeActivite type : TypeActivite.getTypesByCategorie(activite.getCategorie())) {
+                    if (type.getNom().equals(activite.getTypeActivite())) {
+                        typeactField.setValue(type);
+                        break;
+                    }
+                }
+            }
+        }
         
         // Mettre à jour le titre de la fenêtre
         if (titleLabel != null) {
@@ -59,16 +119,23 @@ public class modifierActiviteController {
         }
     }
 
-    @FXML
+        @FXML
     void modifier(ActionEvent event) {
         String titre = titreField.getText().trim();
         String description = descriptionArea.getText().trim();
-        String type = typeactField.getText().trim();
-        String imagePath = imageField1.getText().trim();
+        TypeActivite type = typeactField.getValue();
+        CategorieActivite categorie = categorieCombo.getValue();
+        String imagePath = selectedImagePath.isEmpty() ? imageField1.getText().trim() : selectedImagePath;
 
         // Validation des champs
         if (titre.isEmpty()) {
             showAlert("Le titre est obligatoire");
+            titreField.requestFocus();
+            return;
+        }
+        
+        if (titre.length() < 3 || titre.length() > 100) {
+            showAlert("Le titre doit contenir entre 3 et 100 caractères");
             titreField.requestFocus();
             return;
         }
@@ -79,40 +146,51 @@ public class modifierActiviteController {
             return;
         }
         
-        if (type.isEmpty()) {
+        if (description.length() < 10 || description.length() > 500) {
+            showAlert("La description doit contenir entre 10 et 500 caractères");
+            descriptionArea.requestFocus();
+            return;
+        }
+        
+        if (categorie == null) {
+            showAlert("La catégorie est obligatoire");
+            categorieCombo.requestFocus();
+            return;
+        }
+        
+        if (type == null) {
             showAlert("Le type d'activité est obligatoire");
             typeactField.requestFocus();
             return;
         }
 
         try {
-            String sql = "UPDATE activites SET titre = ?, description = ?, type_activite = ?, image = ? WHERE id = ?";
+            String sql = "UPDATE activites SET titre = ?, description = ?, type_activite = ?, categorie = ?, image = ? WHERE id = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, titre);
             pstmt.setString(2, description);
-            pstmt.setString(3, type);
-            pstmt.setString(4, imagePath);
-            pstmt.setInt(5, currentActivite.getId());
+            pstmt.setString(3, type.getNom());
+            pstmt.setString(4, categorie.name());
+            pstmt.setString(5, imagePath);
+            pstmt.setInt(6, currentActivite.getId());
             
             int rowsAffected = pstmt.executeUpdate();
             
             if (rowsAffected > 0) {
                 showAlert("Activité modifiée avec succès");
-                fermerFenetre(); // Ferme et retourne au catalogue
+                fermerFenetre();
             } else {
-                showAlert("Aucune modification effectuée");
+                showAlert("Erreur lors de la modification de l'activité");
             }
-            
+
         } catch (SQLException e) {
-            showAlert("Erreur lors de la modification: " + e.getMessage());
             e.printStackTrace();
+            showAlert("Erreur lors de la modification de l'activité");
         }
     }
 
     @FXML
     void supprimer(ActionEvent event) {
-        if (currentActivite == null) return;
-        
         try {
             String sql = "DELETE FROM activites WHERE id = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -124,7 +202,7 @@ public class modifierActiviteController {
                 showAlert("Activité supprimée avec succès");
                 fermerFenetre();
             } else {
-                showAlert("Aucune activité supprimée");
+                showAlert("Erreur lors de la suppression de l'activité");
             }
             
         } catch (SQLException e) {
@@ -143,14 +221,36 @@ public class modifierActiviteController {
         fermerFenetre();
     }
 
+    private void fermerFenetre() {
+        Stage stage = (Stage) titreField.getScene().getWindow();
+        stage.close();
+        
+        // Rafraîchir le catalogue automatiquement
+        CatalogueRefreshManager.getInstance().requestRefresh();
+        refreshCatalogue();
+    }
+    
+    private void refreshCatalogue() {
+        try {
+            // Trouver toutes les fenêtres ouvertes et rafraîchir les catalogues
+            for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
+                if (window instanceof Stage) {
+                    Stage stage = (Stage) window;
+                    if (stage.getTitle() != null && stage.getTitle().contains("Catalogue")) {
+                        // Envoyer un événement de rafraîchissement
+                        stage.requestFocus();
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    private void fermerFenetre() {
-        Stage stage = (Stage) titreField.getScene().getWindow();
-        stage.close();
     }
 }

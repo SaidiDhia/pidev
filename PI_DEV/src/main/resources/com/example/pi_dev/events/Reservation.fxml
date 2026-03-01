@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
@@ -11,14 +12,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
 
-<VBox prefHeight="708.0" prefWidth="980.0" style="-fx-background-color: linear-gradient(to bottom, #CAD4DC, #ffffff); -fx-padding: 0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.ReservationController">
+<VBox prefHeight="708.0" prefWidth="980.0" style="-fx-background-color: linear-gradient(to bottom, #CAD4DC, #ffffff); -fx-padding: 0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.events.Controllers.ReservationController">
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="930.0" style="-fx-background-color: linear-gradient(to bottom right, #86A7BF, #2D70B3); -fx-padding: 20; -fx-spacing: 20;">
          <children>
             <ImageView fitHeight="72.0" fitWidth="69.0">
                <image>
-                  <Image url="@images/wanderlust-logo.png" />
+                  <Image url="@/com/example/pi_dev/images/wanderlust-logo.png" />
                </image>
             </ImageView>
             <VBox spacing="5">
@@ -47,32 +49,41 @@
                         <Separator style="-fx-background-color: #e0e0e0;" />
                         <VBox spacing="15">
                            <children>
-                              <ImageView fx:id="EventImage" fitHeight="200" fitWidth="340" style="-fx-background-radius: 10;">
-                                 <image>
-                                    <Image url="@../../../../../projet_integre/src/main/resources/views/images/sahara-trek-thumb.jpg" />
-                                 </image>
-                              </ImageView>
                               <VBox spacing="8">
                                  <children>
-                                    <Label fx:id="EventTitle" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" />
-                                    <HBox alignment="CENTER_LEFT" spacing="15">
-                                       <children>
-                                          <HBox alignment="CENTER" spacing="5">
-                                             <children>
-                                                <Label style="-fx-font-size: 14px; -fx-text-fill: #1A4E85;" text="📍" />
-                                                <Label fx:id="Eventlieu" style="-fx-font-size: 12px; -fx-text-fill: #666666;" />
-                                             </children>
-                                          </HBox>
-                                          <HBox alignment="CENTER" spacing="5">
-                                             <children>
-                                                <Label style="-fx-font-size: 14px; -fx-text-fill: #1A4E85;" text="⏱️" />
-                                                <Label fx:id="datedebut" style="-fx-font-size: 12px; -fx-text-fill: #666666;" />
-                                             </children>
-                                          </HBox>
-                                       </children>
-                                    </HBox>
+                                    <Label style="-fx-font-size: 14px; -fx-text-fill: #666666;" text="Description de l'événement" />
+                                    <Label fx:id="EventDescription" style="-fx-font-size: 14px; -fx-text-fill: #0F2C4F; -fx-wrap-text: true;" text="Chargement..." />
                                  </children>
                               </VBox>
+                              <VBox spacing="8">
+                                 <children>
+                                    <Label style="-fx-font-size: 14px; -fx-text-fill: #666666;" text="Lieu" />
+                                    <Label fx:id="Eventlieu" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="Chargement..." />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="8">
+                                 <children>
+                                    <Label style="-fx-font-size: 14px; -fx-text-fill: #666666;" text="Date" />
+                                    <Label fx:id="datedebut" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0F2C4F;" text="Chargement..." />
+                                 </children>
+                              </VBox>
+                              <!-- Conteneur pour la vidéo YouTube -->
+                              <VBox fx:id="videoContainer" spacing="10" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #2D70B3; -fx-padding: 15; -fx-border-width: 2; -fx-min-height: 200;" visible="false">
+                                 <children>
+                                    <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1A4E85;" text="🎥 Vidéo de présentation" />
+                                    <WebView fx:id="videoWebView" prefWidth="350" prefHeight="180" />
+                                 </children>
+                              </VBox>
+                              <HBox fx:id="EventImagesContainer" spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-background-color: #f5f5f5; -fx-background-radius: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                                 <!-- Les images seront ajoutées dynamiquement ici -->
+                              </HBox>
+                              <HBox spacing="10" alignment="CENTER">
+                                 <children>
+                                    <Button fx:id="prevImageButton" onAction="#previousImage" style="-fx-background-color: #2D70B3; -fx-text-fill: white; -fx-background-radius: 50; -fx-border-radius: 50; -fx-min-width: 40; -fx-min-height: 40; -fx-cursor: hand;" text="◀" />
+                                    <Label fx:id="imageCounterLabel" style="-fx-font-size: 14px; -fx-text-fill: #666;" text="1 / 1" />
+                                    <Button fx:id="nextImageButton" onAction="#nextImage" style="-fx-background-color: #2D70B3; -fx-text-fill: white; -fx-background-radius: 50; -fx-border-radius: 50; -fx-min-width: 40; -fx-min-height: 40; -fx-cursor: hand;" text="▶" />
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                         <VBox spacing="15" style="-fx-background-color: #f8faf8; -fx-background-radius: 10; -fx-padding: 20;">
@@ -86,7 +97,7 @@
                               </HBox>
                               <HBox alignment="CENTER_LEFT" spacing="10">
                                  <children>
-                                    <Label style="-fx-font-size: 14px; -fx-text-fill: #666666;" text="Nombre de personnes:" />
+                                    <Label style="-fx-font-size: 14px; -fx-text-fill: #666666;" text="Places restantes:" />
                                     <Label fx:id="personCountLabel" style="-fx-font-size: 14px; -fx-text-fill: #0F2C4F;" />
                                  </children>
                               </HBox>

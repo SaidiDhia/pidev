@@ -18,17 +18,25 @@ public class ReservationService {
     //  CREATE
     public void ajouter(Reservation r) throws SQLException {
 
-        String sql = "INSERT INTO reservations (id_event, nom_complet, email, telephone, nombre_personnes) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations (id_event, nom_complet, email, telephone, nombre_personnes, demandes_speciales, statut) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        PreparedStatement ps = cnx.prepareStatement(sql);
+        PreparedStatement ps = cnx.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
         ps.setInt(1, r.getIdEvent());
         ps.setString(2, r.getNomComplet());
         ps.setString(3, r.getEmail());
         ps.setString(4, r.getTelephone());
         ps.setInt(5, r.getNombrePersonnes());
+        ps.setString(6, r.getDemandesSpeciales());
+        ps.setString(7, r.getStatut().toString());
 
         ps.executeUpdate();
+
+        // Récupérer l'ID généré
+        ResultSet generatedKeys = ps.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            r.setId(generatedKeys.getInt(1));
+        }
 
         // diminuer les places automatiquement
         EventService es = new EventService();
@@ -38,7 +46,7 @@ public class ReservationService {
     //  READ
     public List<Reservation> afficher() throws SQLException {
         List<Reservation> list = new ArrayList<>();
-        String sql = "SELECT * FROM reservations";
+        String sql = "SELECT * FROM reservations ORDER BY id DESC";
 
         Statement st = cnx.createStatement();
         ResultSet rs = st.executeQuery(sql);
@@ -51,6 +59,26 @@ public class ReservationService {
             r.setEmail(rs.getString("email"));
             r.setTelephone(rs.getString("telephone"));
             r.setNombrePersonnes(rs.getInt("nombre_personnes"));
+            // r.setPrixTotal(rs.getDouble("prix_total")); // Supprimé car la colonne n'existe pas
+            
+            // Conversion de la date - supprimé car la colonne n'existe pas
+            // java.sql.Timestamp ts = rs.getTimestamp("date_reservation");
+            // if (ts != null) {
+            //     r.setDateReservation(ts.toLocalDateTime());
+            // }
+            
+            r.setDemandesSpeciales(rs.getString("demandes_speciales"));
+            
+            // Conversion du statut
+            String statutStr = rs.getString("statut");
+            if (statutStr != null) {
+                try {
+                    r.setStatut(Reservation.StatutReservation.valueOf(statutStr));
+                } catch (IllegalArgumentException e) {
+                    r.setStatut(Reservation.StatutReservation.EN_ATTENTE);
+                }
+            }
+            
             list.add(r);
         }
         return list;
@@ -73,8 +101,8 @@ public class ReservationService {
             ancienEvent = rs.getInt("id_event");
         }
 
-        //  update réservation
-        String updateSql = "UPDATE reservations SET id_event=?, nom_complet=?, email=?, telephone=?, nombre_personnes=? WHERE id=?";
+        // update réservation
+        String updateSql = "UPDATE reservations SET id_event=?, nom_complet=?, email=?, telephone=?, nombre_personnes=?, demandes_speciales=?, statut=? WHERE id=?";
 
         PreparedStatement ps = cnx.prepareStatement(updateSql);
 
@@ -83,11 +111,13 @@ public class ReservationService {
         ps.setString(3, r.getEmail());
         ps.setString(4, r.getTelephone());
         ps.setInt(5, r.getNombrePersonnes());
-        ps.setInt(6, r.getId());
+        ps.setString(6, r.getDemandesSpeciales());
+        ps.setString(7, r.getStatut().toString());
+        ps.setInt(8, r.getId());
 
         ps.executeUpdate();
 
-        //  ajuster les places
+        // ajuster les places
 
         EventService es = new EventService();
 
@@ -96,6 +126,11 @@ public class ReservationService {
 
         // diminuer nouvelles places
         es.diminuerPlaces(r.getIdEvent(), r.getNombrePersonnes());
+    }
+
+    // Méthode add pour compatibilité avec le controller
+    public void add(Reservation r) throws SQLException {
+        ajouter(r);
     }
 
     //  DELETE

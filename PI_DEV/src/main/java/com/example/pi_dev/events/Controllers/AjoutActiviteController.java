@@ -5,8 +5,10 @@ import com.example.pi_dev.events.Entities.TypeActivite;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,10 +22,12 @@ public class AjoutActiviteController {
     @FXML private ComboBox<CategorieActivite> categorieCombo;
     @FXML private ComboBox<TypeActivite> typeactField;
     @FXML private TextField imageField1;
+    @FXML private Button importImageButton;
     @FXML private Button ajouterButton;
     @FXML private Button annulerButton;
 
     private Connection connection;
+    private String selectedImagePath = "";
 
     public void initialize() {
         initializeDatabase();
@@ -59,12 +63,29 @@ public class AjoutActiviteController {
     }
 
     @FXML
+    void importerImage(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une image pour l'activité");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp")
+        );
+        
+        File selectedFile = fileChooser.showOpenDialog(new Stage());
+        
+        if (selectedFile != null) {
+            selectedImagePath = selectedFile.getAbsolutePath();
+            imageField1.setText(selectedFile.getName());
+            showAlert("Image sélectionnée : " + selectedFile.getName());
+        }
+    }
+
+    @FXML
     void ajouter(ActionEvent event) {
         String titre = titreField.getText().trim();
         String description = descriptionArea.getText().trim();
         TypeActivite type = typeactField.getValue();
         CategorieActivite categorie = categorieCombo.getValue();
-        String imagePath = imageField1.getText().trim();
+        String imagePath = selectedImagePath.isEmpty() ? "default.jpg" : selectedImagePath;
 
         // Validation des champs
         if (titre.isEmpty()) {
@@ -104,13 +125,13 @@ public class AjoutActiviteController {
         }
 
         try {
-            String sql = "INSERT INTO activites (titre, description, type_activite, categorie, image) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO activites (titre, description, type_activite, categorie, image) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, titre);
             pstmt.setString(2, description);
             pstmt.setString(3, type.getNom());
             pstmt.setString(4, categorie.name());
-            pstmt.setString(5, imagePath.isEmpty() ? "default.jpg" : imagePath);
+            pstmt.setString(5, imagePath);
             pstmt.executeUpdate();
 
             showAlert("Activité ajoutée avec succès");
