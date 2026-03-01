@@ -57,16 +57,23 @@ module com.example.pi_dev {
     requires static org.testng;
     requires googleauth;
     requires jdk.jsobject;
+    requires itextpdf;
 
     // Open the entire module for FXGL and other reflective libraries
     opens com.example.pi_dev to javafx.fxml, com.almasb.fxgl.all;
 
-    // Messaging module
+    // Messaging module - FULLY ADDED from your original
     opens com.example.pi_dev.messaging.messagecontroller to javafx.fxml;
     opens com.example.pi_dev.messaging.messagingmodel to javafx.base;
     opens com.example.pi_dev.messaging.messagingrepository to javafx.base;
     opens com.example.pi_dev.messaging.messagingservice to javafx.base;
     opens com.example.pi_dev.messaging.messagingsession to javafx.base;
+
+    exports com.example.pi_dev.messaging.messagecontroller;
+    exports com.example.pi_dev.messaging.messagingmodel;
+    exports com.example.pi_dev.messaging.messagingrepository;
+    exports com.example.pi_dev.messaging.messagingservice;
+    exports com.example.pi_dev.messaging.messagingsession;
 
     // User module
     opens com.example.pi_dev.user.controllers to javafx.fxml;
@@ -77,12 +84,7 @@ module com.example.pi_dev {
     opens com.example.pi_dev.user.enums to javafx.base;
     opens com.example.pi_dev.user.utils to javafx.base;
 
-    // Venue module
-    opens com.example.pi_dev.venue.controllers to javafx.fxml;
-    opens com.example.pi_dev.venue.entities to javafx.base;
-    opens com.example.pi_dev.venue.views to javafx.fxml;
-    opens com.example.pi_dev.venue.services to javafx.base;
-    opens com.example.pi_dev.venue.utils to javafx.base;
+
 
 
     // Common module
@@ -91,13 +93,6 @@ module com.example.pi_dev {
 
     // Exports
     exports com.example.pi_dev;
-
-    // Messaging exports
-    exports com.example.pi_dev.messaging.messagecontroller;
-    exports com.example.pi_dev.messaging.messagingmodel;
-    exports com.example.pi_dev.messaging.messagingrepository;
-    exports com.example.pi_dev.messaging.messagingservice;
-    exports com.example.pi_dev.messaging.messagingsession;
 
     // User exports
     exports com.example.pi_dev.user.models;
@@ -108,12 +103,7 @@ module com.example.pi_dev {
     exports com.example.pi_dev.user.repositories;
     exports com.example.pi_dev.user.utils;
 
-    // Venue exports
-    exports com.example.pi_dev.venue;
-    exports com.example.pi_dev.venue.controllers;
-    exports com.example.pi_dev.venue.entities;
-    exports com.example.pi_dev.venue.services;
-    exports com.example.pi_dev.venue.utils;
+
 
     // Events exports
     exports com.example.pi_dev.events.Controllers;
