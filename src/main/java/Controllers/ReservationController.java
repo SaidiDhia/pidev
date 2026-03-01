@@ -186,13 +186,14 @@ public class ReservationController {
                 if (demandesp != null) {
                     // Afficher les matériels nécessaires de l'événement (lecture seule)
                     if (currentEvent.getMaterielsNecessaires() != null && !currentEvent.getMaterielsNecessaires().trim().isEmpty()) {
-                        demandesp.setText(currentEvent.getMaterielsNecessaires());
-                        demandesp.setEditable(false); // Rendre le champ non modifiable
-                        demandesp.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #ddd;");
+                        // Afficher les matériels nécessaires comme information
+                        demandesp.setPromptText("Allergies alimentaires, besoins spéciaux, questions...\n\n📋 Matériels requis pour cet événement :\n" + currentEvent.getMaterielsNecessaires());
+                        demandesp.setEditable(true); // Permettre à l'utilisateur d'ajouter ses demandes
+                        demandesp.setStyle("-fx-border-color: #2D70B3; -fx-background-color: white;");
                     } else {
-                        demandesp.setText("Aucun équipement requis");
-                        demandesp.setEditable(false);
-                        demandesp.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #ddd;");
+                        demandesp.setPromptText("Allergies alimentaires, besoins spéciaux, questions...");
+                        demandesp.setEditable(true);
+                        demandesp.setStyle("-fx-border-color: #2D70B3; -fx-background-color: white;");
                     }
                 }
 
@@ -392,58 +393,60 @@ public class ReservationController {
                     return;
                 }
 
-                // Créer le HTML pour l'intégration de la vidéo avec configuration améliorée
+                // Créer le HTML pour l'intégration de la vidéo (version ultra-simple pour JavaFX)
                 String htmlContent = "<!DOCTYPE html>\n" +
                         "<html>\n" +
                         "<head>\n" +
                         "    <meta charset=\"UTF-8\">\n" +
                         "    <style>\n" +
-                        "        body { margin: 0; padding: 0; background-color: white; }\n" +
-                        "        .video-container { position: relative; width: 100%; height: 180px; }\n" +
-                        "        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }\n" +
-                        "        .error-message { text-align: center; padding: 20px; color: #666; font-family: Arial; }\n" +
+                        "        body { margin: 0; padding: 0; background-color: #000; font-family: Arial; width: 400px; height: 280px; display: flex; justify-content: center; align-items: center; }\n" +
+                        "        .video-box { width: 380px; height: 260px; background-color: #1a1a1a; border: 2px solid #333; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; }\n" +
+                        "        .icon { font-size: 48px; color: #ff0000; margin-bottom: 15px; }\n" +
+                        "        .title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }\n" +
+                        "        .desc { font-size: 14px; color: #ccc; margin-bottom: 20px; }\n" +
+                        "        .btn { background-color: #ff0000; color: white; padding: 12px 24px; border: none; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; }\n" +
+                        "        .btn:hover { background-color: #cc0000; }\n" +
                         "    </style>\n" +
                         "</head>\n" +
                         "<body>\n" +
-                        "    <div class=\"video-container\">\n" +
-                        "        <iframe src=\"" + embedUrl + "?rel=0&showinfo=0&modestbranding=1\" \n" +
-                        "                frameborder=\"0\" \n" +
-                        "                allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" \n" +
-                        "                allowfullscreen>\n" +
-                        "        </iframe>\n" +
+                        "    <div class=\"video-box\">\n" +
+                        "        <div class=\"icon\">🎥</div>\n" +
+                        "        <div class=\"title\">Vidéo de présentation</div>\n" +
+                        "        <div class=\"desc\">Cliquez pour regarder sur YouTube</div>\n" +
+                        "        <a href=\"" + videoUrl + "\" target=\"_blank\" class=\"btn\">▶️ YouTube</a>\n" +
                         "    </div>\n" +
-                        "    <script>\n" +
-                        "        // Gestion des erreurs YouTube\n" +
-                        "        window.addEventListener('message', function(event) {\n" +
-                        "            try {\n" +
-                        "                var data = JSON.parse(event.data);\n" +
-                        "                if (data.event === 'onError') {\n" +
-                        "                    document.querySelector('.video-container').innerHTML = \n" +
-                        "                        '<div class=\"error-message\">Vidéo non disponible. Cliquez pour ouvrir dans YouTube.</div>';\n" +
-                        "                }\n" +
-                        "            } catch(e) {}\n" +
-                        "        });\n" +
-                        "        \n" +
-                        "        // Fallback: si la vidéo ne charge pas\n" +
-                        "        setTimeout(function() {\n" +
-                        "            var iframe = document.querySelector('iframe');\n" +
-                        "            if (iframe && !iframe.contentWindow) {\n" +
-                        "                document.querySelector('.video-container').innerHTML = \n" +
-                        "                    '<div class=\"error-message\"><a href=\"" + embedUrl + "\" target=\"_blank\">Cliquez pour regarder sur YouTube</a></div>';\n" +
-                        "            }\n" +
-                        "        }, 5000);\n" +
-                        "    </script>\n" +
                         "</body>\n" +
                         "</html>";
+                
+                System.out.println("DEBUG: HTML généré (premiers 200 caractères): " + htmlContent.substring(0, Math.min(200, htmlContent.length())));
 
                 // Charger le contenu HTML dans le WebView
                 WebEngine webEngine = videoWebView.getEngine();
+                
+                System.out.println("DEBUG: Chargement HTML simple pour compatibilité JavaFX");
                 webEngine.loadContent(htmlContent);
 
                 // Rendre le conteneur vidéo visible
                 videoContainer.setVisible(true);
-
+                videoContainer.setManaged(true); // S'assurer que le conteneur est géré par le layout
+                
+                // Forcer le rafraîchissement du WebView
+                videoWebView.setVisible(true);
+                videoWebView.setManaged(true);
+                
                 System.out.println("DEBUG: Vidéo YouTube chargée avec succès dans WebView");
+                System.out.println("DEBUG: videoContainer visible: " + videoContainer.isVisible());
+                System.out.println("DEBUG: videoWebView visible: " + videoWebView.isVisible());
+                
+                // Ajouter un listener pour vérifier le chargement
+                webEngine.getLoadWorker().stateProperty().addListener((observable, oldState, newState) -> {
+                    System.out.println("DEBUG: WebView state changed from " + oldState + " to " + newState);
+                    if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                        System.out.println("DEBUG: WebView chargé avec succès");
+                    } else if (newState == javafx.concurrent.Worker.State.FAILED) {
+                        System.err.println("DEBUG: Échec du chargement du WebView");
+                    }
+                });
 
             } catch (Exception e) {
                 System.err.println("Erreur lors du chargement de la vidéo YouTube: " + e.getMessage());
@@ -586,7 +589,7 @@ public class ReservationController {
             reservation.setEmail(emailField.getText());
             reservation.setTelephone(telephoneField.getText());
             reservation.setNombrePersonnes(Integer.parseInt(nombrePersonnesField.getText()));
-            reservation.setDemandesSpeciales(""); // Les demandes spéciales sont gérées séparément
+            reservation.setDemandesSpeciales(demandesp.getText() != null && !demandesp.getText().trim().isEmpty() ? demandesp.getText().trim() : "");
             reservation.setEvent(currentEvent);
             reservation.setStatut(Reservation.StatutReservation.CONFIRMEE);
 

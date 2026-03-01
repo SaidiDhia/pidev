@@ -152,9 +152,14 @@ public class EmailService {
               .append("<p><span class='info-label'>Email:</span> <span class='info-value'>").append(reservation.getEmail()).append("</span></p>")
               .append("<p><span class='info-label'>Téléphone:</span> <span class='info-value'>").append(reservation.getTelephone()).append("</span></p>")
               .append("<p><span class='info-label'>Nombre de personnes:</span> <span class='info-value'>").append(reservation.getNombrePersonnes()).append("</span></p>")
-              .append("<p><span class='info-label'>Prix total:</span> <span class='info-value'>").append(reservation.getPrixTotal()).append(" TND</span></p>")
-              .append("<p><span class='info-label'>Statut:</span> <span class='info-value'>").append(reservation.getStatut()).append("</span></p>")
-              .append("</div>");
+              .append("<p><span class='info-label'>Prix total:</span> <span class='info-value'>").append(reservation.getPrixTotal()).append(" TND</span></p>");
+        
+        // Ajouter les demandes spéciales si présentes
+        if (reservation.getDemandesSpeciales() != null && !reservation.getDemandesSpeciales().trim().isEmpty()) {
+            content.append("<p><span class='info-label'>📝 Demandes spéciales:</span> <span class='info-value'>").append(reservation.getDemandesSpeciales()).append("</span></p>");
+        }
+        
+        content.append("</div>");
         
         // Détails de l'événement
         if (reservation.getEvent() != null) {
