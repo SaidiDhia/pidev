@@ -21,7 +21,7 @@
          <children>
             <ImageView fitHeight="50" fitWidth="50">
                <image>
-                  <Image url="@/com/example/pi_dev/images/wanderlust-logo.png" />
+                  <Image url="@../images/wanderlust-logo.png" />
                </image>
             </ImageView>
             <VBox spacing="5">

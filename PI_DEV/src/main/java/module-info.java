@@ -58,6 +58,7 @@ module com.example.pi_dev {
     requires googleauth;
     requires jdk.jsobject;
     requires itextpdf;
+    requires io;
 
     // Open the entire module for FXGL and other reflective libraries
     opens com.example.pi_dev to javafx.fxml, com.almasb.fxgl.all;
@@ -140,8 +141,16 @@ module com.example.pi_dev {
     opens com.example.pi_dev.booking.Controllers.Front to javafx.fxml;
     opens com.example.pi_dev.booking.Controllers.Admin to javafx.fxml; // if exists
 
+    // Duplicate opens entry removed: com.example.pi_dev.events.Controllers
+
 // Export them as needed
     exports com.example.pi_dev.booking.Controllers.Front;
     exports com.example.pi_dev.common.services;
     exports com.example.pi_dev.common.models;
+
+    //marketplace
+    exports com.example.pi_dev.marketplace.test to javafx.graphics;
+    opens   com.example.pi_dev.marketplace.test to javafx.fxml;
+    opens   com.example.pi_dev.marketplace.Controllers to javafx.fxml;
+    exports com.example.pi_dev.marketplace.Controllers;
 }

@@ -3,6 +3,7 @@ package com.example.pi_dev.events.Controllers;
 import com.example.pi_dev.events.Entities.Activite;
 import com.example.pi_dev.events.Entities.CategorieActivite;
 import com.example.pi_dev.events.Entities.TypeActivite;
+import com.example.pi_dev.events.Utils.Mydatabase;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -11,7 +12,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -41,8 +41,8 @@ public class modifierActiviteController {
 
     private void initializeDatabase() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db", "root", "");
-        } catch (SQLException e) {
+            connection = Mydatabase.getInstance().getConnextion();
+        } catch (Exception e) {
             System.err.println("Database connection error: " + e.getMessage());
             e.printStackTrace();
         }

@@ -34,6 +34,7 @@ import java.util.List;
 
 import com.example.pi_dev.events.Entities.Event;
 import com.example.pi_dev.events.Entities.Activite;
+import com.example.pi_dev.events.Utils.Mydatabase;
 
 public class catalogueController {
 
@@ -156,8 +157,8 @@ public class catalogueController {
 
     private void initializeDatabase() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/wonderlust_db", "root", "");
-        } catch (SQLException e) {
+            connection = Mydatabase.getInstance().getConnextion();
+        } catch (Exception e) {
             System.err.println("Database connection error: " + e.getMessage());
         }
     }
