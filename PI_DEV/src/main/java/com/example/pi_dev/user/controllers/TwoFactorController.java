@@ -229,24 +229,26 @@ public class TwoFactorController {
             BufferedImage bImage = webcam.getImage();
             if (bImage != null) {
                 try {
+                    // 1. Convert captured frame to PNG bytes
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(bImage, "png", baos);
                     capturedImageBytes = baos.toByteArray();
                     
-                    // Show captured image static
+                    // 2. Freeze the webcam preview with the captured image
                     Image image = SwingFXUtils.toFXImage(bImage, null);
                     webcamView.setImage(image);
-                    
-                    // Stop webcam to freeze image
                     stopWebcam();
                     
                     if (isSetupMode) {
-                        verifyButton.setVisible(true); // Show button
+                        // 3a. SETUP MODE: We are configuring Face ID.
+                        // Enable the "Enable Face ID" button which will call HandleVerify to save this base image.
+                        verifyButton.setVisible(true);
                         verifyButton.setManaged(true);
-                        verifyButton.setDisable(false); // Enable "Enable Face ID" button
+                        verifyButton.setDisable(false);
                         instructionLabel.setText("Face captured. Click Enable to save.");
                     } else {
-                        // Verify immediately
+                        // 3b. VERIFY MODE: We are logging in.
+                        // Immediatly verify this capture against the saved base image.
                         verifyFaceLogin();
                     }
                     
@@ -260,18 +262,20 @@ public class TwoFactorController {
     
     private void verifyFaceLogin() {
         User user = UserSession.getInstance().getCurrentUser();
+        // 4. Send this captured image to UserService to compare with the configured Face ID
         boolean isValid = userService.verifyTwoFactorFace(user.getUserId(), capturedImageBytes);
         
         if (isValid) {
              System.out.println("Face Verified!");
              activityLogService.log(user.getEmail(), "2FA_VERIFY_SUCCESS", "Face verification successful");
-             navigateToHome(null); // Helper handles role
-             // Close current window
+             navigateToHome(null); // Navigate based on role (Admin/User)
+             
+             // Close current webcam window
              Stage stage = (Stage) captureButton.getScene().getWindow();
              stage.close(); 
         } else {
             errorLabel.setText("Face verification failed. Try again.");
-            startWebcam(); // Restart to try again
+            startWebcam(); // Restart webcam to capture again
         }
     }
 
@@ -280,15 +284,17 @@ public class TwoFactorController {
         User user = UserSession.getInstance().getCurrentUser();
         
         if (method.equals("FACE")) {
-            // Should be handled by Capture button in Verify mode, 
-            // but in Setup mode this button saves the face.
+            // Note: In Verify (Login) mode, face is checked within handleCapture() via verifyFaceLogin().
+            // This block applies to Setup mode when the user clicks "Enable Face ID".
             if (isSetupMode && capturedImageBytes != null) {
                 try {
+                    // 1. Save the captured image as the reference photo for DeepFace comparison later
                     userService.setupTwoFactorFace(user.getUserId(), capturedImageBytes);
+                    // 2. Mark Face ID as the chosen 2FA method
                     userService.finalizeTwoFactorSetup(user.getUserId(), TFAMethod.FACE);
-                    user.setTfaMethod(TFAMethod.FACE); // Update local session
-                    activityLogService.log(user.getEmail(), "2FA_SETUP", "Enabled Face ID 2FA");
+                    user.setTfaMethod(TFAMethod.FACE); 
                     
+                    activityLogService.log(user.getEmail(), "2FA_SETUP", "Enabled Face ID 2FA");
                     navigateTo("/com/example/pi_dev/user/settings.fxml", event);
                 } catch (Exception e) {
                     errorLabel.setText("Error saving face: " + e.getMessage());
@@ -383,24 +389,7 @@ public class TwoFactorController {
     }
 
     private void closeHomeOverlay(ActionEvent event) {
-        Node source = null;
-        if (event != null) {
-            source = (Node) event.getSource();
-        } else if (verifyButton.getScene() != null) {
-            source = verifyButton;
-        }
-
-        if (source != null) {
-            javafx.scene.layout.StackPane mainContentArea = (javafx.scene.layout.StackPane) source.getScene().lookup("#mainContentArea");
-            if (mainContentArea != null) {
-                mainContentArea.getChildren().remove(mainContentArea.getChildren().size() - 1);
-                // Trigger refresh on the controller if possible
-                Object controller = mainContentArea.getScene().getUserData();
-                if (controller instanceof com.example.pi_dev.venue.controllers.HomeController) {
-                    ((com.example.pi_dev.venue.controllers.HomeController) controller).refresh();
-                }
-            }
-        }
+        // No overlay to close
     }
 
     @FXML

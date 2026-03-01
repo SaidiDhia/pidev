@@ -65,6 +65,13 @@ public class SignupController {
     @FXML
     private PasswordField confirmPasswordField;
 
+
+    @FXML private Label fullNameError;
+    @FXML private Label emailError;
+    @FXML private Label phoneError;
+    @FXML private Label passwordError;
+    @FXML private Label confirmPasswordError;
+
     @FXML
     private Label errorLabel;
 
@@ -209,54 +216,83 @@ public class SignupController {
         }
     }
 
+    private void clearErrors() {
+        fullNameError.setVisible(false);
+        fullNameError.setManaged(false);
+        emailError.setVisible(false);
+        emailError.setManaged(false);
+        phoneError.setVisible(false);
+        phoneError.setManaged(false);
+        passwordError.setVisible(false);
+        passwordError.setManaged(false);
+        confirmPasswordError.setVisible(false);
+        confirmPasswordError.setManaged(false);
+        errorLabel.setText("");
+    }
+
+    private void showError(Label errorNode, String message) {
+        errorNode.setText(message);
+        errorNode.setVisible(true);
+        errorNode.setManaged(true);
+    }
+
     private boolean validateInput() {
+        clearErrors();
+        boolean isValid = true;
+        
         String fullName = fullNameField.getText().trim();
         String email = emailField.getText().trim();
         String phone = phoneField.getText().trim();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        if (fullName.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            errorLabel.setText("Please fill in all required fields");
-            return false;
+        if (fullName.isEmpty()) {
+            showError(fullNameError, "Full Name is required");
+            isValid = false;
+        } else if (fullName.length() < 3) {
+            showError(fullNameError, "Full Name must be at least 3 characters");
+            isValid = false;
         }
 
-        if (fullName.length() < 3) {
-            errorLabel.setText("Full Name must be at least 3 characters");
-            return false;
+        if (email.isEmpty()) {
+            showError(emailError, "Email is required");
+            isValid = false;
+        } else if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            showError(emailError, "Please enter a valid email address");
+            isValid = false;
         }
 
-        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            errorLabel.setText("Please enter a valid email address");
-            return false;
+        if (phone.isEmpty()) {
+            showError(phoneError, "Phone Number is required");
+            isValid = false;
+        } else if (!phone.matches("^\\+?[0-9]{8,15}$")) {
+            showError(phoneError, "Please enter a valid phone number (8-15 digits)");
+            isValid = false;
         }
 
-        if (!phone.matches("^\\+?[0-9]{8,15}$")) {
-            errorLabel.setText("Please enter a valid phone number (8-15 digits)");
-            return false;
+        if (password.isEmpty()) {
+            showError(passwordError, "Password is required");
+            isValid = false;
+        } else if (password.length() < 6) {
+            showError(passwordError, "Password must be at least 6 characters long");
+            isValid = false;
+        } else if (!password.matches(".*[a-zA-Z].*") || !password.matches(".*[0-9].*")) {
+            showError(passwordError, "Password must contain at least one letter and one number");
+            isValid = false;
+        } else if (strengthLabel.getText().contains("Weak")) {
+            showError(passwordError, "Password is too weak. Please use a stronger password.");
+            isValid = false;
         }
 
-        if (password.length() < 6) {
-            errorLabel.setText("Password must be at least 6 characters long");
-            return false;
+        if (confirmPassword.isEmpty()) {
+            showError(confirmPasswordError, "Please confirm your password");
+            isValid = false;
+        } else if (!password.equals(confirmPassword)) {
+            showError(confirmPasswordError, "Passwords do not match");
+            isValid = false;
         }
 
-        if (!password.matches(".*[a-zA-Z].*") || !password.matches(".*[0-9].*")) {
-            errorLabel.setText("Password must contain at least one letter and one number");
-            return false;
-        }
-
-        if (strengthLabel.getText().contains("Weak")) {
-            errorLabel.setText("Password is too weak. Please use a stronger password.");
-            return false;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            errorLabel.setText("Passwords do not match");
-            return false;
-        }
-
-        return true;
+        return isValid;
     }
 
     private boolean isInsideHomeView(ActionEvent event) {

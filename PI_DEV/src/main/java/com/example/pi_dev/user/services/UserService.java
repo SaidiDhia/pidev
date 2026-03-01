@@ -148,19 +148,19 @@ public class UserService implements IUserService {
         }
     }
     
-    // 3. Face 2FA
+    // 3. Face 2FA Setup
+    // This is called when the user configures Face ID. It saves the snapshot image.
     public void setupTwoFactorFace(UUID userId, byte[] imageBytes) throws SQLException {
-        // Save image to disk (simulate)
         try {
+            // 1. Save the image to the local file system (e.g. ~/.pi_dev_faces/)
             String fileName = "face_" + userId + ".png";
             java.nio.file.Path path = java.nio.file.Paths.get(System.getProperty("user.home"), ".pi_dev_faces", fileName);
             java.nio.file.Files.createDirectories(path.getParent());
             java.nio.file.Files.write(path, imageBytes);
-            
-            // Store path in tfa_secrets
+
+            // 2. Store the absolute path in the DB so we know where this user's reference photo is
             String secretValue = "FACE:" + path.toAbsolutePath().toString();
             userRepository.saveTfaSecret(userId, secretValue);
-            
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to save face image", e);
@@ -202,15 +202,24 @@ public class UserService implements IUserService {
         }
     }
     
+    /**
+     * Face 2FA Verify
+     * This is called during Login to verify the newly captured photo against the stored reference photo.
+     * It uses the DeepFace API (reference photo = img1, login capture = img2).
+     */
     public boolean verifyTwoFactorFace(UUID userId, byte[] capturedImage) {
         try {
+            // 1. Get the path of the configured image safely stored during setup
             String storedSecret = userRepository.getTfaSecret(userId);
             if (storedSecret == null || !storedSecret.startsWith("FACE:")) return false;
+            if (capturedImage == null || capturedImage.length == 0) return false;
+
+            // 2. Extract the actual filesystem path
+            String storedPath = storedSecret.substring(5).trim();
             
-            // In a real app, compare 'capturedImage' with image at 'storedSecret.substring(5)'
-            // For now, return true if capturedImage is valid
-            return capturedImage != null && capturedImage.length > 0;
-            
+            // 3. Send both the stored image and the new snapshot to DeepFace implementation
+            DeepFaceService deepFace = new DeepFaceService();
+            return deepFace.verify(storedPath, capturedImage);
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
