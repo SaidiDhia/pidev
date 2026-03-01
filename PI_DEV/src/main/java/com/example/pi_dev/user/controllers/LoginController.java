@@ -17,6 +17,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
@@ -56,6 +57,7 @@ public class LoginController {
                         .orElseThrow();
 
                 UserSession.getInstance().login(user, token);
+                com.example.pi_dev.messaging.messagingsession.Session.login(user.getUserId().toString());
                 activityLogService.log(user.getEmail(), "SIGNIN", "User logged in: " + user.getFullName());
 
                 System.out.println("Login successful!");
@@ -74,26 +76,22 @@ public class LoginController {
                     stage.getScene().setRoot(root);
                     stage.show();
                 } else {
-                    // Admin -> dashboard; Host/Participant -> settings
-                    try {
-                        if (user.getRole() == RoleEnum.ADMIN) {
-                            String path = "/com/example/pi_dev/user/admin_dashboard.fxml";
+                    // Navigate to the common main layout or notify parent
+                    if (isInsideMainLayout(event)) {
+                        notifyMainLayoutSuccess(event);
+                    } else {
+                        try {
+                            String path = "/com/example/pi_dev/main/main_layout.fxml";
                             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
                             Parent root = loader.load();
                             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                            stage.getScene().setRoot(root);
+                            stage.setScene(new Scene(root, 1200, 800));
+                            stage.setMaximized(true);
                             stage.show();
-                        } else {
-                            String path = "/com/example/pi_dev/user/settings.fxml";
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
-                            Parent root = loader.load();
-                            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                            stage.getScene().setRoot(root);
-                            stage.show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            errorLabel.setText("Navigation error: " + e.getMessage());
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        errorLabel.setText("Navigation error: " + e.getMessage());
                     }
                 }
 
@@ -119,9 +117,10 @@ public class LoginController {
     @FXML
     void goToMainHome(MouseEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/hello-view.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/main/main_layout.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.getScene().setRoot(root);
+            stage.setScene(new Scene(root, 1200, 800));
+            stage.setMaximized(true);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,12 +131,57 @@ public class LoginController {
     private void navigateTo(String fxmlPath, ActionEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.getScene().setRoot(root);
-            stage.show();
+            if (isInsideMainLayout(event)) {
+                replaceInMainLayout(root, event);
+            } else {
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.show();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             errorLabel.setText("Navigation error: " + e.getMessage());
+        }
+    }
+
+    private boolean isInsideMainLayout(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Scene scene = source.getScene();
+        if (scene != null && scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
+            javafx.scene.layout.BorderPane root = (javafx.scene.layout.BorderPane) scene.getRoot();
+            return root.getCenter() instanceof StackPane && 
+                   root.getCenter().getId() != null && 
+                   root.getCenter().getId().equals("contentArea");
+        }
+        return false;
+    }
+
+    private void replaceInMainLayout(Parent root, ActionEvent event) {
+        Node source = (Node) event.getSource();
+        StackPane contentArea = (StackPane) source.getScene().lookup("#contentArea");
+        if (contentArea != null) {
+            contentArea.getChildren().setAll(root);
+        }
+    }
+
+    private void notifyMainLayoutSuccess(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Scene scene = source.getScene();
+        if (scene != null && scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
+            javafx.scene.layout.BorderPane root = (javafx.scene.layout.BorderPane) scene.getRoot();
+            // Since MainLayoutController is the controller of the root BorderPane
+            Object controller = root.getUserData(); // We should set this in MainLayoutController
+            if (controller instanceof com.example.pi_dev.main.controllers.MainLayoutController) {
+                ((com.example.pi_dev.main.controllers.MainLayoutController) controller).onLoginSuccess();
+            } else {
+                // Fallback: just reload the layout
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/main/main_layout.fxml"));
+                    scene.setRoot(loader.load());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

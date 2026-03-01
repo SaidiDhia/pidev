@@ -443,9 +443,10 @@ public class AdminDashboardController {
     @FXML
     void handleBackToHome(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/hello-view.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/main/main_layout.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.getScene().setRoot(root);
+            stage.setScene(new Scene(root, 1200, 800));
+            stage.setMaximized(true);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

@@ -268,7 +268,7 @@ public class catalogueController {
     @FXML
     void ouvrirGestionActivites(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/AjoutActivite.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/AjoutActivite.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Ajouter Activité");
@@ -286,7 +286,7 @@ public class catalogueController {
     void ouvrirGoogleCalendar(ActionEvent event) {
         try {
             System.out.println(" Ouverture de l'interface Google Calendar...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/googleCalendar.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/googleCalendar.fxml"));
             Parent root = loader.load();
             
             Stage stage = new Stage();
@@ -309,7 +309,7 @@ public class catalogueController {
     void ouvrirGoogleMaps(ActionEvent event) {
         try {
             System.out.println(" Ouverture de l'interface Google Maps...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/googleMaps.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/googleMaps.fxml"));
             Parent root = loader.load();
             
             Stage stage = new Stage();
@@ -332,7 +332,7 @@ public class catalogueController {
     void ouvrirOrganisation(ActionEvent event) {
         try {
             System.out.println("Tentative d'ouverture de l'interface d'organisation d'événement...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Event.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Event.fxml"));
             Parent root = loader.load();
             
             Stage stage = new Stage();

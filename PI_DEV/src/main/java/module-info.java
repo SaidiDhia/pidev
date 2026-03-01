@@ -84,6 +84,10 @@ module com.example.pi_dev {
     opens com.example.pi_dev.user.enums to javafx.base;
     opens com.example.pi_dev.user.utils to javafx.base;
 
+    // Main layout module
+    opens com.example.pi_dev.main.controllers to javafx.fxml;
+    exports com.example.pi_dev.main.controllers;
+
 
 
 
@@ -106,6 +110,7 @@ module com.example.pi_dev {
 
 
     // Events exports
+    opens com.example.pi_dev.events.Controllers to javafx.fxml;
     exports com.example.pi_dev.events.Controllers;
     exports com.example.pi_dev.events.Entities;
     exports com.example.pi_dev.events.Services;
@@ -113,6 +118,7 @@ module com.example.pi_dev {
     exports com.example.pi_dev.events.Utils;
 
     // Blog exports
+    opens com.example.pi_dev.blog.Controllers to javafx.fxml;
     exports com.example.pi_dev.blog.Controllers;
     exports com.example.pi_dev.blog.Entities;
     exports com.example.pi_dev.blog.Services;

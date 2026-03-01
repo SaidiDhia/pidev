@@ -13,8 +13,8 @@ public class UserMain extends Application {
     @Override
     public void start(Stage stage) throws IOException, SQLException {
         UserDatabaseConnection.getInstance();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 900, 600);
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/main/main_layout.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         stage.setTitle("WonderLust");
         stage.setScene(scene);
         stage.setMaximized(true);

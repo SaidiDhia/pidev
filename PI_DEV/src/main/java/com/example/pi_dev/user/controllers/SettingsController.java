@@ -248,7 +248,7 @@ public class SettingsController {
         if (user != null && user.getRole() == RoleEnum.ADMIN) {
             navigateTo("/com/example/pi_dev/user/admin_dashboard.fxml", event);
         } else {
-            navigateTo("/com/example/pi_dev/hello-view.fxml", event);
+            navigateTo("/com/example/pi_dev/main/main_layout.fxml", event);
         }
     }
 
@@ -257,17 +257,64 @@ public class SettingsController {
         String email = currentUser != null ? currentUser.getEmail() : "Unknown";
         activityLogService.log(email, "SIGNOUT", "User logged out");
         UserSession.getInstance().logout();
-        navigateTo("/com/example/pi_dev/user/login.fxml", event);
+        
+        if (isInsideMainLayout(event)) {
+            notifyMainLayoutLogout(event);
+        } else {
+            navigateTo("/com/example/pi_dev/user/login.fxml", event);
+        }
     }
 
     private void navigateTo(String fxmlPath, ActionEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.getScene().setRoot(root);
-            stage.show();
+            if (isInsideMainLayout(event)) {
+                replaceInMainLayout(root, event);
+            } else {
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.show();
+            }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private boolean isInsideMainLayout(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Scene scene = source.getScene();
+        if (scene != null && scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
+            javafx.scene.layout.BorderPane root = (javafx.scene.layout.BorderPane) scene.getRoot();
+            return root.getCenter() instanceof javafx.scene.layout.StackPane && 
+                   root.getCenter().getId() != null && 
+                   root.getCenter().getId().equals("contentArea");
+        }
+        return false;
+    }
+
+    private void replaceInMainLayout(Parent root, ActionEvent event) {
+        Node source = (Node) event.getSource();
+        javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) source.getScene().lookup("#contentArea");
+        if (contentArea != null) {
+            contentArea.getChildren().setAll(root);
+        }
+    }
+
+    private void notifyMainLayoutLogout(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Scene scene = source.getScene();
+        if (scene != null && scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
+            javafx.scene.layout.BorderPane root = (javafx.scene.layout.BorderPane) scene.getRoot();
+            Object controller = root.getUserData();
+            if (controller instanceof com.example.pi_dev.main.controllers.MainLayoutController) {
+                ((com.example.pi_dev.main.controllers.MainLayoutController) controller).updateUserInfo();
+                try {
+                    Parent loginRoot = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
+                    replaceInMainLayout(loginRoot, event);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

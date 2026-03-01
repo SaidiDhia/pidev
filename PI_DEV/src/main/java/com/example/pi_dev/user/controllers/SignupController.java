@@ -204,9 +204,9 @@ public class SignupController {
             userService.register(newUser);
             activityLogService.log(newUser.getEmail(), "SIGNUP", "New user registered: " + newUser.getFullName());
             // Navigate to Login
-            if (isInsideHomeView(event)) {
+            if (isInsideMainLayout(event)) {
                 Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
-                replaceInHomeView(root, event);
+                replaceInMainLayout(root, event);
             } else {
                 goToLogin(event);
             }
@@ -295,41 +295,40 @@ public class SignupController {
         return isValid;
     }
 
-    private boolean isInsideHomeView(ActionEvent event) {
-        Node source = (Node) event.getSource();
-        Scene scene = source.getScene();
-        if (scene != null && scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
-            javafx.scene.layout.BorderPane root = (javafx.scene.layout.BorderPane) scene.getRoot();
-            return root.getCenter() instanceof javafx.scene.layout.StackPane && 
-                   root.getCenter().getId() != null && 
-                   root.getCenter().getId().equals("mainContentArea");
-        }
-        return false;
-    }
-
-    private void replaceInHomeView(Parent root, ActionEvent event) {
-        Node source = (Node) event.getSource();
-        javafx.scene.layout.StackPane mainContentArea = (javafx.scene.layout.StackPane) source.getScene().lookup("#mainContentArea");
-        if (mainContentArea != null) {
-            root.setStyle("-fx-background-color: rgba(249, 250, 251, 0.98);");
-            mainContentArea.getChildren().remove(mainContentArea.getChildren().size() - 1);
-            mainContentArea.getChildren().add(root);
-        }
-    }
-
     @FXML
     void goToLogin(ActionEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
-            if (isInsideHomeView(event)) {
-                replaceInHomeView(root, event);
+            if (isInsideMainLayout(event)) {
+                replaceInMainLayout(root, event);
             } else {
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.getScene().setRoot(root);
+                stage.setScene(new Scene(root));
                 stage.show();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private boolean isInsideMainLayout(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Scene scene = source.getScene();
+        if (scene != null && scene.getRoot() instanceof javafx.scene.layout.BorderPane) {
+            javafx.scene.layout.BorderPane root = (javafx.scene.layout.BorderPane) scene.getRoot();
+            return root.getCenter() instanceof javafx.scene.layout.StackPane && 
+                   root.getCenter().getId() != null && 
+                   root.getCenter().getId().equals("contentArea");
+        }
+        return false;
+    }
+
+    private void replaceInMainLayout(Parent root, ActionEvent event) {
+        Node source = (Node) event.getSource();
+        javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) source.getScene().lookup("#contentArea");
+        if (contentArea != null) {
+            contentArea.getChildren().setAll(root);
+        }
+    }
+
 }
