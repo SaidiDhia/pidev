@@ -22,8 +22,7 @@ public class HelloController {
                 root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
             }
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            stage.getScene().setRoot(root);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,10 +31,14 @@ public class HelloController {
     @FXML
     protected void onRentPlace(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
+            Parent root;
+            if (UserSession.getInstance().isLoggedIn()) {
+                root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/settings.fxml"));
+            } else {
+                root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
+            }
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            stage.getScene().setRoot(root);
         } catch (IOException e) {
             e.printStackTrace();
         }

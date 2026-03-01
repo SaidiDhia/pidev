@@ -364,7 +364,7 @@ public class TwoFactorController {
                 }
             }
             
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -411,7 +411,7 @@ public class TwoFactorController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = (Stage) (event != null ? ((Node) event.getSource()).getScene().getWindow() : errorLabel.getScene().getWindow());
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

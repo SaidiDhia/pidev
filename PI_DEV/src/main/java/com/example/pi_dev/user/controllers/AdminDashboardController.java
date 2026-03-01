@@ -420,7 +420,7 @@ public class AdminDashboardController {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle(user == null ? "Add User" : "Edit User");
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
@@ -433,7 +433,7 @@ public class AdminDashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/user/settings.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -445,7 +445,7 @@ public class AdminDashboardController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/hello-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -462,7 +462,7 @@ public class AdminDashboardController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/pi_dev/user/login.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
