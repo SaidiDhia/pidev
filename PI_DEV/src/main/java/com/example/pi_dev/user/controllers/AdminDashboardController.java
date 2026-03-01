@@ -366,7 +366,8 @@ public class AdminDashboardController {
 
     private void handleBanUser(User user) {
         if (UserSession.getInstance().getCurrentUser() != null &&
-            user.getUserId() == UserSession.getInstance().getCurrentUser().getUserId()) {
+            user.getUserId() != null &&
+            user.getUserId().equals(UserSession.getInstance().getCurrentUser().getUserId())) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Action Denied");
             alert.setHeaderText("Cannot Ban Self");
