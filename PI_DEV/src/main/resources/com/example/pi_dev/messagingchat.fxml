@@ -117,7 +117,10 @@
                                                         style="-fx-background-color: #ff6b6b; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-size: 12px; -fx-cursor: hand; -fx-opacity: 0.9;"
                                                         text="🗑️ Delete"
                                                         visible="false"/>
-
+                                                <Button fx:id="summarizeChatBtn"
+                                                        text="📋 Summarize Chat"
+                                                        style="-fx-background-color: #2d7a2d; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15;"
+                                                        onAction="#summarizeConversation"/>
 
                                             </children>
                                         </HBox>
@@ -145,6 +148,8 @@
 
                                         <HBox fx:id="messageInputContainer" spacing="5" style="-fx-background-color: #CAD4DC; -fx-background-radius: 30; -fx-padding: 5 10;" alignment="CENTER">
                                             <children>
+                                                <!-- Add this near your messageInput field -->
+
                                                 <MenuButton fx:id="attachMenuBtn"
                                                             style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;"
                                                             text="📎">
@@ -155,6 +160,14 @@
                                                         <MenuItem text="📎 File" onAction="#handleAttachFile"/>
                                                     </items>
                                                 </MenuButton>
+                                                <HBox fx:id="emojiSuggestionBox" spacing="5" alignment="CENTER_LEFT" visible="false" managed="false"
+                                                      style="-fx-background-color: #f0f8f0; -fx-background-radius: 20; -fx-padding: 5 10;">
+                                                    <Label text="💡" style="-fx-font-size: 16px; -fx-text-fill: #2d7a2d;"/>
+                                                    <Label text="Suggestions:" style="-fx-text-fill: #666; -fx-font-size: 12px;"/>
+                                                    <Button fx:id="emoji1Btn" style="-fx-background-color: #f0f0f0; -fx-background-radius: 15; -fx-padding: 2 8; -fx-font-size: 14px;"/>
+                                                    <Button fx:id="emoji2Btn" style="-fx-background-color: #f0f0f0; -fx-background-radius: 15; -fx-padding: 2 8; -fx-font-size: 14px;"/>
+                                                    <Button fx:id="emoji3Btn" style="-fx-background-color: #f0f0f0; -fx-background-radius: 15; -fx-padding: 2 8; -fx-font-size: 14px;"/>
+                                                </HBox>
 
                                                 <!-- Voice recording button -->
                                                 <Button fx:id="voiceRecordBtn"

@@ -16,7 +16,7 @@ public class MessageFilterService {
 
             // English bad words
             "fuck", "shit", "asshole", "bitch", "dick", "cunt", "pussy", "bastard",
-            "motherfucker", "damn", "hell", "piss", "crap", "twat", "wanker",
+            "motherfucker", "damn", "piss", "crap", "twat", "wanker",
             "cock", "suck", "blowjob", "whore", "slut", "fag", "retard",
 
             // Arabic bad words (common ones)
@@ -45,21 +45,8 @@ public class MessageFilterService {
 
     public MessageFilterService() {
         // Initialize leet speak mapping
-        LEET_MAP.put('0', 'o');
-        LEET_MAP.put('1', 'i');
-        LEET_MAP.put('2', 'z');
-        LEET_MAP.put('3', 'e');
-        LEET_MAP.put('4', 'a');
-        LEET_MAP.put('5', 's');
-        LEET_MAP.put('6', 'g');
-        LEET_MAP.put('7', 't');
-        LEET_MAP.put('8', 'b');
-        LEET_MAP.put('9', 'g');
-        LEET_MAP.put('@', 'a');
-        LEET_MAP.put('$', 's');
-        LEET_MAP.put('!', 'i');
-        LEET_MAP.put('#', 'h');
-        LEET_MAP.put('+', 't');
+
+
     }
 
     /**

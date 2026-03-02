@@ -2,10 +2,8 @@ package com.example.pi_dev.messaging.messagecontroller;
 
 import com.example.pi_dev.messaging.messagingmodel.Conversation;
 import com.example.pi_dev.messaging.messagingmodel.Message;
-import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
-import com.example.pi_dev.messaging.messagingrepository.ConversationUserRepository;
-import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
-import com.example.pi_dev.messaging.messagingrepository.UserRepository;
+import com.example.pi_dev.messaging.messagingmodel.Reaction;
+import com.example.pi_dev.messaging.messagingrepository.*;
 import com.example.pi_dev.messaging.messagingservice.*;
 import com.example.pi_dev.messaging.messagingsession.Session;
 
@@ -83,6 +81,8 @@ public class ChatController {
 
     @FXML private Button stopSpeechBtn;
 
+    @FXML private HBox emojiSuggestionBox;
+    @FXML private Button emoji1Btn, emoji2Btn, emoji3Btn;
     // Services
     private final FileUploadService uploadService = new FileUploadService();
     private final GeminiService geminiService = new GeminiService();
@@ -101,6 +101,7 @@ public class ChatController {
     private boolean darkMode = false;
     private ObservableList<Conversation> conversations = FXCollections.observableArrayList();
     private ObservableList<Conversation> archivedConversations = FXCollections.observableArrayList();
+    private final ReactionRepository reactionRepo = new ReactionRepository();
 
     //bad words
     private MessageFilterService filterService;
@@ -143,6 +144,9 @@ public class ChatController {
         audioRecorderService = new AudioRecorderService();
         recordingIndicator.setVisible(false);
         recordingIndicator.setManaged(false);
+
+        //initialize suggestion
+        setupEmojiSuggestions();
 
 
         ttsService = new SimpleTTSService();
@@ -320,51 +324,48 @@ public class ChatController {
                 Button menuBtn = new Button("⋮");
                 menuBtn.getStyleClass().add("menu-button");
 
+                // In your message cell factory, find where you create the menu
                 ContextMenu menu = new ContextMenu();
                 MenuItem edit = new MenuItem("Edit");
                 MenuItem delete = new MenuItem("Delete");
                 MenuItem translate = new MenuItem("🌐 Translate");
-                // Find where you create the context menu and add this MenuItem:
                 MenuItem listen = new MenuItem("🔊 Listen");
+                MenuItem summarize = new MenuItem("📋 Summarize");
 
-// Add the action:
+// Set actions FIRST
+                summarize.setOnAction(e -> summarizeMessage(msg));
                 listen.setOnAction(e -> {
                     if (msg.isText()) {
                         ttsService.speakMessage(msg.getContent());
                         showInfo("🔊 Speaking message...");
-
-                        // Optional: Disable listen button briefly to prevent spam
                         listen.setDisable(true);
                         new Thread(() -> {
-                            try {
-                                Thread.sleep(2000); // Re-enable after 2 seconds
-                            } catch (InterruptedException ex) {}
+                            try { Thread.sleep(2000); } catch (InterruptedException ex) {}
                             Platform.runLater(() -> listen.setDisable(false));
                         }).start();
-
                     } else {
                         showError("Can only listen to text messages");
                     }
                 });
-                menu.getItems().add(0, listen); // Add at the beginning
-                menu.getItems().add(translate);
+                translate.setOnAction(e -> translateMessage(msg));
 
-                if (msg.isText()) {
-                    if (isMine) {
-                        // For my messages: show Edit + Delete + Translate
-                        menu.getItems().addAll(edit, delete);
-                    } else {
-                        // For their messages: ONLY show Translate (no Edit/Delete)
-                        // Already added translate above, so nothing else needed
-                    }
-                } else {
-                    if (isMine) {
-                        // For my media: show Delete only
-                        menu.getItems().add(delete);
-                    }
-                    // For their media: only Translate (already added)
+// Clear and rebuild menu properly
+                menu.getItems().clear();
+
+// Always add common items
+                menu.getItems().addAll(listen, translate);
+
+// Add summarize ONLY for long text messages
+                if (msg.isText() && msg.getContent().length() > 200) {
+                    menu.getItems().add(summarize);
                 }
 
+// Add edit/delete based on ownership
+                if (msg.isText() && isMine) {
+                    menu.getItems().addAll(edit, delete);
+                } else if (!msg.isText() && isMine) {
+                    menu.getItems().add(delete);
+                }
                 translate.setOnAction(e -> translateMessage(msg));
 
                 menuBtn.setOnAction(e -> menu.show(menuBtn, Side.BOTTOM, 0, 0));
@@ -417,6 +418,14 @@ public class ChatController {
                 VBox bubble = new VBox(5);
                 bubble.setMaxWidth(350);
                 bubble.getChildren().add(header);
+
+                bubble.setOnMouseClicked(event -> {
+                    if (event.getClickCount() == 2) {
+                        showReactionPicker(msg, bubble);
+                        event.consume();
+                    }
+                });
+                updateReactionDisplay(msg, bubble);
 
                 if (msg.isImage()) {
                     displayImageMessage(msg, bubble);
@@ -487,7 +496,97 @@ public class ChatController {
                     showErrorPlaceholder(bubble, "Failed to load image");
                 }
             }
+            // Add these methods inside your cell factory
+            private void showReactionPicker(Message msg, VBox bubble) {
+                // Create reaction popup
+                ContextMenu reactionMenu = new ContextMenu();
 
+                String[] emojis = {"👍", "❤️", "😂", "😮", "😢", "😡"};
+                String[] names = {"Like", "Love", "Haha", "Wow", "Sad", "Angry"};
+
+                for (int i = 0; i < emojis.length; i++) {
+                    MenuItem item = new MenuItem(emojis[i] + " " + names[i]);
+                    String reaction = emojis[i];
+                    item.setOnAction(e -> addReaction(msg, reaction, bubble));
+                    reactionMenu.getItems().add(item);
+                }
+
+                reactionMenu.show(bubble, Side.TOP, 0, 0);
+            }
+
+            private void addReaction(Message msg, String reaction, VBox bubble) {
+                String currentUser = Session.getCurrentUserId();
+
+                new Thread(() -> {
+                    try {
+                        // Check if user already reacted
+                        String existing = reactionRepo.getUserReaction(msg.getId(), currentUser);
+
+                        if (existing != null) {
+                            if (existing.equals(reaction)) {
+                                // Same reaction - remove it
+                                reactionRepo.removeReaction(msg.getId(), currentUser);
+                            } else {
+                                // Different reaction - update
+                                reactionRepo.removeReaction(msg.getId(), currentUser);
+                                reactionRepo.addReaction(msg.getId(), currentUser, reaction);
+                            }
+                        } else {
+                            // New reaction
+                            reactionRepo.addReaction(msg.getId(), currentUser, reaction);
+                        }
+
+                        // Update UI to show reactions
+                        javafx.application.Platform.runLater(() -> {
+                            updateReactionDisplay(msg, bubble);
+                        });
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+
+            private void updateReactionDisplay(Message msg, VBox bubble) {
+                try {
+                    List<Reaction> reactions = reactionRepo.getReactionsForMessage(msg.getId());
+
+                    // Remove old reaction bar if exists
+                    bubble.getChildren().removeIf(node ->
+                            node instanceof HBox && "reaction-bar".equals(node.getStyleClass().stream().findFirst().orElse("")));
+
+                    if (!reactions.isEmpty()) {
+                        // Group reactions by type
+                        java.util.Map<String, Long> counts = reactions.stream()
+                                .collect(java.util.stream.Collectors.groupingBy(
+                                        Reaction::getReaction, java.util.stream.Collectors.counting()));
+
+                        // Create reaction bar
+                        HBox reactionBar = new HBox(5);
+                        reactionBar.setAlignment(Pos.CENTER_LEFT);
+                        reactionBar.setPadding(new Insets(5, 0, 0, 0));
+                        reactionBar.getStyleClass().add("reaction-bar");
+
+                        counts.forEach((emoji, count) -> {
+                            Label reactionLabel = new Label(emoji + " " + count);
+                            reactionLabel.setStyle("-fx-background-color: #f0f0f0; -fx-background-radius: 12; -fx-padding: 2 8; -fx-font-size: 12px; -fx-text-fill: #333333;");
+                            reactionLabel.setTooltip(new Tooltip(getReactionUsers(reactions, emoji)));
+                            reactionBar.getChildren().add(reactionLabel);
+                        });
+
+                        bubble.getChildren().add(reactionBar);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            private String getReactionUsers(List<Reaction> reactions, String emoji) {
+                return reactions.stream()
+                        .filter(r -> r.getReaction().equals(emoji))
+                        .map(r -> r.getUserFullName() != null ? r.getUserFullName() : r.getUserId())
+                        .collect(java.util.stream.Collectors.joining("\n"));
+            }
             private void displayVideoMessage(Message msg, VBox bubble) {
                 try {
                     String fileUrl = msg.getFileUrl();
@@ -1446,6 +1545,148 @@ public class ChatController {
             }
         });
     }
+    //method summirize
+    private void summarizeMessage(Message msg) {
+        String prompt = String.format(
+                "Summarize this message in 1-2 sentences:\n\n%s",
+                msg.getContent()
+        );
+
+        Alert loading = new Alert(Alert.AlertType.INFORMATION);
+        loading.setTitle("Summarizing");
+        loading.setHeaderText(null);
+        loading.setContentText("⏳ Generating summary...");
+        loading.show();
+
+        new Thread(() -> {
+            try {
+                String summary = geminiService.generateResponse(prompt);
+
+                javafx.application.Platform.runLater(() -> {
+                    loading.close();
+
+                    Alert result = new Alert(Alert.AlertType.INFORMATION);
+                    result.setTitle("Message Summary");
+                    result.setHeaderText("Summary:");
+
+                    TextArea textArea = new TextArea(summary);
+                    textArea.setWrapText(true);
+                    textArea.setEditable(false);
+                    textArea.setPrefRowCount(3);
+                    textArea.setPrefWidth(400);
+
+                    result.getDialogPane().setContent(textArea);
+                    result.getDialogPane().getStyleClass().add("dialog-pane");
+                    result.showAndWait();
+                });
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    loading.close();
+                    showError("Summarization failed: " + e.getMessage());
+                });
+            }
+        }).start();
+    }
+    @FXML
+    private void summarizeConversation() {
+        if (selectedConversation == null) {
+            showError("Please select a conversation first.");
+            return;
+        }
+
+        if (messageList.getItems().isEmpty()) {
+            showError("No messages to summarize");
+            return;
+        }
+
+        List<Message> messages = messageList.getItems();
+
+        // Show loading dialog
+        Alert loading = new Alert(Alert.AlertType.INFORMATION);
+        loading.setTitle("Summarizing");
+        loading.setHeaderText(null);
+        loading.setContentText("⏳ Generating conversation summary...");
+        loading.show();
+
+        // Build conversation context
+        StringBuilder context = new StringBuilder();
+        context.append("Summarize this conversation in 3-5 bullet points. Be concise:\n\n");
+
+        int start = Math.max(0, messages.size() - 20); // Last 20 messages
+        for (int i = start; i < messages.size(); i++) {
+            Message msg = messages.get(i);
+
+            // Get sender name
+            String senderName = "User";
+            try {
+                String fullName = userRepo.getUserFullName(msg.getSenderId());
+                if (fullName != null && !fullName.isEmpty()) {
+                    senderName = fullName;
+                } else {
+                    senderName = "User " + msg.getSenderId();
+                }
+            } catch (SQLException e) {
+                senderName = "User " + msg.getSenderId();
+            }
+
+            // Add message with appropriate prefix
+            String prefix = msg.getSenderId().equals(Session.getCurrentUserId()) ? "Me" : senderName;
+
+            // Show message type
+            String content = msg.getContent();
+            if (msg.isImage()) content = "[Image]";
+            else if (msg.isVideo()) content = "[Video]";
+            else if (msg.isAudio()) content = "[Audio]";
+            else if (msg.isFile()) content = "[File]";
+
+            context.append(prefix).append(": ").append(content).append("\n");
+        }
+
+        context.append("\nProvide a concise summary with 3-5 bullet points:");
+
+        String prompt = context.toString();
+
+        // Call API in background
+        new Thread(() -> {
+            try {
+                String summary = geminiService.generateResponse(prompt);
+
+                javafx.application.Platform.runLater(() -> {
+                    loading.close();
+
+                    // Show summary in dialog
+                    Dialog<ButtonType> dialog = new Dialog<>();
+                    dialog.setTitle("📋 Conversation Summary");
+                    dialog.setHeaderText("Summary of last " + Math.min(20, messages.size()) + " messages");
+
+                    DialogPane dialogPane = dialog.getDialogPane();
+                    dialogPane.getStyleClass().add("dialog-pane");
+                    dialogPane.setPrefWidth(500);
+                    dialogPane.setPrefHeight(400);
+
+                    TextArea summaryArea = new TextArea(summary);
+                    summaryArea.setWrapText(true);
+                    summaryArea.setEditable(false);
+                    summaryArea.setStyle("-fx-font-size: 14px; -fx-padding: 15;");
+
+                    ScrollPane scrollPane = new ScrollPane(summaryArea);
+                    scrollPane.setFitToWidth(true);
+                    scrollPane.setFitToHeight(true);
+
+                    dialogPane.setContent(scrollPane);
+                    dialogPane.getButtonTypes().add(ButtonType.CLOSE);
+
+                    dialog.showAndWait();
+                });
+
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    loading.close();
+                    showError("Failed to summarize: " + e.getMessage());
+                });
+            }
+        }).start();
+    }
 
     private Label createStyledLabel(String text) {
         Label label = new Label(text);
@@ -1485,6 +1726,55 @@ public class ChatController {
         } catch (SQLException e) {
             showError("Failed to update conversation: " + e.getMessage());
         }
+    }
+    // EMOGIES
+    private void setupEmojiSuggestions() {
+        messageInput.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.length() > 10 && !newVal.equals(oldVal)) {
+                suggestEmojis(newVal);
+            }
+        });
+    }
+
+    private void suggestEmojis(String text) {
+        String prompt = String.format(
+                "Based on this message: '%s', suggest 3 relevant emojis. " +
+                        "Return ONLY the emojis separated by spaces, nothing else.",
+                text
+        );
+
+        new Thread(() -> {
+            try {
+                String suggestion = geminiService.generateResponse(prompt);
+                String[] emojis = suggestion.trim().split("\\s+");
+
+                javafx.application.Platform.runLater(() -> {
+                    if (emojis.length >= 3) {
+                        emoji1Btn.setText(emojis[0]);
+                        emoji2Btn.setText(emojis[1]);
+                        emoji3Btn.setText(emojis[2]);
+                        emojiSuggestionBox.setVisible(true);
+                        emojiSuggestionBox.setManaged(true);
+
+                        // Add click handlers
+                        emoji1Btn.setOnAction(e -> insertEmoji(emojis[0]));
+                        emoji2Btn.setOnAction(e -> insertEmoji(emojis[1]));
+                        emoji3Btn.setOnAction(e -> insertEmoji(emojis[2]));
+                    }
+                });
+            } catch (Exception e) {
+                // Ignore suggestion failures
+            }
+        }).start();
+    }
+
+
+
+    private void insertEmoji(String emoji) {
+        messageInput.setText(messageInput.getText() + " " + emoji);
+        messageInput.positionCaret(messageInput.getText().length());
+        emojiSuggestionBox.setVisible(false);
+        emojiSuggestionBox.setManaged(false);
     }
 
     @FXML
