@@ -1,7 +1,6 @@
 package com.example.pi_dev.events.Iservices;
 
 import com.example.pi_dev.events.Entities.Event;
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -12,16 +11,12 @@ public interface IEventService {
 
     // READ
     List<Event> afficher() throws SQLException;
-
     Event getById(int id) throws SQLException;
-
     List<Event> getByActivite(int idActivite) throws SQLException;
 
     // UPDATE
     void modifier(Event event) throws SQLException;
-
     void diminuerPlaces(int idEvent, int nombre) throws SQLException;
-
     void augmenterPlaces(int idEvent, int nombre) throws SQLException;
 
     // DELETE

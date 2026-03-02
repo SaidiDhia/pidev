@@ -7,7 +7,9 @@ import com.example.pi_dev.events.Services.EventService;
 import com.example.pi_dev.events.Services.ReservationService;
 import com.example.pi_dev.events.Services.GoogleCalendarService;
 import com.example.pi_dev.events.Services.EmailService;
+import com.example.pi_dev.events.Utils.Mydatabase;
 
+import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,77 +32,48 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.web.WebView;
 import javafx.scene.web.WebEngine;
-import java.util.regex.Pattern;
-import com.example.pi_dev.events.Services.GoogleCalendarService;
 
 public class ReservationController {
 
-    @FXML
-    private Label EventDescription;
-    @FXML
-    private Label Eventlieu;
-    @FXML
-    private Label datedebut;
-    @FXML
-    private Label personCountLabel;
-    @FXML
-    private Label prixlabel;
-    @FXML
-    private HBox EventImagesContainer;
-    @FXML
-    private Button prevImageButton;
-    @FXML
-    private Button nextImageButton;
-    @FXML
-    private Label imageCounterLabel;
-    @FXML
-    private VBox videoContainer;
-    @FXML
-    private WebView videoWebView;
+    @FXML private Label EventDescription;
+    @FXML private Label Eventlieu;
+    @FXML private Label datedebut;
+    @FXML private Label personCountLabel;
+    @FXML private Label prixlabel;
+    @FXML private HBox EventImagesContainer;
+    @FXML private Button prevImageButton;
+    @FXML private Button nextImageButton;
+    @FXML private Label imageCounterLabel;
+    @FXML private VBox videoContainer;
+    @FXML private WebView videoWebView;
 
-    @FXML
-    private TextField idEventField;
-    @FXML
-    private TextField nomField;
-    @FXML
-    private TextField emailField;
-    @FXML
-    private TextField telephoneField;
-    @FXML
-    private TextField nombrePersonnesField;
-    @FXML
-    private TextArea demandesp;
+    @FXML private TextField idEventField;
+    @FXML private TextField nomField;
+    @FXML private TextField emailField;
+    @FXML private TextField telephoneField;
+    @FXML private TextField nombrePersonnesField;
+    @FXML private TextArea demandesp;
 
-    @FXML
-    private Button reserverButton;
-    @FXML
-    private Button annulerRES;
-    @FXML
-    private Button cataloguebtn;
-    @FXML
-    private Button panierButton;
+    @FXML private Button reserverButton;
+    @FXML private Button annulerRES;
+    @FXML private Button cataloguebtn;
+    @FXML private Button panierButton;
 
     private EventService eventService = new EventService();
     private ReservationService reservationService = new ReservationService();
 
     private Event currentEvent;
-
-    // Variables pour la navigation des images
     private List<javafx.scene.Node> allMediaNodes = new ArrayList<>();
     private int currentImageIndex = 0;
 
-    // panier local
     public static ObservableList<Reservation> panier = FXCollections.observableArrayList();
 
-    // Service Google Calendar
     private GoogleCalendarService googleCalendarService;
-
-    // Service Email
     private EmailService emailService;
 
-    // ================= INITIALISATION =================
     public void initialize() {
-        // Initialiser Google Calendar Service
+        System.out.println("✅ ReservationController initialisé");
+
         googleCalendarService = new GoogleCalendarService();
         boolean calendarInitialized = googleCalendarService.initialize();
 
@@ -110,7 +83,6 @@ public class ReservationController {
             System.out.println("⚠️ Google Calendar Service non disponible");
         }
 
-        // Initialiser Email Service
         emailService = new EmailService();
         boolean emailInitialized = emailService.initialize();
 
@@ -120,32 +92,23 @@ public class ReservationController {
             System.out.println("⚠️ Email Service non disponible");
         }
 
-        // Ajouter un listener pour mettre à jour le prix total quand le nombre de personnes change
         nombrePersonnesField.textProperty().addListener((observable, oldValue, newValue) -> {
             updateLabels();
         });
 
-        // Valeur par défaut de 1 personne
         nombrePersonnesField.setText("1");
     }
 
-    // ================= INITIALISATION EVENT =================
     public void loadEvent(int idEvent) {
         try {
             currentEvent = eventService.findById(idEvent);
 
             if (currentEvent != null) {
                 System.out.println("DEBUG: Événement chargé - ID: " + currentEvent.getId());
-                System.out.println("DEBUG: Événement titre: " + (currentEvent.getActivite() != null ? currentEvent.getActivite().getTitre() : "Pas d'activité"));
-                System.out.println("DEBUG: Événement lieu: " + currentEvent.getLieu());
-                System.out.println("DEBUG: Événement prix: " + currentEvent.getPrix());
 
-                // Charger les images de l'événement
                 loadEventImages();
 
-                // Vérifier que les champs FXML sont initialisés avant de les utiliser
                 if (EventDescription != null) {
-                    // Afficher la description de l'événement (priorité sur la description de l'activité)
                     String eventDescription = currentEvent.getDescription();
                     String activiteDescription = (currentEvent.getActivite() != null) ? currentEvent.getActivite().getDescription() : null;
 
@@ -166,7 +129,6 @@ public class ReservationController {
                 }
 
                 if (datedebut != null) {
-                    // Formater les dates correctement
                     if (currentEvent.getDateDebut() != null) {
                         datedebut.setText(currentEvent.getDateDebut().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                     } else {
@@ -174,25 +136,22 @@ public class ReservationController {
                     }
                 }
 
-                // Charger la vidéo YouTube directement dans l'interface
                 loadYouTubeVideo();
 
                 if (personCountLabel != null) {
-                    // Afficher les places restantes au lieu du nombre total
                     int placesRestantes = currentEvent.getPlacesDisponibles();
                     personCountLabel.setText(" " + placesRestantes + " places restantes");
                 }
 
                 if (demandesp != null) {
-                    // Afficher les matériels nécessaires de l'événement (lecture seule)
                     if (currentEvent.getMaterielsNecessaires() != null && !currentEvent.getMaterielsNecessaires().trim().isEmpty()) {
-                        demandesp.setText(currentEvent.getMaterielsNecessaires());
-                        demandesp.setEditable(false); // Rendre le champ non modifiable
-                        demandesp.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #ddd;");
+                        demandesp.setPromptText("Allergies alimentaires, besoins spéciaux, questions...\n\n📋 Matériels requis pour cet événement :\n" + currentEvent.getMaterielsNecessaires());
+                        demandesp.setEditable(true);
+                        demandesp.setStyle("-fx-border-color: #2D70B3; -fx-background-color: white;");
                     } else {
-                        demandesp.setText("Aucun équipement requis");
-                        demandesp.setEditable(false);
-                        demandesp.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #ddd;");
+                        demandesp.setPromptText("Allergies alimentaires, besoins spéciaux, questions...");
+                        demandesp.setEditable(true);
+                        demandesp.setStyle("-fx-border-color: #2D70B3; -fx-background-color: white;");
                     }
                 }
 
@@ -207,10 +166,6 @@ public class ReservationController {
                     }
                 }
 
-                // Charger la vidéo YouTube directement dans l'interface
-                loadYouTubeVideo();
-
-                // Afficher les photos supplémentaires si disponibles
                 loadEventPhotos();
             }
 
@@ -224,7 +179,6 @@ public class ReservationController {
             allMediaNodes.clear();
             currentImageIndex = 0;
 
-            // Ajouter l'image principale de l'événement
             if (currentEvent.getImage() != null && !currentEvent.getImage().trim().isEmpty()) {
                 try {
                     java.io.File imageFile = new java.io.File(currentEvent.getImage());
@@ -243,7 +197,6 @@ public class ReservationController {
                 }
             }
 
-            // Ajouter l'image de l'activité si différente
             if (currentEvent.getActivite() != null && currentEvent.getActivite().getImage() != null) {
                 String activityImagePath = currentEvent.getActivite().getImage();
                 if (!activityImagePath.isEmpty() && !activityImagePath.equals(currentEvent.getImage())) {
@@ -265,10 +218,8 @@ public class ReservationController {
                 }
             }
 
-            // Ajouter les photos supplémentaires
             loadEventPhotos();
 
-            // Afficher la première image par défaut
             if (!allMediaNodes.isEmpty()) {
                 System.out.println("DEBUG: Nombre total de médias chargés: " + allMediaNodes.size());
                 updateImageDisplay();
@@ -283,9 +234,8 @@ public class ReservationController {
 
     private void loadEventPhotos() {
         try {
-            // Récupérer les photos de l'événement depuis la base de données
             String sql = "SELECT chemin_photo FROM event_photos WHERE id_event = ?";
-            java.sql.PreparedStatement ps = com.example.pi_dev.events.Utils.Mydatabase.getInstance().getConnextion().prepareStatement(sql);
+            java.sql.PreparedStatement ps = Mydatabase.getInstance().getConnextion().prepareStatement(sql);
             ps.setInt(1, currentEvent.getId());
             java.sql.ResultSet rs = ps.executeQuery();
 
@@ -302,7 +252,6 @@ public class ReservationController {
                     if (photoFile.exists()) {
                         Image image = new Image(photoFile.toURI().toString());
 
-                        // Ajouter au conteneur principal d'images
                         ImageView imageView = new ImageView(image);
                         imageView.setFitHeight(180);
                         imageView.setFitWidth(180);
@@ -321,7 +270,6 @@ public class ReservationController {
         }
     }
 
-    // ================= NAVIGATION IMAGES =================
     @FXML
     void previousImage(ActionEvent event) {
         if (currentImageIndex > 0) {
@@ -343,19 +291,15 @@ public class ReservationController {
             return;
         }
 
-        // Vider le conteneur
         EventImagesContainer.getChildren().clear();
 
-        // Ajouter seulement l'image actuelle
         javafx.scene.Node currentNode = allMediaNodes.get(currentImageIndex);
         EventImagesContainer.getChildren().add(currentNode);
 
-        // Mettre à jour le compteur
         if (imageCounterLabel != null) {
             imageCounterLabel.setText((currentImageIndex + 1) + " / " + allMediaNodes.size());
         }
 
-        // Activer/désactiver les boutons
         if (prevImageButton != null) {
             prevImageButton.setDisable(currentImageIndex == 0);
         }
@@ -368,94 +312,63 @@ public class ReservationController {
 
     private void loadYouTubeVideo() {
         System.out.println("DEBUG: Début loadYouTubeVideo()");
-        System.out.println("DEBUG: currentEvent = " + (currentEvent != null ? "NON NULL" : "NULL"));
-
-        if (currentEvent != null) {
-            System.out.println("DEBUG: currentEvent.getVideoYoutube() = " + currentEvent.getVideoYoutube());
-            System.out.println("DEBUG: videoWebView = " + (videoWebView != null ? "NON NULL" : "NULL"));
-            System.out.println("DEBUG: videoContainer = " + (videoContainer != null ? "NON NULL" : "NULL"));
-        }
 
         if (currentEvent != null && currentEvent.getVideoYoutube() != null && !currentEvent.getVideoYoutube().trim().isEmpty() && videoWebView != null && videoContainer != null) {
             try {
                 String videoUrl = currentEvent.getVideoYoutube().trim();
                 System.out.println("DEBUG: Chargement de la vidéo YouTube dans WebView: " + videoUrl);
 
-                // Convertir l'URL YouTube en URL embed
                 String embedUrl = convertToEmbedUrl(videoUrl);
-                System.out.println("DEBUG: URL embed: " + embedUrl);
 
-                // Vérifier si l'URL embed est valide
                 if (embedUrl == null || embedUrl.trim().isEmpty()) {
                     System.err.println("DEBUG: URL embed invalide, masquage du conteneur vidéo");
                     videoContainer.setVisible(false);
                     return;
                 }
 
-                // Créer le HTML pour l'intégration de la vidéo avec configuration améliorée
                 String htmlContent = "<!DOCTYPE html>\n" +
                         "<html>\n" +
                         "<head>\n" +
                         "    <meta charset=\"UTF-8\">\n" +
                         "    <style>\n" +
-                        "        body { margin: 0; padding: 0; background-color: white; }\n" +
-                        "        .video-container { position: relative; width: 100%; height: 180px; }\n" +
-                        "        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }\n" +
-                        "        .error-message { text-align: center; padding: 20px; color: #666; font-family: Arial; }\n" +
+                        "        body { margin: 0; padding: 0; background-color: #000; font-family: Arial; width: 400px; height: 280px; display: flex; justify-content: center; align-items: center; }\n" +
+                        "        .video-box { width: 380px; height: 260px; background-color: #1a1a1a; border: 2px solid #333; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; }\n" +
+                        "        .icon { font-size: 48px; color: #ff0000; margin-bottom: 15px; }\n" +
+                        "        .title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }\n" +
+                        "        .desc { font-size: 14px; color: #ccc; margin-bottom: 20px; }\n" +
+                        "        .btn { background-color: #ff0000; color: white; padding: 12px 24px; border: none; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; }\n" +
+                        "        .btn:hover { background-color: #cc0000; }\n" +
                         "    </style>\n" +
                         "</head>\n" +
                         "<body>\n" +
-                        "    <div class=\"video-container\">\n" +
-                        "        <iframe src=\"" + embedUrl + "?rel=0&showinfo=0&modestbranding=1\" \n" +
-                        "                frameborder=\"0\" \n" +
-                        "                allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" \n" +
-                        "                allowfullscreen>\n" +
-                        "        </iframe>\n" +
+                        "    <div class=\"video-box\">\n" +
+                        "        <div class=\"icon\">🎥</div>\n" +
+                        "        <div class=\"title\">Vidéo de présentation</div>\n" +
+                        "        <div class=\"desc\">Cliquez pour regarder sur YouTube</div>\n" +
+                        "        <a href=\"" + videoUrl + "\" target=\"_blank\" class=\"btn\">▶️ YouTube</a>\n" +
                         "    </div>\n" +
-                        "    <script>\n" +
-                        "        // Gestion des erreurs YouTube\n" +
-                        "        window.addEventListener('message', function(event) {\n" +
-                        "            try {\n" +
-                        "                var data = JSON.parse(event.data);\n" +
-                        "                if (data.event === 'onError') {\n" +
-                        "                    document.querySelector('.video-container').innerHTML = \n" +
-                        "                        '<div class=\"error-message\">Vidéo non disponible. Cliquez pour ouvrir dans YouTube.</div>';\n" +
-                        "                }\n" +
-                        "            } catch(e) {}\n" +
-                        "        });\n" +
-                        "        \n" +
-                        "        // Fallback: si la vidéo ne charge pas\n" +
-                        "        setTimeout(function() {\n" +
-                        "            var iframe = document.querySelector('iframe');\n" +
-                        "            if (iframe && !iframe.contentWindow) {\n" +
-                        "                document.querySelector('.video-container').innerHTML = \n" +
-                        "                    '<div class=\"error-message\"><a href=\"" + embedUrl + "\" target=\"_blank\">Cliquez pour regarder sur YouTube</a></div>';\n" +
-                        "            }\n" +
-                        "        }, 5000);\n" +
-                        "    </script>\n" +
                         "</body>\n" +
                         "</html>";
 
-                // Charger le contenu HTML dans le WebView
                 WebEngine webEngine = videoWebView.getEngine();
                 webEngine.loadContent(htmlContent);
 
-                // Rendre le conteneur vidéo visible
                 videoContainer.setVisible(true);
+                videoContainer.setManaged(true);
+                videoWebView.setVisible(true);
+                videoWebView.setManaged(true);
 
                 System.out.println("DEBUG: Vidéo YouTube chargée avec succès dans WebView");
 
             } catch (Exception e) {
                 System.err.println("Erreur lors du chargement de la vidéo YouTube: " + e.getMessage());
                 e.printStackTrace();
-                // Cacher le conteneur vidéo en cas d'erreur
                 if (videoContainer != null) {
                     videoContainer.setVisible(false);
                 }
             }
         } else {
             System.out.println("DEBUG: Aucune vidéo YouTube à charger ou WebView non initialisé");
-            // Cacher le conteneur vidéo s'il n'y a pas de vidéo
             if (videoContainer != null) {
                 videoContainer.setVisible(false);
             }
@@ -494,7 +407,6 @@ public class ReservationController {
                 embedUrl = "https://www.youtube.com/embed/" + videoId;
             }
 
-            // Validation supplémentaire de l'ID vidéo
             if (!embedUrl.isEmpty()) {
                 String videoId = embedUrl.substring(embedUrl.lastIndexOf("/") + 1);
                 if (videoId.length() < 11 || videoId.matches(".*[^a-zA-Z0-9_-].*")) {
@@ -511,7 +423,6 @@ public class ReservationController {
         return embedUrl;
     }
 
-    // ================= CONTROLE SAISIE =================
     private boolean validateInput() {
         if (currentEvent == null) {
             showAlert("Veuillez d'abord sélectionner un événement");
@@ -559,7 +470,6 @@ public class ReservationController {
         return true;
     }
 
-    // ================= RESERVER =================
     @FXML
     void reserver(ActionEvent event) {
         if (!validateInput()) {
@@ -567,47 +477,41 @@ public class ReservationController {
         }
 
         try {
-            // Validation de l'événement
             if (currentEvent == null || currentEvent.getId() == 0) {
                 showAlert("Aucun événement sélectionné. Veuillez sélectionner un événement avant de réserver.");
                 return;
             }
 
-            // Vérifier que l'événement existe toujours en base
             if (!eventExists(currentEvent.getId())) {
                 showAlert("L'événement sélectionné n'est plus disponible. Veuillez rafraîchir la liste des événements et réessayer.");
                 return;
             }
 
-            // Créer la réservation
             Reservation reservation = new Reservation();
             reservation.setIdEvent(currentEvent.getId());
+
             reservation.setNom(nomField.getText());
             reservation.setEmail(emailField.getText());
             reservation.setTelephone(telephoneField.getText());
+
             reservation.setNombrePersonnes(Integer.parseInt(nombrePersonnesField.getText()));
-            reservation.setDemandesSpeciales(""); // Les demandes spéciales sont gérées séparément
+            reservation.setDemandesSpeciales(demandesp.getText() != null && !demandesp.getText().trim().isEmpty() ? demandesp.getText().trim() : "");
             reservation.setEvent(currentEvent);
             reservation.setStatut(Reservation.StatutReservation.CONFIRMEE);
 
-            // Calculer le prix total
             double prixUnitaire = currentEvent.getPrix().doubleValue();
             int nbPersonnes = Integer.parseInt(nombrePersonnesField.getText());
             double prixTotal = prixUnitaire * nbPersonnes;
             reservation.setPrixTotal(prixTotal);
 
-            // Ajouter à la base de données
             reservationService.add(reservation);
 
-            // Ajouter au panier
             panier.add(reservation);
 
             showAlert("Réservation effectuée avec succès !");
 
-            // Générer et afficher le QR code
             afficherQRCode(reservation);
 
-            // Ajouter automatiquement au calendrier Google
             if (googleCalendarService != null && googleCalendarService.isAvailable()) {
                 boolean addedToCalendar = googleCalendarService.addReservationToCalendar(reservation);
                 if (addedToCalendar) {
@@ -621,17 +525,15 @@ public class ReservationController {
                 showAlert("Réservation effectuée avec succès !");
             }
 
-            // Envoyer un email de confirmation avec lien Google Maps
             if (emailService != null && emailService.isAvailable()) {
                 boolean emailSent = emailService.sendReservationConfirmation(reservation);
                 if (emailSent) {
                     System.out.println("📧 Email de confirmation envoyé avec lien Google Maps");
-                    // Afficher un message informatif
                     Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
                     infoAlert.setTitle("📧 Email envoyé");
                     infoAlert.setHeaderText(null);
                     infoAlert.setContentText("Un email de confirmation a été envoyé à " + reservation.getEmail() +
-                        "\n\n🗺️ L'email contient un lien Google Maps pour vous rendre au lieu de l'événement.");
+                            "\n\n🗺️ L'email contient un lien Google Maps pour vous rendre au lieu de l'événement.");
                     infoAlert.showAndWait();
                 } else {
                     System.out.println("⚠️ Erreur lors de l'envoi de l'email");
@@ -639,16 +541,13 @@ public class ReservationController {
                 }
             }
 
-            // Fermer la fenêtre de réservation
             fermerFenetre();
 
         } catch (SQLException e) {
             System.err.println("Erreur lors de la réservation: " + e.getMessage());
 
-            // Gestion spécifique des erreurs de clé étrangère
             if (e.getMessage().contains("foreign key constraint fails")) {
                 showAlert("Erreur : L'événement sélectionné n'est plus disponible. Veuillez rafraîchir la liste des événements et réessayer.");
-                // Fermer la fenêtre de réservation
                 fermerFenetre();
             } else {
                 showAlert("Erreur lors de la réservation: " + e.getMessage());
@@ -681,13 +580,11 @@ public class ReservationController {
         }
     }
 
-    // ================= ANNULER =================
     @FXML
     void annulerRES(ActionEvent event) {
         goToCatalogue(event);
     }
 
-    // ================= NAVIGATION =================
     @FXML
     void goToCatalogue(ActionEvent event) {
         fermerFenetre();
@@ -703,7 +600,6 @@ public class ReservationController {
         updateLabels();
     }
 
-    // ================= UTILITY =================
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
@@ -744,25 +640,6 @@ public class ReservationController {
         }
     }
 
-    private void ouvrirPanierAutomatiquement() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Panier.fxml"));
-            Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setTitle("🛒 Mon Panier");
-            stage.setScene(new Scene(root));
-            stage.setWidth(1000);
-            stage.setHeight(750);
-            stage.setMinWidth(900);
-            stage.setMinHeight(650);
-            stage.centerOnScreen();
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Erreur lors de l'ouverture du panier");
-        }
-    }
-
     private void fermerFenetre() {
         if (EventDescription != null && EventDescription.getScene() != null) {
             Stage stage = (Stage) EventDescription.getScene().getWindow();
@@ -773,7 +650,7 @@ public class ReservationController {
     private boolean eventExists(int eventId) {
         try {
             String sql = "SELECT COUNT(*) FROM events WHERE id = ?";
-            java.sql.PreparedStatement ps = com.example.pi_dev.events.Utils.Mydatabase.getInstance().getConnextion().prepareStatement(sql);
+            java.sql.PreparedStatement ps = Mydatabase.getInstance().getConnextion().prepareStatement(sql);
             ps.setInt(1, eventId);
             java.sql.ResultSet rs = ps.executeQuery();
 

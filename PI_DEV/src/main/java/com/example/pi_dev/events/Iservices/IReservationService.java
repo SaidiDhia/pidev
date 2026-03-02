@@ -1,7 +1,6 @@
 package com.example.pi_dev.events.Iservices;
 
 import com.example.pi_dev.events.Entities.Reservation;
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -12,14 +11,11 @@ public interface IReservationService {
 
     // READ
     List<Reservation> afficher() throws SQLException;
-
     Reservation getById(int id) throws SQLException;
-
     List<Reservation> getByEvent(int idEvent) throws SQLException;
 
     // UPDATE
     void modifier(Reservation reservation) throws SQLException;
-
     void changerStatut(int idReservation, Reservation.StatutReservation statut) throws SQLException;
 
     // DELETE

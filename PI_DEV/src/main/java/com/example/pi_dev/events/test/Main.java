@@ -1,4 +1,4 @@
-package com.example.pi_dev.events.test; // doit correspondre au dossier /package
+package com.example.pi_dev.events.test;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,15 +11,12 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Charger le FXML principal
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Catalogue.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Catalogue.fxml"));
             Parent root = loader.load();
 
-            // Créer la scène
             Scene scene = new Scene(root);
 
-            // Configurer le stage
-            primaryStage.setTitle("Wonderlust - Catalogue");
+            primaryStage.setTitle("Wanderlust - Catalogue");
             primaryStage.setScene(scene);
             primaryStage.setWidth(1400);
             primaryStage.setHeight(900);
@@ -29,11 +26,11 @@ public class Main extends Application {
             primaryStage.show();
 
         } catch (Exception e) {
-            e.printStackTrace(); // affiche la vraie erreur
+            e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        launch(args); // lance JavaFX
+        launch(args);
     }
 }

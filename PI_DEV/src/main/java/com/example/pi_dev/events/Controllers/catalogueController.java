@@ -3,6 +3,10 @@ package com.example.pi_dev.events.Controllers;
 import com.example.pi_dev.events.Services.WeatherService;
 import com.example.pi_dev.events.Services.GoogleCalendarService;
 import com.example.pi_dev.events.Services.GoogleMapsService;
+import com.example.pi_dev.events.Utils.Mydatabase;
+import com.example.pi_dev.events.Entities.Event;
+import com.example.pi_dev.events.Entities.Activite;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +28,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
@@ -31,10 +36,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.pi_dev.events.Entities.Event;
-import com.example.pi_dev.events.Entities.Activite;
-import com.example.pi_dev.events.Utils.Mydatabase;
 
 public class catalogueController {
 
@@ -247,7 +248,6 @@ public class catalogueController {
         flowEvents.getChildren().clear();
 
         for (Activite activite : activitesList) {
-            // ✅ Correction : vérifier null avant d'appeler toLowerCase()
             String titre = activite.getTitre() != null ? activite.getTitre().toLowerCase() : "";
             String type = activite.getTypeActivite() != null ? activite.getTypeActivite().toLowerCase() : "";
             String desc = activite.getDescription() != null ? activite.getDescription().toLowerCase() : "";
@@ -258,7 +258,6 @@ public class catalogueController {
         }
 
         for (Event eventItem : eventsList) {
-            // ✅ Correction : vérifier null
             String organisateur = eventItem.getOrganisateur() != null ? eventItem.getOrganisateur().toLowerCase() : "";
             if (organisateur.contains(searchText)) {
                 addEventCard(eventItem);
@@ -286,20 +285,20 @@ public class catalogueController {
     @FXML
     void ouvrirGoogleCalendar(ActionEvent event) {
         try {
-            System.out.println(" Ouverture de l'interface Google Calendar...");
+            System.out.println("Ouverture de l'interface Google Calendar...");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/googleCalendar.fxml"));
             Parent root = loader.load();
-            
+
             Stage stage = new Stage();
-            stage.setTitle(" Google Calendar - Configuration");
+            stage.setTitle("Google Calendar - Configuration");
             stage.setScene(new Scene(root));
             stage.setWidth(500);
             stage.setHeight(600);
             stage.centerOnScreen();
             stage.show();
-            
-            System.out.println(" Interface Google Calendar ouverte avec succès");
-            
+
+            System.out.println("Interface Google Calendar ouverte avec succès");
+
         } catch (Exception e) {
             System.err.println("Erreur lors de l'ouverture de Google Calendar: " + e.getMessage());
             showAlert("Erreur", "Impossible d'ouvrir l'interface Google Calendar.");
@@ -309,20 +308,20 @@ public class catalogueController {
     @FXML
     void ouvrirGoogleMaps(ActionEvent event) {
         try {
-            System.out.println(" Ouverture de l'interface Google Maps...");
+            System.out.println("Ouverture de l'interface Google Maps...");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/googleMaps.fxml"));
             Parent root = loader.load();
-            
+
             Stage stage = new Stage();
-            stage.setTitle(" Google Maps - Localisation d'Événements");
+            stage.setTitle("Google Maps - Localisation d'Événements");
             stage.setScene(new Scene(root));
             stage.setWidth(850);
             stage.setHeight(750);
             stage.centerOnScreen();
             stage.show();
-            
-            System.out.println(" Interface Google Maps ouverte avec succès");
-            
+
+            System.out.println("Interface Google Maps ouverte avec succès");
+
         } catch (Exception e) {
             System.err.println("Erreur lors de l'ouverture de Google Maps: " + e.getMessage());
             showAlert("Erreur", "Impossible d'ouvrir l'interface Google Maps.");
@@ -335,7 +334,7 @@ public class catalogueController {
             System.out.println("Tentative d'ouverture de l'interface d'organisation d'événement...");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Event.fxml"));
             Parent root = loader.load();
-            
+
             Stage stage = new Stage();
             stage.setTitle("Organiser un événement");
             stage.setScene(new Scene(root));
@@ -343,9 +342,9 @@ public class catalogueController {
             stage.setHeight(650);
             stage.centerOnScreen();
             stage.show();
-            
+
             System.out.println("Interface d'organisation ouverte avec succès");
-            
+
         } catch (IOException e) {
             System.err.println("Erreur lors de l'ouverture de Event.fxml: " + e.getMessage());
             e.printStackTrace();
@@ -457,7 +456,6 @@ public class catalogueController {
 
         card.getChildren().addAll(imageView, titleLabel);
 
-        // ✅ Correction : vérifier null pour typeActivite
         if (activite.getTypeActivite() != null && !activite.getTypeActivite().isEmpty()) {
             Label typeLabel = new Label("Type: " + activite.getTypeActivite());
             typeLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
@@ -514,7 +512,6 @@ public class catalogueController {
             Label titleLabel = new Label(event.getOrganisateur() != null ? event.getOrganisateur() : "");
             titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a5f3f;");
 
-
             Label dateDebutLabel = new Label("📅 Début: " +
                     (event.getDateDebut() != null ? event.getDateDebut().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "Non défini"));
             dateDebutLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #333;");
@@ -538,14 +535,12 @@ public class catalogueController {
             Button modifierButton = new Button("✏️ Modifier");
             modifierButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 20; -fx-border-radius: 20; -fx-padding: 8 16; -fx-cursor: hand;");
 
-            // ✅ Correction : variable finale pour la lambda
             final Event eventFinal = event;
             modifierButton.setOnAction(e -> ouvrirModificationEvent(eventFinal));
 
             buttonBox.getChildren().add(modifierButton);
             card.getChildren().addAll(titleLabel, dateDebutLabel, dateFinLabel, prixLabel, capaciteLabel, placesLabel, buttonBox);
 
-            // ✅ Correction : variable finale pour la lambda
             card.setOnMouseClicked(e -> ouvrirReservation(eventFinal));
 
             flowEvents.getChildren().add(card);
@@ -576,23 +571,23 @@ public class catalogueController {
     private void ouvrirModificationEvent(Event event) {
         try {
             System.out.println("DEBUG: Ouverture modification pour l'événement ID: " + event.getId());
-            
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/modifierEvent.fxml"));
             if (loader.getLocation() == null) {
                 System.err.println("ERREUR: Fichier modifierEvent.fxml introuvable");
                 showAlert("Fichier de modification d'événement introuvable");
                 return;
             }
-            
+
             Parent root = loader.load();
             modifierEventController controller = loader.getController();
-            
+
             if (controller == null) {
                 System.err.println("ERREUR: Controller non trouvé dans le FXML");
                 showAlert("Controller de modification non trouvé");
                 return;
             }
-            
+
             controller.setEventId(event.getId());
             Stage stage = new Stage();
             stage.setTitle("Modifier l'événement: " + event.getOrganisateur());
@@ -602,14 +597,13 @@ public class catalogueController {
             stage.centerOnScreen();
             stage.show();
             stage.setOnHidden(e -> refreshData());
-            
+
             System.out.println("DEBUG: Fenêtre de modification ouverte avec succès");
-            
+
         } catch (IOException e) {
             System.err.println("ERREUR IOException lors de l'ouverture de la modification: " + e.getMessage());
             e.printStackTrace();
             showAlert("Erreur lors de l'ouverture de la modification: " + e.getMessage());
-            System.err.println("ERREUR générale lors de l'ouverture de la modification: " + e.getMessage());
         }
     }
 
@@ -620,7 +614,7 @@ public class catalogueController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-    
+
     private void showAlert(String message) {
         showAlert("Information", message);
     }
@@ -652,7 +646,6 @@ public class catalogueController {
     }
 
     private void updateWeatherDisplay(WeatherService.WeatherData weather, String city) {
-        // ✅ Correction : vérifier null pour weatherInfoContainer
         if (weatherInfoContainer == null) return;
 
         weatherInfoContainer.getChildren().clear();

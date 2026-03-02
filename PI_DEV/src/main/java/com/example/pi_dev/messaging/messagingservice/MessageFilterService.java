@@ -20,7 +20,7 @@ public class MessageFilterService {
             "cock", "suck", "blowjob", "whore", "slut", "fag", "retard",
 
             // Arabic bad words (common ones)
-            "كس", "شرموط", "عرص", "متناك", "ابن الكلب", "يا كلب",
+            "كس", "شرموط", "عرص", "ابن الكلب", "يا كلب",
             "يا حمار", "يا غبي", "خرة",  "كسمك", "كسم",
              "خول", "لوطي", "شرموطة", "نبيل",
 
@@ -32,7 +32,7 @@ public class MessageFilterService {
     // Stronger words that should block the message entirely
     private static final Set<String> STRONG_BAD_WORDS = new HashSet<>(Arrays.asList(
             // These words will block the message completely
-            "fuck", "shit", "putain", "merde", "كس", "شرموط", "قحب", "كسمك"
+            "fuck", "shit", "putain", "merde", "كس", "شرموط",  "كسمك"
     ));
 
     // Pattern to detect words with leetspeak (like f*ck, sh!t)

@@ -23,23 +23,12 @@ import java.text.DecimalFormat;
 
 public class PanierController {
 
-    @FXML
-    private VBox panierContainer;
-
-    @FXML
-    private HBox panierVideBox;
-
-    @FXML
-    private Text totalLabel;
-
-    @FXML
-    private Button retourCatalogueButton;
-
-    @FXML
-    private Button viderPanierButton;
-
-    @FXML
-    private Button validerPanierButton;
+    @FXML private VBox panierContainer;
+    @FXML private HBox panierVideBox;
+    @FXML private Text totalLabel;
+    @FXML private Button retourCatalogueButton;
+    @FXML private Button viderPanierButton;
+    @FXML private Button validerPanierButton;
 
     private DecimalFormat df = new DecimalFormat("#0.00");
 
@@ -48,26 +37,22 @@ public class PanierController {
     }
 
     private void afficherPanier() {
-        // Récupérer le panier depuis ReservationController
         ObservableList<Reservation> panier = ReservationController.panier;
         System.out.println("=== DEBUG: afficherPanier() appelé ===");
         System.out.println("Nombre de réservations dans le panier: " + panier.size());
-        
+
         panierContainer.getChildren().clear();
 
         if (panier.isEmpty()) {
             System.out.println("DEBUG: Panier vide - affichage du message vide");
-            // Afficher le message panier vide
             panierVideBox.setVisible(true);
             totalLabel.setText("0 TND");
             validerPanierButton.setDisable(true);
         } else {
             System.out.println("DEBUG: Panier non vide - affichage des réservations");
-            // Masquer le message panier vide
             panierVideBox.setVisible(false);
             validerPanierButton.setDisable(false);
 
-            // Afficher chaque réservation
             double total = 0;
             for (Reservation reservation : panier) {
                 System.out.println("DEBUG: Création de la carte pour réservation #" + reservation.getId() + " - " + reservation.getNomComplet());
@@ -76,7 +61,6 @@ public class PanierController {
                 total += reservation.getPrixUnitaire() * reservation.getNombrePersonnes();
             }
             System.out.println("DEBUG: Total calculé: " + total + " TND");
-            // Mettre à jour le total
             totalLabel.setText(df.format(total) + " TND");
         }
     }
@@ -87,7 +71,6 @@ public class PanierController {
         card.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 15;");
         card.setPrefWidth(900);
 
-        // Header de la carte
         HBox headerBox = new HBox();
         headerBox.setAlignment(Pos.CENTER_LEFT);
         headerBox.setSpacing(15);
@@ -107,7 +90,6 @@ public class PanierController {
 
         headerBox.getChildren().addAll(titreText, spacer, nomText, supprimerButton);
 
-        // Contenu de la réservation
         VBox contentBox = new VBox();
         contentBox.setSpacing(8);
 
@@ -139,7 +121,7 @@ public class PanierController {
 
         if (confirmation.showAndWait().get() == ButtonType.OK) {
             ReservationController.panier.remove(reservation);
-            afficherPanier(); // Rafraîchir l'affichage
+            afficherPanier();
         }
     }
 
@@ -152,7 +134,7 @@ public class PanierController {
 
         if (confirmation.showAndWait().get() == ButtonType.OK) {
             ReservationController.panier.clear();
-            afficherPanier(); // Rafraîchir l'affichage
+            afficherPanier();
         }
     }
 
@@ -173,16 +155,12 @@ public class PanierController {
         confirmation.setContentText("Confirmez la réservation de " + ReservationController.panier.size() + " événement(s) pour un total de " + totalLabel.getText());
 
         if (confirmation.showAndWait().get() == ButtonType.OK) {
-            // Ici vous pourriez ajouter la logique pour sauvegarder les réservations en base
-            // Par exemple : les marquer comme confirmées, envoyer un email, etc.
-            
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("Réservations validées");
             success.setHeaderText("🎉 Réservations confirmées!");
             success.setContentText("Vos " + ReservationController.panier.size() + " réservation(s) ont été validées avec succès.\n\nUn email de confirmation vous sera envoyé.");
             success.showAndWait();
 
-            // Vider le panier après validation
             ReservationController.panier.clear();
             afficherPanier();
         }

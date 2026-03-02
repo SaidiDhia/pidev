@@ -10,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.awt.Toolkit;
@@ -21,7 +20,6 @@ import java.io.File;
 public class ActiviteCardController {
 
     @FXML private Button catalog;
-    @FXML private Button disponibleButton;
     @FXML private Button partagerButton;
     @FXML private ImageView activiteImageView;
     @FXML private Label titreLabel;
@@ -65,15 +63,15 @@ public class ActiviteCardController {
                         activiteImageView.setImage(image);
                     } else {
                         // Image par défaut si le fichier n'existe pas
-                        activiteImageView.setImage(new Image("/images/default-activity.jpg"));
+                        loadDefaultImage();
                     }
                 } catch (Exception e) {
                     System.err.println("Erreur lors du chargement de l'image: " + e.getMessage());
-                    activiteImageView.setImage(new Image("/images/default-activity.jpg"));
+                    loadDefaultImage();
                 }
             } else {
                 // Image par défaut si pas de chemin
-                activiteImageView.setImage(new Image("/images/default-activity.jpg"));
+                loadDefaultImage();
             }
 
             // Afficher la catégorie si disponible
@@ -88,27 +86,6 @@ public class ActiviteCardController {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void loadActiviteImage(String imagePath) {
-        try {
-            if (imagePath != null && !imagePath.isEmpty() && !imagePath.equals("default.jpg")) {
-                File imageFile = new File(imagePath);
-                if (imageFile.exists()) {
-                    Image image = new Image(imageFile.toURI().toString());
-                    activiteImageView.setImage(image);
-                } else {
-                    // Image par défaut si le fichier n'existe pas
-                    loadDefaultImage();
-                }
-            } else {
-                // Image par défaut
-                loadDefaultImage();
-            }
-        } catch (Exception e) {
-            System.err.println("Erreur lors du chargement de l'image: " + imagePath);
-            loadDefaultImage();
         }
     }
 
@@ -167,30 +144,6 @@ public class ActiviteCardController {
     }
 
     @FXML
-    void marquerDisponible(ActionEvent event) {
-        try {
-            // Récupérer les informations de l'activité
-            String titre = (String) currentActivite.getClass().getMethod("getTitre").invoke(currentActivite);
-
-            // Afficher la confirmation
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Disponibilité");
-            alert.setHeaderText("✅ Activité marquée comme disponible");
-            alert.setContentText("L'activité '" + titre + "' est maintenant marquée comme disponible.\n\n" +
-                    "Les utilisateurs pourront maintenant réserver cette activité !");
-            alert.showAndWait();
-
-        } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erreur");
-            alert.setHeaderText("❌ Erreur lors du marquage");
-            alert.setContentText("Une erreur est survenue: " + e.getMessage());
-            alert.showAndWait();
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
     void reserver(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/events/Reservation.fxml"));
@@ -218,7 +171,7 @@ public class ActiviteCardController {
     }
 
     private void showAlert(String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
         alert.showAndWait();
     }

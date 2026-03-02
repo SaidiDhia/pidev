@@ -14,7 +14,6 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 
 public class modifierActiviteController {
 
@@ -62,7 +61,6 @@ public class modifierActiviteController {
     }
 
     private void initializeTypes() {
-        // Initialiser avec une liste vide
         typeactField.setPromptText("Veuillez d'abord sélectionner une catégorie");
     }
 
@@ -71,11 +69,11 @@ public class modifierActiviteController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir une image pour l'activité");
         fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp")
+                new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp")
         );
-        
+
         File selectedFile = fileChooser.showOpenDialog(new Stage());
-        
+
         if (selectedFile != null) {
             selectedImagePath = selectedFile.getAbsolutePath();
             imageField1.setText(selectedFile.getName());
@@ -85,24 +83,21 @@ public class modifierActiviteController {
 
     public void setActiviteData(Activite activite) {
         this.currentActivite = activite;
-        
+
         System.out.println("DEBUG Modification - ID: " + activite.getId());
         System.out.println("DEBUG Modification - Titre: " + activite.getTitre());
         System.out.println("DEBUG Modification - Type: " + activite.getTypeActivite());
         System.out.println("DEBUG Modification - Description: " + activite.getDescription());
         System.out.println("DEBUG Modification - Image: " + activite.getImage());
-        
-        // Pré-remplir les champs avec les données existantes
+
         titreField.setText(activite.getTitre());
         descriptionArea.setText(activite.getDescription());
         imageField1.setText(activite.getImage() != null ? activite.getImage() : "");
-        
-        // Gérer la catégorie et le type
+
         if (activite.getCategorie() != null) {
             categorieCombo.setValue(activite.getCategorie());
-            updateTypes(); // Mettre à jour les types selon la catégorie
-            
-            // Sélectionner le type correspondant
+            updateTypes();
+
             if (activite.getTypeActivite() != null) {
                 for (TypeActivite type : TypeActivite.getTypesByCategorie(activite.getCategorie())) {
                     if (type.getNom().equals(activite.getTypeActivite())) {
@@ -112,14 +107,13 @@ public class modifierActiviteController {
                 }
             }
         }
-        
-        // Mettre à jour le titre de la fenêtre
+
         if (titleLabel != null) {
             titleLabel.setText("Modifier l'activité: " + activite.getTitre());
         }
     }
 
-        @FXML
+    @FXML
     void modifier(ActionEvent event) {
         String titre = titreField.getText().trim();
         String description = descriptionArea.getText().trim();
@@ -127,37 +121,36 @@ public class modifierActiviteController {
         CategorieActivite categorie = categorieCombo.getValue();
         String imagePath = selectedImagePath.isEmpty() ? imageField1.getText().trim() : selectedImagePath;
 
-        // Validation des champs
         if (titre.isEmpty()) {
             showAlert("Le titre est obligatoire");
             titreField.requestFocus();
             return;
         }
-        
+
         if (titre.length() < 3 || titre.length() > 100) {
             showAlert("Le titre doit contenir entre 3 et 100 caractères");
             titreField.requestFocus();
             return;
         }
-        
+
         if (description.isEmpty()) {
             showAlert("La description est obligatoire");
             descriptionArea.requestFocus();
             return;
         }
-        
+
         if (description.length() < 10 || description.length() > 500) {
             showAlert("La description doit contenir entre 10 et 500 caractères");
             descriptionArea.requestFocus();
             return;
         }
-        
+
         if (categorie == null) {
             showAlert("La catégorie est obligatoire");
             categorieCombo.requestFocus();
             return;
         }
-        
+
         if (type == null) {
             showAlert("Le type d'activité est obligatoire");
             typeactField.requestFocus();
@@ -173,9 +166,9 @@ public class modifierActiviteController {
             pstmt.setString(4, categorie.name());
             pstmt.setString(5, imagePath);
             pstmt.setInt(6, currentActivite.getId());
-            
+
             int rowsAffected = pstmt.executeUpdate();
-            
+
             if (rowsAffected > 0) {
                 showAlert("Activité modifiée avec succès");
                 fermerFenetre();
@@ -195,16 +188,16 @@ public class modifierActiviteController {
             String sql = "DELETE FROM activites WHERE id = ?";
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, currentActivite.getId());
-            
+
             int rowsAffected = pstmt.executeUpdate();
-            
+
             if (rowsAffected > 0) {
                 showAlert("Activité supprimée avec succès");
                 fermerFenetre();
             } else {
                 showAlert("Erreur lors de la suppression de l'activité");
             }
-            
+
         } catch (SQLException e) {
             showAlert("Erreur lors de la suppression: " + e.getMessage());
             e.printStackTrace();
@@ -224,20 +217,17 @@ public class modifierActiviteController {
     private void fermerFenetre() {
         Stage stage = (Stage) titreField.getScene().getWindow();
         stage.close();
-        
-        // Rafraîchir le catalogue automatiquement
+
         CatalogueRefreshManager.getInstance().requestRefresh();
         refreshCatalogue();
     }
-    
+
     private void refreshCatalogue() {
         try {
-            // Trouver toutes les fenêtres ouvertes et rafraîchir les catalogues
             for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
                 if (window instanceof Stage) {
                     Stage stage = (Stage) window;
                     if (stage.getTitle() != null && stage.getTitle().contains("Catalogue")) {
-                        // Envoyer un événement de rafraîchissement
                         stage.requestFocus();
                         break;
                     }

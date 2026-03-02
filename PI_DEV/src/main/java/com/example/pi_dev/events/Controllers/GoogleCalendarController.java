@@ -2,10 +2,7 @@ package com.example.pi_dev.events.Controllers;
 
 import com.example.pi_dev.events.Services.GoogleCalendarService;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -22,20 +19,18 @@ public class GoogleCalendarController implements Initializable {
     @FXML private Button syncButton;
     @FXML private ProgressBar progressBar;
     @FXML private VBox infoContainer;
-    
+
     private GoogleCalendarService calendarService;
     private boolean isConnected = false;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         calendarService = new GoogleCalendarService();
-        
-        // Initialiser le service
+
         boolean initialized = calendarService.initialize();
         updateStatus(initialized);
-        
+
         if (initialized) {
-            // Tester la connexion automatiquement
             testConnection();
         }
     }
@@ -45,14 +40,13 @@ public class GoogleCalendarController implements Initializable {
         try {
             updateStatus(false);
             progressBar.setVisible(true);
-            
-            // Simulation pour l'instant
-            showAlert("🔑 Mode Simulation", 
-                "Google Calendar est en mode simulation. En production, cette action ouvrirait la page d'authentification Google.");
-            
+
+            showAlert("🔑 Mode Simulation",
+                    "Google Calendar est en mode simulation. En production, cette action ouvrirait la page d'authentification Google.");
+
             isConnected = true;
             updateStatus(true);
-            
+
         } catch (Exception e) {
             System.err.println("Erreur lors de la connexion: " + e.getMessage());
             showAlert("❌ Erreur de connexion", "Impossible d'ouvrir la page d'authentification.");
@@ -70,10 +64,9 @@ public class GoogleCalendarController implements Initializable {
         try {
             progressBar.setVisible(true);
             statusLabel.setText("🔄 Test de connexion...");
-            
-            // Simulation du test
+
             boolean connected = calendarService.testConnection();
-            
+
             if (connected) {
                 isConnected = true;
                 updateStatus(true);
@@ -83,7 +76,7 @@ public class GoogleCalendarController implements Initializable {
                 updateStatus(false);
                 showAlert("❌ Échec de connexion", "Impossible de se connecter à Google Calendar.");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Erreur lors du test: " + e.getMessage());
             isConnected = false;
@@ -103,20 +96,19 @@ public class GoogleCalendarController implements Initializable {
         try {
             progressBar.setVisible(true);
             statusLabel.setText("🔄 Synchronisation...");
-            
-            // Simuler la synchronisation
+
             int syncedCount = calendarService.syncAllReservations(
-                    com.example.pi_dev.events.Controllers.ReservationController.panier
+                    ReservationController.panier
             );
-            
+
             if (syncedCount > 0) {
-                showAlert("✅ Synchronisation réussie", 
-                    syncedCount + " réservations ont été synchronisées avec Google Calendar.");
+                showAlert("✅ Synchronisation réussie",
+                        syncedCount + " réservations ont été synchronisées avec Google Calendar.");
             } else {
-                showAlert("ℹ️ Synchronisation terminée", 
-                    "Aucune réservation à synchroniser.");
+                showAlert("ℹ️ Synchronisation terminée",
+                        "Aucune réservation à synchroniser.");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Erreur lors de la synchronisation: " + e.getMessage());
             showAlert("❌ Erreur de synchronisation", "Impossible de synchroniser les réservations.");
@@ -137,33 +129,31 @@ public class GoogleCalendarController implements Initializable {
             statusLabel.setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold;");
             connectButton.setText("🔄 Se reconnecter");
             syncButton.setDisable(false);
-            
-            // Ajouter les informations de connexion
+
             infoContainer.getChildren().clear();
             Label infoLabel = new Label("✅ Google Calendar est connecté et prêt à synchroniser vos réservations.");
             infoLabel.setStyle("-fx-text-fill: #155724; -fx-font-style: italic;");
             infoContainer.getChildren().add(infoLabel);
-            
+
         } else {
             statusLabel.setText("📅 Google Calendar Non Connecté");
             statusLabel.setStyle("-fx-text-fill: #dc3545; -fx-font-weight: bold;");
             connectButton.setText("🔑 Se connecter");
             syncButton.setDisable(true);
-            
-            // Ajouter les instructions de connexion
+
             infoContainer.getChildren().clear();
             Label instructionLabel = new Label("📋 Pour connecter Google Calendar :");
             instructionLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-            
+
             Label step1 = new Label("1. Cliquez sur 'Se connecter'");
             Label step2 = new Label("2. Authentifiez-vous avec votre compte Google");
             Label step3 = new Label("3. Autorisez l'accès à Google Calendar");
             Label step4 = new Label("4. Revenez ici et testez la connexion");
-            
+
             VBox stepsBox = new VBox(5);
             stepsBox.getChildren().addAll(step1, step2, step3, step4);
             stepsBox.setStyle("-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-background-radius: 5;");
-            
+
             infoContainer.getChildren().addAll(instructionLabel, stepsBox);
         }
     }

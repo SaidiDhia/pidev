@@ -1,7 +1,6 @@
 package com.example.pi_dev.events.Iservices;
 
 import com.example.pi_dev.events.Entities.Activite;
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -12,7 +11,6 @@ public interface IActiviteService {
 
     // READ
     List<Activite> afficher() throws SQLException;
-
     Activite getById(int id) throws SQLException;
 
     // UPDATE

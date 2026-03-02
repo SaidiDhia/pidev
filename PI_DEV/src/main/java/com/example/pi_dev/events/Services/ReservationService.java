@@ -32,13 +32,11 @@ public class ReservationService {
 
         ps.executeUpdate();
 
-        // Récupérer l'ID généré
         ResultSet generatedKeys = ps.getGeneratedKeys();
         if (generatedKeys.next()) {
             r.setId(generatedKeys.getInt(1));
         }
 
-        // diminuer les places automatiquement
         EventService es = new EventService();
         es.diminuerPlaces(r.getIdEvent(), r.getNombrePersonnes());
     }
@@ -59,17 +57,8 @@ public class ReservationService {
             r.setEmail(rs.getString("email"));
             r.setTelephone(rs.getString("telephone"));
             r.setNombrePersonnes(rs.getInt("nombre_personnes"));
-            // r.setPrixTotal(rs.getDouble("prix_total")); // Supprimé car la colonne n'existe pas
-            
-            // Conversion de la date - supprimé car la colonne n'existe pas
-            // java.sql.Timestamp ts = rs.getTimestamp("date_reservation");
-            // if (ts != null) {
-            //     r.setDateReservation(ts.toLocalDateTime());
-            // }
-            
             r.setDemandesSpeciales(rs.getString("demandes_speciales"));
-            
-            // Conversion du statut
+
             String statutStr = rs.getString("statut");
             if (statutStr != null) {
                 try {
@@ -78,7 +67,7 @@ public class ReservationService {
                     r.setStatut(Reservation.StatutReservation.EN_ATTENTE);
                 }
             }
-            
+
             list.add(r);
         }
         return list;
@@ -87,7 +76,6 @@ public class ReservationService {
     //  UPDATE
     public void modifier(Reservation r) throws SQLException {
 
-        // 1️ récupérer ancienne réservation
         String selectSql = "SELECT nombre_personnes, id_event FROM reservations WHERE id = ?";
         PreparedStatement selectPs = cnx.prepareStatement(selectSql);
         selectPs.setInt(1, r.getId());
@@ -101,7 +89,6 @@ public class ReservationService {
             ancienEvent = rs.getInt("id_event");
         }
 
-        // update réservation
         String updateSql = "UPDATE reservations SET id_event=?, nom_complet=?, email=?, telephone=?, nombre_personnes=?, demandes_speciales=?, statut=? WHERE id=?";
 
         PreparedStatement ps = cnx.prepareStatement(updateSql);
@@ -117,14 +104,9 @@ public class ReservationService {
 
         ps.executeUpdate();
 
-        // ajuster les places
-
         EventService es = new EventService();
 
-        // restituer anciennes places
         es.diminuerPlaces(ancienEvent, -ancienNombre);
-
-        // diminuer nouvelles places
         es.diminuerPlaces(r.getIdEvent(), r.getNombrePersonnes());
     }
 
@@ -136,7 +118,6 @@ public class ReservationService {
     //  DELETE
     public void supprimer(int idReservation) throws SQLException {
 
-        //  récupérer infos réservation
         String selectSql = "SELECT id_event, nombre_personnes FROM reservations WHERE id=?";
         PreparedStatement selectPs = cnx.prepareStatement(selectSql);
         selectPs.setInt(1, idReservation);
@@ -150,13 +131,11 @@ public class ReservationService {
             nombre = rs.getInt("nombre_personnes");
         }
 
-        // 2 supprimer réservation
         String deleteSql = "DELETE FROM reservations WHERE id=?";
         PreparedStatement deletePs = cnx.prepareStatement(deleteSql);
         deletePs.setInt(1, idReservation);
         deletePs.executeUpdate();
 
-        // 3️⃣ restituer places
         EventService es = new EventService();
         es.diminuerPlaces(idEvent, -nombre);
     }

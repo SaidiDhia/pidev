@@ -13,7 +13,6 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 
 public class AjoutActiviteController {
 
@@ -67,11 +66,11 @@ public class AjoutActiviteController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir une image pour l'activité");
         fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp")
+                new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.gif", "*.bmp")
         );
-        
+
         File selectedFile = fileChooser.showOpenDialog(new Stage());
-        
+
         if (selectedFile != null) {
             selectedImagePath = selectedFile.getAbsolutePath();
             imageField1.setText(selectedFile.getName());
@@ -93,31 +92,31 @@ public class AjoutActiviteController {
             titreField.requestFocus();
             return;
         }
-        
+
         if (titre.length() < 3 || titre.length() > 100) {
             showAlert("Le titre doit contenir entre 3 et 100 caractères");
             titreField.requestFocus();
             return;
         }
-        
+
         if (description.isEmpty()) {
             showAlert("La description est obligatoire");
             descriptionArea.requestFocus();
             return;
         }
-        
+
         if (description.length() < 10 || description.length() > 500) {
             showAlert("La description doit contenir entre 10 et 500 caractères");
             descriptionArea.requestFocus();
             return;
         }
-        
+
         if (categorie == null) {
             showAlert("La catégorie est obligatoire");
             categorieCombo.requestFocus();
             return;
         }
-        
+
         if (type == null) {
             showAlert("Le type d'activité est obligatoire");
             typeactField.requestFocus();
@@ -156,12 +155,12 @@ public class AjoutActiviteController {
     private void fermerFenetre() {
         Stage stage = (Stage) titreField.getScene().getWindow();
         stage.close();
-        
+
         // Rafraîchir le catalogue automatiquement
         CatalogueRefreshManager.getInstance().requestRefresh();
         refreshCatalogue();
     }
-    
+
     private void refreshCatalogue() {
         try {
             // Trouver toutes les fenêtres ouvertes et rafraîchir les catalogues

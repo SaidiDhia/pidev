@@ -1,6 +1,7 @@
 package com.example.pi_dev.events.Controllers;
 
 import com.example.pi_dev.events.Entities.Event;
+import com.example.pi_dev.events.Entities.Activite;
 import com.example.pi_dev.events.Services.WeatherService;
 import com.example.pi_dev.events.Utils.Mydatabase;
 import javafx.event.ActionEvent;
@@ -55,7 +56,6 @@ public class modifierEventController implements Initializable {
     private Connection connection;
     private WeatherService weatherService;
     private List<Object> activitesList = new ArrayList<>();
-    private List<Object> activitesSelectionnees = new ArrayList<>();
     private Event currentEvent;
     private List<String> photosPaths = new ArrayList<>();
     private String imagePrincipalePath;
@@ -94,12 +94,16 @@ public class modifierEventController implements Initializable {
                 String description = rs.getString("description");
                 String imagePath = rs.getString("image");
 
-                Object activite = createActiviteObject(id, titre, type, description, imagePath);
-                if (activite != null) {
-                    activitesList.add(activite);
-                    activiteCombo.getItems().add(titre);
-                    System.out.println("Activité ajoutée au combo: " + titre);
-                }
+                Activite activite = new Activite();
+                activite.setId(id);
+                activite.setTitre(titre);
+                activite.setTypeActivite(type);
+                activite.setDescription(description);
+                activite.setImage(imagePath);
+
+                activitesList.add(activite);
+                activiteCombo.getItems().add(titre);
+                System.out.println("Activité ajoutée au combo: " + titre);
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors du chargement des activités: " + e.getMessage());
@@ -107,23 +111,6 @@ public class modifierEventController implements Initializable {
         }
     }
 
-    private Object createActiviteObject(int id, String titre, String type, String description, String imagePath) {
-        try {
-            com.example.pi_dev.events.Entities.Activite activite = new com.example.pi_dev.events.Entities.Activite();
-            activite.setId(id);
-            activite.setTitre(titre);
-            activite.setTypeActivite(type);
-            activite.setDescription(description);
-            activite.setImage(imagePath);
-            return activite;
-        } catch (Exception e) {
-            System.err.println("Erreur création Activite: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // Méthode pour charger les données d'un événement existant
     public void setEventId(int eventId) {
         try {
             String sql = "SELECT * FROM events WHERE id = ?";
@@ -156,14 +143,12 @@ public class modifierEventController implements Initializable {
         }
     }
 
-    // Méthode pour charger les données d'un événement existant
     public void setEventData(Event event) {
         this.currentEvent = event;
-        
+
         try {
             System.out.println("DEBUG: Chargement de l'événement ID: " + event.getId());
-            
-            // Remplir les champs avec les données de l'événement
+
             if (nomorgField != null) {
                 nomorgField.setText(event.getOrganisateur() != null ? event.getOrganisateur() : "");
             }
@@ -193,16 +178,14 @@ public class modifierEventController implements Initializable {
             if (capaciteField != null) {
                 capaciteField.setText(event.getCapaciteMax() != null ? String.valueOf(event.getCapaciteMax()) : "20");
             }
-            
-            // Dates
+
             if (dateDebutPicker != null && event.getDateDebut() != null) {
                 dateDebutPicker.setValue(event.getDateDebut().toLocalDate());
             }
             if (dateFinPicker != null && event.getDateFin() != null) {
                 dateFinPicker.setValue(event.getDateFin().toLocalDate());
             }
-            
-            // Image principale
+
             if (imagePrincipaleView != null && event.getImage() != null && !event.getImage().trim().isEmpty()) {
                 try {
                     File imageFile = new File(event.getImage());
@@ -218,23 +201,20 @@ public class modifierEventController implements Initializable {
                     System.err.println("Erreur lors du chargement de l'image: " + e.getMessage());
                 }
             }
-            
-            // Sélectionner l'activité associée
+
             if (activiteCombo != null && event.getIdActivite() > 0) {
                 for (int i = 0; i < activitesList.size(); i++) {
-                    if (activitesList.get(i) instanceof com.example.pi_dev.events.Entities.Activite) {
-                        com.example.pi_dev.events.Entities.Activite activite = (com.example.pi_dev.events.Entities.Activite) activitesList.get(i);
-                        if (activite.getId() == event.getIdActivite()) {
-                            activiteCombo.getSelectionModel().select(i);
-                            System.out.println("DEBUG: Activité sélectionnée: " + activite.getTitre());
-                            break;
-                        }
+                    Activite activite = (Activite) activitesList.get(i);
+                    if (activite.getId() == event.getIdActivite()) {
+                        activiteCombo.getSelectionModel().select(i);
+                        System.out.println("DEBUG: Activité sélectionnée: " + activite.getTitre());
+                        break;
                     }
                 }
             }
-            
+
             System.out.println("DEBUG: Événement chargé avec succès");
-            
+
         } catch (Exception e) {
             System.err.println("Erreur lors de la récupération des données de l'événement: " + e.getMessage());
             e.printStackTrace();
@@ -316,12 +296,10 @@ public class modifierEventController implements Initializable {
                 return;
             }
 
-            // Récupérer l'ID de l'activité sélectionnée
             int activiteId = getSelectedActiviteId();
 
-            // Mettre à jour l'événement dans la base de données
             String sql = "UPDATE events SET id_activite = ?, lieu = ?, organisateur = ?, email = ?, telephone = ?, description = ?, materiels_necessaires = ?, date_debut = ?, date_fin = ?, prix = ?, capacite_max = ?, places_disponibles = ?, statut = ?, date_modification = CURRENT_TIMESTAMP, video_youtube = ?, image = ? WHERE id = ?";
-            
+
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, activiteId);
             pstmt.setString(2, lieu);
@@ -344,8 +322,7 @@ public class modifierEventController implements Initializable {
 
             if (rowsAffected > 0) {
                 showAlert("Événement modifié avec succès!");
-                
-                // Rafraîchir le catalogue automatiquement
+
                 CatalogueRefreshManager.getInstance().requestRefresh();
                 fermerFenetre();
             } else {
@@ -364,8 +341,8 @@ public class modifierEventController implements Initializable {
         if (selectedTitre != null && !selectedTitre.trim().isEmpty()) {
             try {
                 for (Object activiteObj : activitesList) {
-                    if (activiteObj != null && activiteObj instanceof com.example.pi_dev.events.Entities.Activite) {
-                        com.example.pi_dev.events.Entities.Activite currentActivite = (com.example.pi_dev.events.Entities.Activite) activiteObj;
+                    if (activiteObj instanceof Activite) {
+                        Activite currentActivite = (Activite) activiteObj;
                         if (selectedTitre.equals(currentActivite.getTitre())) {
                             return currentActivite.getId();
                         }
@@ -375,7 +352,7 @@ public class modifierEventController implements Initializable {
                 System.err.println("Erreur lors de la récupération de l'ID de l'activité: " + e.getMessage());
             }
         }
-        return 1; // Valeur par défaut
+        return 1;
     }
 
     @FXML
@@ -383,18 +360,16 @@ public class modifierEventController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir une image pour l'événement");
         fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif")
         );
 
         File selectedFile = fileChooser.showOpenDialog(null);
         if (selectedFile != null) {
             try {
-                // Charger et afficher l'image
                 Image image = new Image(selectedFile.toURI().toString());
                 imagePrincipaleView.setImage(image);
                 imagePrincipalePath = selectedFile.getAbsolutePath();
 
-                // Mettre à jour le label
                 imageStatusLabel.setText("Nouvelle image: " + selectedFile.getName());
 
                 System.out.println("Image sélectionnée: " + imagePrincipalePath);
@@ -409,27 +384,27 @@ public class modifierEventController implements Initializable {
     void ajouterPhoto(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Ajouter des photos supplémentaires");
-        
+
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-            "Fichiers images (*.jpg, *.jpeg, *.png, *.gif)", "*.jpg", "*.jpeg", "*.png", "*.gif");
+                "Fichiers images (*.jpg, *.jpeg, *.png, *.gif)", "*.jpg", "*.jpeg", "*.png", "*.gif");
         fileChooser.getExtensionFilters().add(extFilter);
-        
+
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(null);
-        
+
         if (selectedFiles != null && !selectedFiles.isEmpty()) {
             for (File selectedFile : selectedFiles) {
                 try {
                     String fileName = System.currentTimeMillis() + "_" + selectedFile.getName();
                     Path targetPath = Paths.get(UPLOADS_DIR + fileName);
                     Files.copy(selectedFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-                    
+
                     String photoPath = UPLOADS_DIR + fileName;
                     photosPaths.add(photoPath);
-                    
+
                     createPhotoThumbnail(photoPath, selectedFile);
-                    
+
                     System.out.println("Photo supplémentaire ajoutée: " + photoPath);
-                    
+
                 } catch (IOException e) {
                     System.err.println("Erreur lors de la copie de la photo: " + e.getMessage());
                 }
@@ -473,7 +448,7 @@ public class modifierEventController implements Initializable {
         alert.setTitle("Supprimer l'événement");
         alert.setHeaderText("Êtes-vous sûr de vouloir supprimer cet événement ?");
         alert.setContentText("Cette action est irréversible et supprimera définitivement l'événement.");
-        
+
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK && currentEvent != null) {
                 try {
@@ -481,7 +456,7 @@ public class modifierEventController implements Initializable {
                     PreparedStatement pstmt = connection.prepareStatement(sql);
                     pstmt.setInt(1, currentEvent.getId());
                     int rowsAffected = pstmt.executeUpdate();
-                    
+
                     if (rowsAffected > 0) {
                         showAlert("Événement supprimé avec succès!");
                         CatalogueRefreshManager.getInstance().requestRefresh();
