@@ -18,7 +18,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.control.Separator?>
 
-<BorderPane prefHeight="800.0" prefWidth="1100.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.Controllers.AdminDashboardController">
+<BorderPane prefHeight="800.0" prefWidth="1100.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.Controllers.Users.AdminDashboardController">
     <top>
         <VBox styleClass="navbar" style="-fx-background-color: #2563eb;">
             <children>

@@ -6,171 +6,170 @@
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/EventsMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/EventsMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/GeminiDirectTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/GeminiDirectTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/HelloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/HelloController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/MainTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/MainTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/MessagingMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/MessagingMain.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/UserMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/UserMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Controllers/BlogController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Commentaire.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Post.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Reaction.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IcommentaireServices.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IpostServices.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IreactionServices.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/AI_ModerationService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Commentaire_Services.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/ModerationResult.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Posting_Services.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Reaction_Services.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/SaveService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/TranslationService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Test/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Utils/BlogDataBase.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Admin/AdminAllPlacesController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Admin/AdminDashboardController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Admin/AdminRentingsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Admin/AdminReservationsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/AppController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/BookingDialogController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/MyBookingsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/PlaceBrowseController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/PlaceDetailsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/ReviewDialogController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Host/MyPlacesController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Host/PlaceFormController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Entities/Booking.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Entities/GeoPoint.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Entities/Place.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Entities/Review.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Iservices/IBookingService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Iservices/IPlaceService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/AiReviewResult.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/AiReviewService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/BookingService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/GeoService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/PlaceService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/ReceiptService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/ReviewService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Mydatabase.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Session.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/test/MainFX.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/common/models/ActivityLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/common/models/ActivityLog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Controllers/BlogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Blog/BlogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Commentaire.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Commentaire.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Post.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Entities/Reaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Reaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/GUI/MainApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/BlogGUI/MainApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IcommentaireServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IcommentaireServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IpostServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IpostServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Iservices/IreactionServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IreactionServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/AI_ModerationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/AI_ModerationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Commentaire_Services.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Commentaire_Services.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/ModerationResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/ModerationResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Posting_Services.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Posting_Services.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/Reaction_Services.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Reaction_Services.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/SaveService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/SaveService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Services/TranslationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/TranslationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Test/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Test/Blog/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/blog/Utils/BlogDataBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Blog/BlogDataBase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Admin/AdminAllPlacesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminAllPlacesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Admin/AdminDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminDashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Admin/AdminRentingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminRentingsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Admin/AdminReservationsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminReservationsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/AppController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/AppController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/BookingDialogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/BookingDialogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/MyBookingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/MyBookingsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/PlaceBrowseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/PlaceBrowseController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/PlaceDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/PlaceDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Front/ReviewDialogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/ReviewDialogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Host/MyPlacesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/MyPlacesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Controllers/Host/PlaceFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/PlaceFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Entities/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Booking.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Entities/GeoPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/GeoPoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Entities/Place.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Place.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Entities/Review.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Review.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Iservices/IBookingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Booking/IBookingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Iservices/IPlaceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Booking/IPlaceService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/AiReviewResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/AiReviewResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/AiReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/AiReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/BookingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/BookingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/GeoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/GeoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/PlaceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/PlaceService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/ReceiptService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/ReceiptService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Services/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/ReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Booking/Mydatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/Utils/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Booking/Session.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/booking/test/MainFX.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Test/Booking/MainFX.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/common/services/ActivityLogService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/common/services/ActivityLogService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/dashboard/DashboardMain.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/ActiviteCardController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/AjoutActiviteController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/CatalogueRefreshManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/EventController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/GoogleCalendarController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/GoogleMapsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/PanierController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/QRCodeController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/ReservationController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/TestEventFeatures.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/catalogueController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/modifierActiviteController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/modifierEventController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/Activite.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/CategorieActivite.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/Event.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/EventPhoto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/Reservation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/TypeActivite.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Iservices/IActiviteService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Iservices/IEventService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Iservices/IReservationService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/ActiviteService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/EmailService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/EventPhotoService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/EventService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/GoogleCalendarService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/GoogleMapsService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/ReservationService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/WeatherService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Utils/Mydatabase.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/test/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/main/controllers/MainLayoutController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/CartController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/FactureDetailsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/FactureListController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/LivraisonController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/OrdersManagementController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductAvailableController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductDetailsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductManagementController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/RoleSelectionController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/StatsDashboardController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ajouterPersonneController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Cart.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/DeliveryAddress.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Facture.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/FactureProduct.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Panier.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Product.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Iservices/IPanierService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Iservices/IproductServices.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/CartService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/CurrencyService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/DeliveryAddressService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/EmailService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/FactureProductService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/FactureService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/PanierService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/ProductService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/CloudinaryConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/ImageUploader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/Mydatabase.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/QRCodeGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/ActiviteCardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/ActiviteCardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/AjoutActiviteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/AjoutActiviteController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/CatalogueRefreshManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/CatalogueRefreshManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/EventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/EventController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/GoogleCalendarController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/GoogleCalendarController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/GoogleMapsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/GoogleMapsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/PanierController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/PanierController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/QRCodeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/QRCodeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/ReservationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/TestEventFeatures.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/TestEventFeatures.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/catalogueController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/catalogueController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/modifierActiviteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/modifierActiviteController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Controllers/modifierEventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/modifierEventController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/Activite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Events/Activite.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/CategorieActivite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Events/CategorieActivite.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Events/Event.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/EventPhoto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Events/EventPhoto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Events/Reservation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Entities/TypeActivite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Events/TypeActivite.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Iservices/IActiviteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Events/IActiviteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Iservices/IEventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Events/IEventService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Iservices/IReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Events/IReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/ActiviteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Events/ActiviteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Events/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/EventPhotoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Events/EventPhotoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/EventService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Events/EventService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/GoogleCalendarService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Events/GoogleCalendarService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/GoogleMapsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Events/GoogleMapsService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Events/ReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Services/WeatherService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Events/WeatherService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/Utils/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Events/Mydatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/events/test/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Test/Events/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/main/controllers/MainLayoutController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Main/MainLayoutController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/CartController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/CartController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/FactureDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/FactureDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/FactureListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/FactureListController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/LivraisonController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/LivraisonController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/OrdersManagementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/OrdersManagementController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductAvailableController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/ProductAvailableController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/ProductDetailsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ProductManagementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/ProductManagementController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/RoleSelectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/RoleSelectionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/StatsDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/StatsDashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Controllers/ajouterPersonneController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Marketplace/ajouterPersonneController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Cart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Marketplace/Cart.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/DeliveryAddress.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Marketplace/DeliveryAddress.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Facture.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Marketplace/Facture.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/FactureProduct.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Marketplace/FactureProduct.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Panier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Marketplace/Panier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Entites/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Marketplace/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Iservices/IPanierService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Marketplace/IPanierService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Iservices/IproductServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Marketplace/IproductServices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/CartService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Marketplace/CartService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/CurrencyService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Marketplace/CurrencyService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/DeliveryAddressService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Marketplace/DeliveryAddressService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Marketplace/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/FactureProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Marketplace/FactureProductService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/FactureService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Marketplace/FactureService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/PanierService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Marketplace/PanierService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Services/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Marketplace/ProductService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/CloudinaryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Marketplace/CloudinaryConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/ImageUploader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Marketplace/ImageUploader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Marketplace/Mydatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/Utils/QRCodeGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Marketplace/QRCodeGenerator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/example/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/MainFx.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ChatController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ImageMessageCell.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ParticipantManagementDialog.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingdatabase/DatabaseConnection.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/Conversation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/ConversationParticipant.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/Message.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/Reaction.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/ConversationRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/ConversationUserRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/MessageRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/ReactionRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/UserRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/AudioRecorderService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/FileUploadService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/GeminiService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/MessageFilterService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/SimpleTTSService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingsession/Session.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/UserCrudConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/UserCrudConsole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/UserMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/UserMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/AdminDashboardController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/ForgotPasswordController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/LoginController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SettingsController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SignupController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/TwoFactorController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/UserFormController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/enums/RoleEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/enums/RoleEnum.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/enums/TFAMethod.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/enums/TFAMethod.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/PasswordResetToken.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/TFASecret.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/User.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/repositories/UserRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/DeepFaceService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/EmailService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/IUserService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/PasswordResetService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/TwoFactorService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/UserService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/utils/JwtUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/utils/UserSession.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Test/Marketplace/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/marketplace/test/MainFx.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Test/Marketplace/MainFx.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Messaging/ChatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ImageMessageCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Messaging/ImageMessageCell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagecontroller/ParticipantManagementDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Messaging/ParticipantManagementDialog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingdatabase/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Database/Messaging/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/Conversation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Messaging/Conversation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/ConversationParticipant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Messaging/ConversationParticipant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Messaging/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingmodel/Reaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Messaging/Reaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/ConversationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Repositories/Messaging/ConversationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/ConversationUserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Repositories/Messaging/ConversationUserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/MessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Repositories/Messaging/MessageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/ReactionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Repositories/Messaging/ReactionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingrepository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Repositories/Messaging/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/AudioRecorderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Messaging/AudioRecorderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/FileUploadService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Messaging/FileUploadService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/GeminiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Messaging/GeminiService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/MessageFilterService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Messaging/MessageFilterService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingservice/SimpleTTSService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Messaging/SimpleTTSService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/messaging/messagingsession/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Session/Session.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/UserCrudConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/UserCrudConsole.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/UserMain.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/AdminDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/AdminDashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/ForgotPasswordController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/ForgotPasswordController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SettingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/SettingsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/SignupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/SignupController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/TwoFactorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/TwoFactorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/controllers/UserFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/UserFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/database/UserDatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Database/Users/UserDatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/enums/RoleEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/enums/RoleEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/enums/TFAMethod.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/enums/TFAMethod.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/PasswordResetToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Users/PasswordResetToken.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/TFASecret.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Users/TFASecret.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Users/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Repositories/Users/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/DeepFaceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Users/DeepFaceService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Users/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/IUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Users/IUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/PasswordResetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Users/PasswordResetService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/TwoFactorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Users/TwoFactorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/services/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Users/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/utils/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Users/JwtUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/user/utils/UserSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Users/UserSession.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/BlogView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/BlogView.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/AppShell.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/AppShell.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminAllPlaces.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminAllPlaces.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminDashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminDashboard.fxml" afterDir="false" />
@@ -194,7 +193,9 @@
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/googleMaps.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/googleMaps.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/modifierEvent.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/modifierEvent.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/modifsuppActivite.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/events/modifsuppActivite.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/hello-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/hello-view.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/main/main_layout.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/main/main_layout.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/css/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/BuyerHome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/BuyerHome.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/Cart.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/Cart.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/FactureDetails.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/FactureDetails.fxml" afterDir="false" />
@@ -207,6 +208,8 @@
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/SellerHome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/SellerHome.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/StatsDashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/StatsDashboard.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/product_management.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/product_management.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat-dark.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat-dark.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/messagingchat.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/2fa.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/2fa.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/admin_dashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/admin_dashboard.fxml" afterDir="false" />
@@ -214,9 +217,12 @@
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/login.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/settings.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/settings.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/signup.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/user_form.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/user/user_form.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/messaging/messagingrepository/ConversationRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/messaging/messagingrepository/ConversationRepositoryTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/messaging/messagingrepository/MessageRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/messaging/messagingrepository/MessageRepositoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/weather-config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/weather-config.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/sql/user_schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/sql/user_schema.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/messaging/messagingrepository/ConversationRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/messaging/messagingrepository/MessageRepositoryTest.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -262,37 +268,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.EventsMain.executor&quot;: &quot;Run&quot;,
-    &quot;Application.MainApp.executor&quot;: &quot;Run&quot;,
-    &quot;Application.MainFX.executor&quot;: &quot;Run&quot;,
-    &quot;Application.MainFx.executor&quot;: &quot;Run&quot;,
-    &quot;Application.MessagingMain.executor&quot;: &quot;Run&quot;,
-    &quot;Application.UserMain.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;integration-sprint&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/MSI/Desktop/Ingégnerie/season 2/PI-DEV/PI_DEV&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.EventsMain.executor": "Run",
+    "Application.MainApp.executor": "Run",
+    "Application.MainFX.executor": "Run",
+    "Application.MainFx.executor": "Run",
+    "Application.MessagingMain.executor": "Run",
+    "Application.UserMain.executor": "Run",
+    "Application.com.example.pi_dev.user.UserMain.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "integration-sprint",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/MSI/Desktop/Ingégnerie/season 2/PI-DEV/PI_DEV/src/main/java/com/example/pi_dev",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\java\com\example\pi_dev" />
+      <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\java\com\example\pi_dev\Services" />
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV" />
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\java\com\example\pi_dev\blog" />
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\resources\com\example\pi_dev\blog" />
@@ -363,7 +372,7 @@
       <module name="PI_DEV" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.example.pi_dev.user.*" />
+          <option name="PATTERN" value="com.example.pi_dev.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -401,6 +410,7 @@
       <workItem from="1772326359342" duration="5093000" />
       <workItem from="1772372901376" duration="19268000" />
       <workItem from="1772420248328" duration="186000" />
+      <workItem from="1772420455266" duration="1693000" />
     </task>
     <servers />
   </component>

@@ -64,31 +64,9 @@ module com.example.pi_dev {
     // Open the entire module for FXGL and other reflective libraries
     opens com.example.pi_dev to javafx.fxml, com.almasb.fxgl.all;
 
-    // Messaging module - FULLY ADDED from your original
-    opens com.example.pi_dev.messaging.messagecontroller to javafx.fxml;
-    opens com.example.pi_dev.messaging.messagingmodel to javafx.base;
-    opens com.example.pi_dev.messaging.messagingrepository to javafx.base;
-    opens com.example.pi_dev.messaging.messagingservice to javafx.base;
-    opens com.example.pi_dev.messaging.messagingsession to javafx.base;
 
-    exports com.example.pi_dev.messaging.messagecontroller;
-    exports com.example.pi_dev.messaging.messagingmodel;
-    exports com.example.pi_dev.messaging.messagingrepository;
-    exports com.example.pi_dev.messaging.messagingservice;
-    exports com.example.pi_dev.messaging.messagingsession;
 
-    // User module
-    opens com.example.pi_dev.user.controllers to javafx.fxml;
-    opens com.example.pi_dev.user.models to javafx.base;
-    opens com.example.pi_dev.user.database to javafx.base;
-    opens com.example.pi_dev.user.repositories to javafx.base;
-    opens com.example.pi_dev.user.services to javafx.base;
-    opens com.example.pi_dev.user.enums to javafx.base;
-    opens com.example.pi_dev.user.utils to javafx.base;
 
-    // Main layout module
-    opens com.example.pi_dev.main.controllers to javafx.fxml;
-    exports com.example.pi_dev.main.controllers;
 
 
 
@@ -100,58 +78,73 @@ module com.example.pi_dev {
     // Exports
     exports com.example.pi_dev;
 
-    // User exports
-    exports com.example.pi_dev.user.models;
-    exports com.example.pi_dev.user.services;
-    exports com.example.pi_dev.user.enums;
-    exports com.example.pi_dev.user.controllers;
-    exports com.example.pi_dev.user.database;
-    exports com.example.pi_dev.user.repositories;
-    exports com.example.pi_dev.user.utils;
 
 
 
-    // Events exports
-    opens com.example.pi_dev.events.Controllers to javafx.fxml;
-    exports com.example.pi_dev.events.Controllers;
-    exports com.example.pi_dev.events.Entities;
-    exports com.example.pi_dev.events.Services;
-    exports com.example.pi_dev.events.Iservices;
-    exports com.example.pi_dev.events.Utils;
 
-    // Blog exports
-    opens com.example.pi_dev.blog.Controllers to javafx.fxml;
-    exports com.example.pi_dev.blog.Controllers;
-    exports com.example.pi_dev.blog.Entities;
-    exports com.example.pi_dev.blog.Services;
-    exports com.example.pi_dev.blog.GUI;
 
-    //booking exports
-    exports com.example.pi_dev.booking.test to javafx.graphics;
-    opens   com.example.pi_dev.booking.test to javafx.fxml;
 
-    // Booking module exports and opens
-    opens com.example.pi_dev.booking.Controllers to javafx.fxml;
-    exports com.example.pi_dev.booking.Controllers;
+
+
+
 
     // ADDED: Host package opens and exports
-    opens com.example.pi_dev.booking.Controllers.Host to javafx.fxml;
-    exports com.example.pi_dev.booking.Controllers.Host;
+    opens com.example.pi_dev.Controllers.Booking.Host to javafx.fxml;
+    exports com.example.pi_dev.Controllers.Booking.Host;
 
     // Booking controllers - open ALL subpackages
-    opens com.example.pi_dev.booking.Controllers.Front to javafx.fxml;
-    opens com.example.pi_dev.booking.Controllers.Admin to javafx.fxml; // if exists
+    opens com.example.pi_dev.Controllers.Booking.Front to javafx.fxml;
+    opens com.example.pi_dev.Controllers.Booking.Admin to javafx.fxml; // if exists
 
     // Duplicate opens entry removed: com.example.pi_dev.events.Controllers
 
 // Export them as needed
-    exports com.example.pi_dev.booking.Controllers.Front;
+    exports com.example.pi_dev.Controllers.Booking.Front;
     exports com.example.pi_dev.common.services;
     exports com.example.pi_dev.common.models;
 
-    //marketplace
-    exports com.example.pi_dev.marketplace.test to javafx.graphics;
-    opens   com.example.pi_dev.marketplace.test to javafx.fxml;
-    opens   com.example.pi_dev.marketplace.Controllers to javafx.fxml;
-    exports com.example.pi_dev.marketplace.Controllers;
+
+    exports com.example.pi_dev.Controllers.Blog;
+    opens com.example.pi_dev.Controllers.Blog to javafx.fxml;
+    exports com.example.pi_dev.Controllers.Booking;
+    opens com.example.pi_dev.Controllers.Booking to javafx.fxml;
+    exports com.example.pi_dev.Controllers.Events;
+    opens com.example.pi_dev.Controllers.Events to javafx.fxml;
+    exports com.example.pi_dev.Controllers.Main;
+    opens com.example.pi_dev.Controllers.Main to javafx.fxml;
+    exports com.example.pi_dev.Controllers.Marketplace;
+    opens com.example.pi_dev.Controllers.Marketplace to javafx.fxml;
+    exports com.example.pi_dev.Controllers.Messaging;
+    opens com.example.pi_dev.Controllers.Messaging to javafx.fxml;
+    exports com.example.pi_dev.Controllers.Users;
+    opens com.example.pi_dev.Controllers.Users to javafx.fxml;
+    exports com.example.pi_dev.Entities.Users;
+    opens com.example.pi_dev.Entities.Users to javafx.base;
+    exports com.example.pi_dev.Entities.Messaging;
+    opens com.example.pi_dev.Entities.Messaging to javafx.base;
+    exports com.example.pi_dev.Entities.Events;
+    exports com.example.pi_dev.Entities.Blog;
+    exports com.example.pi_dev.Iservices.Events;
+    exports com.example.pi_dev.Services.Users;
+    opens com.example.pi_dev.Services.Users to javafx.base;
+    exports com.example.pi_dev.Services.Messaging;
+    opens com.example.pi_dev.Services.Messaging to javafx.base;
+    exports com.example.pi_dev.Services.Events;
+    exports com.example.pi_dev.Services.Blog;
+    exports com.example.pi_dev.Test.Booking to javafx.graphics;
+    opens com.example.pi_dev.Test.Booking to javafx.fxml;
+    exports com.example.pi_dev.Test.Marketplace to javafx.graphics;
+    opens com.example.pi_dev.Test.Marketplace to javafx.fxml;
+    exports com.example.pi_dev.Utils.Events;
+    exports com.example.pi_dev.Utils.Users;
+    opens com.example.pi_dev.Utils.Users to javafx.base;
+    exports com.example.pi_dev.BlogGUI;
+    exports com.example.pi_dev.Database.Users;
+    opens com.example.pi_dev.Database.Users to javafx.base;
+    exports com.example.pi_dev.Repositories.Messaging;
+    opens com.example.pi_dev.Repositories.Messaging to javafx.base;
+    exports com.example.pi_dev.Repositories.Users;
+    opens com.example.pi_dev.Repositories.Users to javafx.base;
+    exports com.example.pi_dev.Session;
+    opens com.example.pi_dev.Session to javafx.base;
 }

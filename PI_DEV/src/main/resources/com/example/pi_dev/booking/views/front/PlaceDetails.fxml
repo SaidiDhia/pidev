@@ -13,7 +13,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.pi_dev.Controllers.Front.PlaceDetailsController"
+            fx:controller="com.example.pi_dev.Controllers.Booking.Front.PlaceDetailsController"
             stylesheets="@../../style.css">
 
     <ScrollPane fitToWidth="true" styleClass="scroll-pane"

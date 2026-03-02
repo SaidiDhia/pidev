@@ -19,7 +19,7 @@
 <VBox fx:id="mainContainer" style="-fx-background-color: linear-gradient(to bottom, #CAD4DC, #ffffff); -fx-padding: 0;"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.pi_dev.Controllers.ChatController">
+      fx:controller="com.example.pi_dev.Controllers.Messaging.ChatController">
 
     <children>
         <!-- ==================== HEADER SECTION ==================== -->
