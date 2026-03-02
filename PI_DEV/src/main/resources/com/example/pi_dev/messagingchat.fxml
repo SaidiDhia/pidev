@@ -117,6 +117,8 @@
                                                         style="-fx-background-color: #ff6b6b; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-size: 12px; -fx-cursor: hand; -fx-opacity: 0.9;"
                                                         text="🗑️ Delete"
                                                         visible="false"/>
+
+
                                             </children>
                                         </HBox>
 
@@ -231,47 +233,7 @@
                         </VBox>
                     </content>
                 </Tab>
-                <!-- ==================== CONTACTS TAB ==================== -->
-                <Tab fx:id="contactsTab" closable="false" text="👥 Contacts">
-                    <content>
-                        <VBox fx:id="contactsContainer" style="-fx-background-color: #f8faf8;" spacing="20">
-                            <padding>
-                                <Insets top="30" right="30" bottom="30" left="30"/>
-                            </padding>
-                            <children>
-                                <HBox fx:id="contactsHeader" alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: linear-gradient(to bottom right, #1A4E85, #0F2C4F); -fx-background-radius: 12; -fx-padding: 20;">
-                                    <children>
-                                        <Label fx:id="contactsIcon" style="-fx-font-size: 24px; -fx-text-fill: white;" text="👥" />
-                                        <VBox fx:id="contactsTitleBox" spacing="5">
-                                            <children>
-                                                <Label fx:id="contactsTitle" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Your Contacts" />
-                                                <Label fx:id="contactsSubtitle" style="-fx-font-size: 14px; -fx-text-fill: #CAD4DC;" text="Connect with fellow adventurers" />
-                                            </children>
-                                        </VBox>
-                                        <Region HBox.hgrow="ALWAYS" />
-                                    </children>
-                                </HBox>
 
-                                <ScrollPane fx:id="contactsScrollPane"
-                                            fitToWidth="true"
-                                            hbarPolicy="NEVER"
-                                            VBox.vgrow="ALWAYS"
-                                            style="-fx-background-color: transparent; -fx-border-color: transparent;">
-                                    <content>
-                                        <FlowPane fx:id="contactsFlow"
-                                                  hgap="20"
-                                                  vgap="20">
-                                            <padding>
-                                                <Insets top="10" right="10" bottom="10" left="10"/>
-                                            </padding>
-                                            <!-- Contacts will be added dynamically by the controller -->
-                                        </FlowPane>
-                                    </content>
-                                </ScrollPane>
-                            </children>
-                        </VBox>
-                    </content>
-                </Tab>
             </tabs>
         </TabPane>
 

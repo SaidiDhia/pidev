@@ -6,13 +6,12 @@ import com.example.pi_dev.messaging.messagingrepository.ConversationRepository;
 import com.example.pi_dev.messaging.messagingrepository.ConversationUserRepository;
 import com.example.pi_dev.messaging.messagingrepository.MessageRepository;
 import com.example.pi_dev.messaging.messagingrepository.UserRepository;
-import com.example.pi_dev.messaging.messagingservice.AudioRecorderService;
-import com.example.pi_dev.messaging.messagingservice.FileUploadService;
-import com.example.pi_dev.messaging.messagingservice.GeminiService;
+import com.example.pi_dev.messaging.messagingservice.*;
 import com.example.pi_dev.messaging.messagingsession.Session;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
@@ -82,6 +81,8 @@ public class ChatController {
     // Smart Reply button
     @FXML private Button smartReplyBtn;
 
+    @FXML private Button stopSpeechBtn;
+
     // Services
     private final FileUploadService uploadService = new FileUploadService();
     private final GeminiService geminiService = new GeminiService();
@@ -100,6 +101,13 @@ public class ChatController {
     private boolean darkMode = false;
     private ObservableList<Conversation> conversations = FXCollections.observableArrayList();
     private ObservableList<Conversation> archivedConversations = FXCollections.observableArrayList();
+
+    //bad words
+    private MessageFilterService filterService;
+
+
+    private SimpleTTSService ttsService;
+
 
     private void setupImageHandling() {
         if (attachImageBtn != null) {
@@ -135,6 +143,15 @@ public class ChatController {
         audioRecorderService = new AudioRecorderService();
         recordingIndicator.setVisible(false);
         recordingIndicator.setManaged(false);
+
+
+        ttsService = new SimpleTTSService();
+        ttsService.listWindowsVoices(); // Optional: see available voices (Windows only)
+
+        // In your initialize() method, add:
+        filterService = new MessageFilterService();
+        System.out.println("✅ Message Filter Service initialized with " +
+                filterService.getFilteredWords().size() + " words");
 
         // Conversation selection listener
         conversationList.getSelectionModel()
@@ -307,7 +324,29 @@ public class ChatController {
                 MenuItem edit = new MenuItem("Edit");
                 MenuItem delete = new MenuItem("Delete");
                 MenuItem translate = new MenuItem("🌐 Translate");
+                // Find where you create the context menu and add this MenuItem:
+                MenuItem listen = new MenuItem("🔊 Listen");
 
+// Add the action:
+                listen.setOnAction(e -> {
+                    if (msg.isText()) {
+                        ttsService.speakMessage(msg.getContent());
+                        showInfo("🔊 Speaking message...");
+
+                        // Optional: Disable listen button briefly to prevent spam
+                        listen.setDisable(true);
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(2000); // Re-enable after 2 seconds
+                            } catch (InterruptedException ex) {}
+                            Platform.runLater(() -> listen.setDisable(false));
+                        }).start();
+
+                    } else {
+                        showError("Can only listen to text messages");
+                    }
+                });
+                menu.getItems().add(0, listen); // Add at the beginning
                 menu.getItems().add(translate);
 
                 if (msg.isText()) {
@@ -828,20 +867,41 @@ public class ChatController {
 
     // ==================== Message Actions ====================
 
+    //baddaltha bch twalli bel filter
     @FXML
     private void sendMessage() {
-        if (selectedConversation == null || messageInput.getText().isBlank()) return;
+        if (selectedConversation == null || messageInput.getText().isBlank())
+            return;
 
+        String originalMessage = messageInput.getText();
+
+        // Filter the message
+        MessageFilterService.FilterResult result = filterService.validateMessage(originalMessage);
+
+        if (!result.isAllowed()) {
+            // Message contains strong profanity - block it
+            showError(result.getWarning());
+            messageInput.clear();
+            return;
+        }
+
+        // Create message with filtered content
         Message msg = new Message(
                 selectedConversation.getId(),
                 Session.getCurrentUserId(),
-                messageInput.getText()
+                result.getFilteredMessage() // Use filtered version
         );
 
         try {
             messageRepo.create(msg);
             messageInput.clear();
             loadMessages();
+
+            // Show warning if message was filtered
+            if (result.getWarning() != null) {
+                showInfo(result.getWarning());
+            }
+
         } catch (SQLException e) {
             showError(e.getMessage());
         }
@@ -1486,6 +1546,13 @@ public class ChatController {
         } catch (SQLException e) {
             showError("Failed to load participants: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    @FXML
+    private void stopSpeaking() {
+        if (ttsService != null) {
+            ttsService.stopSpeaking();
+            showInfo("⏹️ Speech stopped");
         }
     }
 
