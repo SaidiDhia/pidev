@@ -91,6 +91,9 @@
                         <TextField fx:id="categoryField" promptText="e.g. Apartment, House, Villa" styleClass="text-input"/>
                     </VBox>
 
+                    <!-- Image URL (hidden, set programmatically) -->
+                    <TextField fx:id="imageUrlField" visible="false" managed="false"/>
+
                     <Separator opacity="0.35"/>
 
                     <!-- ── Photos Section ──────────────────────────────────── -->

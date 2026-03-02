@@ -76,7 +76,9 @@ public class PlaceFormController {
         addressField.setText(p.getAddress());
         cityField.setText(p.getCity());
         categoryField.setText(p.getCategory());
-        imageUrlField.setText(p.getImageUrl() != null ? p.getImageUrl() : "");
+        if (imageUrlField != null) {
+            imageUrlField.setText(p.getImageUrl() != null ? p.getImageUrl() : "");
+        }
         if (submitBtn != null)
             submitBtn.setText("Update Listing");
         if (geoStatusLabel != null && p.getLat() != null) {
@@ -146,7 +148,7 @@ public class PlaceFormController {
                     photosPreview.getChildren().add(iv);
                 }
             }
-            if (!files.isEmpty()) {
+            if (!files.isEmpty() && imageUrlField != null) {
                 imageUrlField.setText(files.get(0).toURI().toString());
             }
         }
@@ -167,7 +169,7 @@ public class PlaceFormController {
         String address = addressField.getText().trim();
         String city = cityField.getText().trim();
         String category = categoryField.getText().trim();
-        String imageUrl = imageUrlField.getText().trim();
+        String imageUrl = imageUrlField != null ? imageUrlField.getText().trim() : "";
 
         if (title.isEmpty() || desc.isEmpty() || priceStr.isEmpty() || capStr.isEmpty()
                 || maxGStr.isEmpty() || address.isEmpty() || city.isEmpty() || category.isEmpty()) {
@@ -244,7 +246,9 @@ public class PlaceFormController {
         addressField.clear();
         cityField.clear();
         categoryField.clear();
-        imageUrlField.clear();
+        if (imageUrlField != null) {
+            imageUrlField.clear();
+        }
         if (errorLabel != null)
             errorLabel.setText("");
         if (successLabel != null)

@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.awt.Toolkit;
@@ -26,6 +27,8 @@ public class ActiviteCardController {
     @FXML private Label typeLabel;
     @FXML private Label descriptionLabel;
     @FXML private Label categorieLabel;
+    @FXML private VBox weatherWidgetContainer;
+    @FXML private Button disponibleButton;
 
     private Object currentActivite;
 
@@ -141,6 +144,20 @@ public class ActiviteCardController {
     @FXML
     void goToCatalogue(ActionEvent event) {
         fermerFenetre();
+    }
+
+    @FXML
+    void marquerDisponible(ActionEvent event) {
+        try {
+            // Afficher une simple confirmation pour le moment
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succès");
+            alert.setHeaderText("✅ Disponibilité mise à jour !");
+            alert.setContentText("L'activité a été marquée comme disponible.");
+            alert.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

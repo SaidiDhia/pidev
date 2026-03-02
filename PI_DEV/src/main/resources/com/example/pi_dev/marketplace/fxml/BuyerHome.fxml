@@ -13,11 +13,11 @@
 
     <!-- TOP NAV — Buyer only -->
     <top>
-        <VBox style="-fx-background-color: #2E7D32;">
+        <VBox style="-fx-background-color: #1565C0;">
 
             <!-- Nav Bar -->
             <HBox spacing="15" alignment="CENTER_LEFT"
-                  style="-fx-padding: 12 20; -fx-background-color: #2E7D32;">
+                  style="-fx-padding: 12 20; -fx-background-color: #1565C0;">
 
                 <!-- Back to role selection -->
                 <Button text="⬅ Home" onAction="#goToRoleSelection"
@@ -51,7 +51,7 @@
 
             <!-- Search and Filter Bar -->
             <HBox spacing="12" alignment="CENTER"
-                  style="-fx-padding: 10 20; -fx-background-color: #1B5E20;">
+                  style="-fx-padding: 10 20; -fx-background-color: #0D47A1;">
 
                 <!-- Search -->
                 <TextField fx:id="searchField"

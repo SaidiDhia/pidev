@@ -269,10 +269,6 @@ public class TwoFactorController {
              System.out.println("Face Verified!");
              activityLogService.log(user.getEmail(), "2FA_VERIFY_SUCCESS", "Face verification successful");
              navigateToHome(null); // Navigate based on role (Admin/User)
-             
-             // Close current webcam window
-             Stage stage = (Stage) captureButton.getScene().getWindow();
-             stage.close(); 
         } else {
             errorLabel.setText("Face verification failed. Try again.");
             startWebcam(); // Restart webcam to capture again

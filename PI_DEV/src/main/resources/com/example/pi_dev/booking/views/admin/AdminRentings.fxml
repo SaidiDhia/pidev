@@ -2,33 +2,24 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1"
+<VBox spacing="24" style="-fx-background-color: #F9FAFB; -fx-padding: 32 40 40 40;"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.pi_dev.Controllers.Booking.Admin.AdminRentingsController"
-      stylesheets="@../../style.css"
-      spacing="20"
-      style="-fx-background-color: white; -fx-padding: 24 32 32 32;">
+      stylesheets="@../../style.css">
 
     <VBox spacing="4">
-        <Label styleClass="text-h2" text="Pending Place Approvals"/>
-        <Label styleClass="section-subtitle" text="Review and approve or deny submitted place listings"/>
+        <Label styleClass="text-h2" text="Place Approvals"/>
+        <Label styleClass="section-subtitle" text="Review new place listings submitted by hosts"/>
     </VBox>
 
-    <TableView fx:id="placesTable" VBox.vgrow="ALWAYS" styleClass="table-view">
-        <columns>
-            <TableColumn fx:id="colTitle"   text="Title"       prefWidth="350"/>
-            <TableColumn fx:id="colCity"    text="City"        prefWidth="200"/>
-            <TableColumn fx:id="colPrice"   text="Price/Day"   prefWidth="120"/>
-            <TableColumn fx:id="colStatus"  text="Status"      prefWidth="120"/>
-            <TableColumn fx:id="colActions" text="Actions"     prefWidth="200"/>
-        </columns>
-        <placeholder>
-            <Label styleClass="section-subtitle" text="No pending places."/>
-        </placeholder>
-    </TableView>
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: white;">
+        <FlowPane fx:id="placesFlowPane" hgap="20" vgap="20" style="-fx-padding: 10;">
+            <!-- Cards will be injected here -->
+        </FlowPane>
+    </ScrollPane>
 
 </VBox>

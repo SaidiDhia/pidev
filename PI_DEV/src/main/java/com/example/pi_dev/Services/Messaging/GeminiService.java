@@ -11,7 +11,7 @@ import java.time.Duration;
 
 public class GeminiService {
     // Your API key (works fine)
-    private static final String API_KEY = "AIzaSyDs0rgnlSxeM1gLuwRAcz4zil6umqabVVc";
+    private static final String API_KEY = "AIzaSyDYNBZev4Y1CK--PTFzVY0cuhzvurxeEQM";
 
     // FIXED: Correct API endpoint with proper model name
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + API_KEY;

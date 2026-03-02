@@ -2,9 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/17"
@@ -22,19 +22,12 @@
             <Label styleClass="section-subtitle" text="Manage your property listings"/>
         </VBox>
 
-        <!-- Table -->
-        <TableView fx:id="placesTable" VBox.vgrow="ALWAYS" styleClass="table-view">
-            <columns>
-                <TableColumn fx:id="colTitle"   text="Title"       prefWidth="350"/>
-                <TableColumn fx:id="colCity"    text="City"        prefWidth="200"/>
-                <TableColumn fx:id="colPrice"   text="Price/Day"   prefWidth="120"/>
-                <TableColumn fx:id="colStatus"  text="Status"      prefWidth="120"/>
-                <TableColumn fx:id="colActions" text="Actions"     prefWidth="200"/>
-            </columns>
-            <placeholder>
-                <Label styleClass="section-subtitle" text="No places listed yet."/>
-            </placeholder>
-        </TableView>
+        <!-- Cards Container -->
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: #F9FAFB;">
+            <FlowPane fx:id="placesFlowPane" hgap="24" vgap="24" style="-fx-padding: 10;">
+                <!-- Cards will be injected here -->
+            </FlowPane>
+        </ScrollPane>
 
     </VBox>
 

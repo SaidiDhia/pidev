@@ -223,7 +223,9 @@ public class EventController implements Initializable {
                 pstmt.setInt(9, capaciteValue);
                 pstmt.setDate(10, dateDebutPicker.getValue() != null ? java.sql.Date.valueOf(dateDebutPicker.getValue()) : null);
                 pstmt.setDate(11, dateFinPicker.getValue() != null ? java.sql.Date.valueOf(dateFinPicker.getValue()) : null);
-                pstmt.setBytes(12, imagePrincipaleData);
+                // Save primary image to disk and persist its relative path instead of raw bytes
+                String primaryImagePath = savePrimaryImageToUploads();
+                pstmt.setString(12, primaryImagePath != null ? primaryImagePath : "");
                 pstmt.setString(13, videoYoutubeField != null ? videoYoutubeField.getText().trim() : "");
                 pstmt.setString(14, "A_VENIR");
                 pstmt.setTimestamp(15, new Timestamp(System.currentTimeMillis()));
@@ -494,6 +496,32 @@ public class EventController implements Initializable {
                 }
             }
         }
+    }
+
+    private String savePrimaryImageToUploads() {
+        try {
+            if (imagePrincipaleData == null || imagePrincipaleData.length == 0) return null;
+            String ext = detectImageExtension(imagePrincipaleData);
+            String fileName = "event_" + System.currentTimeMillis() + (ext != null ? ("." + ext) : ".png");
+            Path target = Paths.get(UPLOADS_DIR, fileName);
+            Files.write(target, imagePrincipaleData);
+            return target.toString().replace("\\", "/");
+        } catch (IOException e) {
+            System.err.println("Erreur sauvegarde image principale: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private String detectImageExtension(byte[] bytes) {
+        if (bytes.length >= 8) {
+            // PNG header: 89 50 4E 47 0D 0A 1A 0A
+            if ((bytes[0] & 0xFF) == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) return "png";
+            // JPEG header: FF D8
+            if ((bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8) return "jpg";
+            // GIF header: GIF87a or GIF89a
+            if (bytes[0] == 'G' && bytes[1] == 'I' && bytes[2] == 'F') return "gif";
+        }
+        return "png";
     }
 
     private void createPhotoThumbnail(byte[] photoBytes, File originalFile) {

@@ -2,8 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/17"
@@ -18,18 +18,10 @@
         <Label styleClass="section-subtitle" text="Review and manage bookings from guests for your places"/>
     </VBox>
 
-    <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
-        <columns>
-            <TableColumn fx:id="colProperty" text="Property"    prefWidth="300"/>
-            <TableColumn fx:id="colDates"    text="Dates"       prefWidth="250"/>
-            <TableColumn fx:id="colGuests"   text="Guests"      prefWidth="100"/>
-            <TableColumn fx:id="colTotal"    text="Total ($)"   prefWidth="120"/>
-            <TableColumn fx:id="colStatus"   text="Status"      prefWidth="120"/>
-            <TableColumn fx:id="colActions"  text="Actions"     prefWidth="250"/>
-        </columns>
-        <placeholder>
-            <Label styleClass="section-subtitle" text="No reservations found."/>
-        </placeholder>
-    </TableView>
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: white;">
+        <FlowPane fx:id="bookingsFlowPane" hgap="20" vgap="20" style="-fx-padding: 10;">
+            <!-- Cards will be injected here -->
+        </FlowPane>
+    </ScrollPane>
 
 </VBox>

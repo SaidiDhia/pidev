@@ -5,71 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="02797c90-314a-4438-89a6-1ff27b9f06e6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Blog/AdminDashboardBlogController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/HostReservationsController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/PlaceImage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/NotificationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/PlaceImageService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/AdminDashboardBlog.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/host/HostReservations.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/Services/Blog/AI_ModerationServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/Services/Users/DeepFaceServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/Services/Users/EmailServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/Services/Users/PasswordResetServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/Services/Users/TwoFactorServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/example/pi_dev/Services/Users/UserServiceTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deepface" beforeDir="false" afterPath="$PROJECT_DIR$/deepface" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Blog/BlogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Blog/BlogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminAllPlacesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminAllPlacesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminDashboardController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminRentingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminRentingsController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminReservationsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Admin/AdminReservationsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/AppController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/AppController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/MyBookingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/MyBookingsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/PlaceBrowseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/PlaceBrowseController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/PlaceDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/PlaceDetailsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/ReviewDialogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Front/ReviewDialogController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Database/Messaging/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Database/Messaging/DatabaseConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Database/Users/UserDatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Database/Users/UserDatabaseConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Commentaire.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Commentaire.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Post.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Reaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Blog/Reaction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Booking.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/GeoPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/GeoPoint.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Place.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Place.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Review.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Entities/Booking/Review.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IcommentaireServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IcommentaireServices.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IpostServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IpostServices.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IreactionServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Blog/IreactionServices.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Booking/IBookingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Booking/IBookingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Booking/IPlaceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Iservices/Booking/IPlaceService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Repositories/Users/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Repositories/Users/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/AI_ModerationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/AI_ModerationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Commentaire_Services.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Commentaire_Services.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/ModerationResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/ModerationResult.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Posting_Services.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Posting_Services.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Reaction_Services.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/Reaction_Services.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/SaveService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/SaveService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/TranslationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Blog/TranslationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/BookingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/BookingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/GeoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/GeoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/PlaceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Booking/PlaceService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Test/Blog/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Test/Blog/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Blog/BlogDataBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Blog/BlogDataBase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Booking/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Booking/Mydatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Booking/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Booking/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Events/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Events/Mydatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Marketplace/Mydatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Utils/Marketplace/Mydatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/BlogView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/BlogView.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/AppShell.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/AppShell.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/HostReservationsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/HostReservationsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/MyPlacesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/MyPlacesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/PlaceFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Booking/Host/PlaceFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/ActiviteCardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/ActiviteCardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/EventController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Events/EventController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/TwoFactorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Controllers/Users/TwoFactorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Messaging/GeminiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Messaging/GeminiService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Users/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pi_dev/Services/Users/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminAllPlaces.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminAllPlaces.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminDashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminDashboard.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminRentings.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminRentings.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminReservations.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/admin/AdminReservations.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/BookingDialog.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/BookingDialog.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/MyBookings.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/MyBookings.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/PlaceBrowse.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/PlaceBrowse.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/PlaceDetails.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/PlaceDetails.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/ReviewDialog.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/front/ReviewDialog.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/host/HostReservations.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/host/HostReservations.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/host/MyPlaces.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/host/MyPlaces.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/host/PlaceForm.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/booking/views/host/PlaceForm.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/BuyerHome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/BuyerHome.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/RoleSelection.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pi_dev/marketplace/fxml/RoleSelection.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,6 +44,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
@@ -125,13 +90,16 @@
     &quot;Application.MessagingMain.executor&quot;: &quot;Run&quot;,
     &quot;Application.UserMain.executor&quot;: &quot;Run&quot;,
     &quot;Application.com.example.pi_dev.user.UserMain.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceTest.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;integrate-integration-sprint&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;integration-sprintbranch&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/jacer/Desktop/pi_dev/YASMINE/PI_DEV/src/main/resources/com/example/pi_dev&quot;,
@@ -143,7 +111,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -160,8 +128,15 @@
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\resources\com\example\pi_dev" />
       <recent name="C:\Users\MSI\Desktop\Ingégnerie\season 2\PI-DEV\PI_DEV\src\main\java\com\example\pi_dev\blog" />
     </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.pi_dev" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="com.example.pi_dev.Services.Users" />
+      <recent name="com.example.pi_dev.Services.Blog" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="com.example.pi_dev.Services.Booking" />
@@ -171,19 +146,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Application.UserMain">
-    <configuration name="GeminiDirectTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.GeminiDirectTest" />
-      <module name="PI_DEV" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.example.pi_dev.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="MessagingMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.MessagingMain" />
       <module name="PI_DEV" />
@@ -236,13 +198,28 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="UserServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="PI_DEV" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.pi_dev.Services.Users.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.pi_dev.Services.Users" />
+      <option name="MAIN_CLASS_NAME" value="com.example.pi_dev.Services.Users.UserServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UserServiceTest" />
         <item itemvalue="Application.UserMain" />
         <item itemvalue="Application.com.example.pi_dev.user.UserMain" />
         <item itemvalue="Application.MessagingMain" />
         <item itemvalue="Application.VenueMain" />
-        <item itemvalue="Application.GeminiDirectTest" />
       </list>
     </recent_temporary>
   </component>
@@ -268,6 +245,7 @@
       <workItem from="1772420248328" duration="186000" />
       <workItem from="1772420455266" duration="1693000" />
       <workItem from="1772440442272" duration="5342000" />
+      <workItem from="1772477902719" duration="306000" />
     </task>
     <servers />
   </component>
@@ -300,5 +278,13 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>

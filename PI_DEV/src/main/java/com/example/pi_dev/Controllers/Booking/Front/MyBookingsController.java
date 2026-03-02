@@ -6,18 +6,21 @@ import com.example.pi_dev.Services.Booking.BookingService;
 import com.example.pi_dev.Services.Booking.PlaceService;
 import com.example.pi_dev.Services.Booking.ReceiptService;
 import com.example.pi_dev.Utils.Booking.Session;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -25,21 +28,7 @@ import java.util.List;
 public class MyBookingsController {
 
     @FXML
-    private TableView<BookingService.BookingView> bookingsTable;
-    @FXML
-    private TableColumn<BookingService.BookingView, String> colProperty;
-    @FXML
-    private TableColumn<BookingService.BookingView, String> colDates;
-    @FXML
-    private TableColumn<BookingService.BookingView, Integer> colGuests;
-    @FXML
-    private TableColumn<BookingService.BookingView, Double> colTotal;
-    @FXML
-    private TableColumn<BookingService.BookingView, String> colStatus;
-    @FXML
-    private TableColumn<BookingService.BookingView, Void> colPdf;
-    @FXML
-    private TableColumn<BookingService.BookingView, Void> colActions;
+    private FlowPane bookingsFlowPane;
 
     private final BookingService bookingService = new BookingService();
     private final PlaceService placeService = new PlaceService();
@@ -47,103 +36,117 @@ public class MyBookingsController {
 
     @FXML
     public void initialize() {
-        setupColumns();
         loadData();
     }
 
-    private void setupColumns() {
-        colProperty.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().placeTitle));
-
-        colDates.setCellValueFactory(data -> {
-            Booking b = data.getValue().booking;
-            return new SimpleStringProperty(b.getStartDate() + " → " + b.getEndDate());
-        });
-
-        colGuests.setCellValueFactory(
-                data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().booking.getGuestsCount())
-                        .asObject());
-
-        colTotal.setCellValueFactory(
-                data -> new javafx.beans.property.SimpleDoubleProperty(data.getValue().booking.getTotalPrice())
-                        .asObject());
-
-        colStatus.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().booking.getStatus().name()));
-
-        // Receipt download column
-        colPdf.setCellFactory(col -> new TableCell<>() {
-            private final Button downloadBtn = new Button("📄 Receipt");
-
-            {
-                downloadBtn.setStyle("-fx-background-color: #0EA5E9; -fx-text-fill: white; " +
-                        "-fx-background-radius: 6; -fx-padding: 3 10 3 10; -fx-cursor: hand; -fx-font-size: 11px;");
-                downloadBtn.setOnAction(e -> {
-                    BookingService.BookingView bv = getTableView().getItems().get(getIndex());
-                    handleDownloadReceipt(bv);
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : downloadBtn);
-            }
-        });
-
-        // Actions column: Edit | Delete | Cancel
-        colActions.setCellFactory(col -> new TableCell<>() {
-            private final Button editBtn = new Button("Edit");
-            private final Button deleteBtn = new Button("Delete");
-            private final Button cancelBtn = new Button("✖ Cancel");
-            private final HBox box = new HBox(6, editBtn, deleteBtn, cancelBtn);
-
-            {
-                editBtn.getStyleClass().addAll("btn", "btn-sm");
-                deleteBtn.getStyleClass().addAll("btn", "btn-sm", "btn-danger");
-                cancelBtn.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; " +
-                        "-fx-background-radius: 6; -fx-padding: 3 10 3 10; -fx-cursor: hand; -fx-font-size: 11px;");
-
-                editBtn.setOnAction(e -> {
-                    BookingService.BookingView bv = getTableView().getItems().get(getIndex());
-                    handleEdit(bv);
-                });
-                deleteBtn.setOnAction(e -> {
-                    BookingService.BookingView bv = getTableView().getItems().get(getIndex());
-                    handleDelete(bv);
-                });
-                cancelBtn.setOnAction(e -> {
-                    BookingService.BookingView bv = getTableView().getItems().get(getIndex());
-                    handleCancel(bv);
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    BookingService.BookingView bv = getTableView().getItems().get(getIndex());
-                    Booking.Status status = bv.booking.getStatus();
-                    boolean isPending = status == Booking.Status.PENDING;
-                    boolean isConfirmed = status == Booking.Status.CONFIRMED;
-
-                    editBtn.setDisable(!isPending);
-                    deleteBtn.setDisable(!isPending && status != Booking.Status.CANCELLED);
-
-                    // Cancel button only visible for PENDING or CONFIRMED
-                    boolean canCancel = isPending || isConfirmed;
-                    cancelBtn.setVisible(canCancel);
-                    cancelBtn.setManaged(canCancel);
-
-                    setGraphic(box);
-                }
-            }
-        });
+    private void loadData() {
+        bookingsFlowPane.getChildren().clear();
+        List<BookingService.BookingView> views = bookingService.findByUserWithTitle(Session.currentUserId);
+        for (BookingService.BookingView view : views) {
+            bookingsFlowPane.getChildren().add(createBookingCard(view));
+        }
     }
 
-    private void loadData() {
-        List<BookingService.BookingView> views = bookingService.findByUserWithTitle(Session.currentUserId);
-        bookingsTable.setItems(FXCollections.observableArrayList(views));
+    private VBox createBookingCard(BookingService.BookingView bv) {
+        VBox card = new VBox(12);
+        card.setPrefWidth(320);
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 12; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2); " +
+                "-fx-border-color: #E5E7EB; -fx-border-radius: 12; -fx-border-width: 1;");
+        card.setPadding(new Insets(16));
+
+        // Image
+        StackPane imageHolder = new StackPane();
+        imageHolder.setPrefHeight(150);
+        imageHolder.setStyle("-fx-background-color: #F3F4F6; -fx-background-radius: 8;");
+        
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(288);
+        imageView.setFitHeight(150);
+        imageView.setPreserveRatio(true);
+        
+        Place place = placeService.getPlaceById(bv.booking.getPlaceId());
+        if (place != null && place.getImageUrl() != null && !place.getImageUrl().isEmpty()) {
+            loadImage(imageView, place.getImageUrl());
+        }
+        imageHolder.getChildren().add(imageView);
+
+        // Content
+        VBox content = new VBox(6);
+        Label property = new Label(bv.placeTitle);
+        property.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;");
+        property.setWrapText(true);
+
+        Label dates = new Label("📅 " + bv.booking.getStartDate() + " → " + bv.booking.getEndDate());
+        dates.setStyle("-fx-font-size: 13px; -fx-text-fill: #4B5563;");
+
+        Label guests = new Label("👥 Guests: " + bv.booking.getGuestsCount());
+        guests.setStyle("-fx-font-size: 13px; -fx-text-fill: #4B5563;");
+
+        Label price = new Label(String.format("Total: $%.2f", bv.booking.getTotalPrice()));
+        price.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #059669;");
+
+        // Status Badge
+        Label statusBadge = new Label(bv.booking.getStatus().name());
+        String badgeColor = switch (bv.booking.getStatus()) {
+            case CONFIRMED -> "#DCFCE7";
+            case REJECTED, CANCELLED -> "#FEE2E2";
+            case PENDING -> "#FEF9C3";
+            default -> "#F3F4F6";
+        };
+        String textColor = switch (bv.booking.getStatus()) {
+            case CONFIRMED -> "#166534";
+            case REJECTED, CANCELLED -> "#991B1B";
+            case PENDING -> "#854D0E";
+            default -> "#374151";
+        };
+        statusBadge.setStyle("-fx-background-color: " + badgeColor + "; -fx-text-fill: " + textColor + "; " +
+                "-fx-padding: 4 8; -fx-background-radius: 4; -fx-font-size: 11px; -fx-font-weight: bold;");
+
+        content.getChildren().addAll(property, dates, guests, price, statusBadge);
+
+        // Actions
+        HBox actions = new HBox(8);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        Button receiptBtn = new Button("Receipt");
+        receiptBtn.setStyle("-fx-background-color: #0EA5E9; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 11px; -fx-cursor: hand;");
+        receiptBtn.setOnAction(e -> handleDownloadReceipt(bv));
+
+        Booking.Status status = bv.booking.getStatus();
+        boolean isPending = status == Booking.Status.PENDING;
+        boolean isConfirmed = status == Booking.Status.CONFIRMED;
+
+        Button editBtn = new Button("Edit");
+        editBtn.setStyle("-fx-background-color: #2563EB; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 11px; -fx-cursor: hand;");
+        editBtn.setDisable(!isPending);
+        editBtn.setOnAction(e -> handleEdit(bv));
+
+        Button cancelBtn = new Button("Cancel");
+        cancelBtn.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 11px; -fx-cursor: hand;");
+        cancelBtn.setVisible(isPending || isConfirmed);
+        cancelBtn.setManaged(isPending || isConfirmed);
+        cancelBtn.setOnAction(e -> handleCancel(bv));
+
+        actions.getChildren().addAll(receiptBtn, editBtn, cancelBtn);
+
+        card.getChildren().addAll(imageHolder, content, actions);
+        return card;
+    }
+
+    private void loadImage(ImageView imageView, String url) {
+        try {
+            if (url.startsWith("file:") || url.startsWith("http:") || url.startsWith("https:")) {
+                imageView.setImage(new Image(url));
+            } else {
+                File file = new File(url);
+                if (file.exists()) {
+                    imageView.setImage(new Image(file.toURI().toString()));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load image: " + url);
+        }
     }
 
     private void handleDownloadReceipt(BookingService.BookingView bv) {
@@ -163,10 +166,6 @@ public class MyBookingsController {
     }
 
     private void handleEdit(BookingService.BookingView bv) {
-        if (bv.booking.getStatus() != Booking.Status.PENDING) {
-            new Alert(Alert.AlertType.WARNING, "Only PENDING bookings can be edited.", ButtonType.OK).showAndWait();
-            return;
-        }
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/pi_dev/booking/views/front/BookingDialog.fxml"));
@@ -186,60 +185,22 @@ public class MyBookingsController {
         }
     }
 
-    private void handleDelete(BookingService.BookingView bv) {
-        Booking.Status status = bv.booking.getStatus();
-        if (status != Booking.Status.PENDING && status != Booking.Status.CANCELLED) {
-            new Alert(Alert.AlertType.WARNING, "Only PENDING or CANCELLED bookings can be deleted.", ButtonType.OK)
-                    .showAndWait();
-            return;
-        }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Delete this booking?", ButtonType.YES, ButtonType.NO);
+    private void handleCancel(BookingService.BookingView bv) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Cancel this booking?", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
-                bookingService.supprimerBooking(bv.booking.getId());
+                bookingService.updateStatus(bv.booking.getId(), Booking.Status.CANCELLED);
                 loadData();
             }
         });
     }
 
-    private void handleCancel(BookingService.BookingView bv) {
-        Booking.Status status = bv.booking.getStatus();
-
-        // Safety guard (button should be hidden for these, but just in case)
-        if (status != Booking.Status.PENDING && status != Booking.Status.CONFIRMED) {
-            new Alert(Alert.AlertType.WARNING,
-                    "Annulation impossible pour le statut : " + status.name(), ButtonType.OK).showAndWait();
-            return;
-        }
-
-        // Confirmation dialog
-        String msg = status == Booking.Status.CONFIRMED
-                ? "Confirmer l'annulation de cette réservation ?\n\nUn remboursement sera calculé selon la politique de remboursement."
-                : "Confirmer l'annulation de cette réservation ?\n\n(Aucun remboursement – réservation en attente.)";
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, msg, ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Annuler la réservation");
+    private void handleDelete(BookingService.BookingView bv) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Delete this booking?", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
-                try {
-                    double refund = bookingService.cancelByUser(bv.booking.getId());
-                    loadData();
-
-                    // Build success message with refund info
-                    String successMsg;
-                    if (refund > 0) {
-                        double percent = (refund / bv.booking.getTotalPrice()) * 100;
-                        successMsg = String.format(
-                                "Réservation annulée avec succès.%nRemboursement : %.0f%% = %.2f$",
-                                percent, refund);
-                    } else {
-                        successMsg = "Réservation annulée avec succès.\nRemboursement : 0$";
-                    }
-                    new Alert(Alert.AlertType.INFORMATION, successMsg, ButtonType.OK).showAndWait();
-
-                } catch (RuntimeException ex) {
-                    new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK).showAndWait();
-                }
+                bookingService.supprimerBooking(bv.booking.getId());
+                loadData();
             }
         });
     }
