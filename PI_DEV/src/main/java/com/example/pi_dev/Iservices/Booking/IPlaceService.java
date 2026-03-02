@@ -4,7 +4,7 @@ import com.example.pi_dev.Entities.Booking.Place;
 import java.util.List;
 
 public interface IPlaceService {
-    void ajouterPlace(Place p);
+    int ajouterPlace(Place p);
 
     void modifierPlace(Place p);
 

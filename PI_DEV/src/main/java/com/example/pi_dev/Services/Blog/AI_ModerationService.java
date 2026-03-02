@@ -20,9 +20,7 @@ import java.util.Map;
  */
 public class AI_ModerationService {
 
-    // ── Paste your key from https://openrouter.ai/settings/keys ─────────────
-    private static final String API_KEY = "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";
-    // ─────────────────────────────────────────────────────────────────────────
+    private static final String API_KEY = "";
 
     private static final String[] FREE_MODELS = {
             "openrouter/auto",
@@ -74,6 +72,10 @@ public class AI_ModerationService {
     public ModerationResult moderate(String content) {
         if (content == null || content.isBlank()) {
             return new ModerationResult(0.0, "Empty content", false);
+        }
+
+        if (API_KEY == null || API_KEY.isBlank()) {
+            return localKeywordModeration(content);
         }
 
         // ── Step 1: Try AI moderation via OpenRouter ──────────────────────────

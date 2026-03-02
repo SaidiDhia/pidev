@@ -124,6 +124,9 @@ module com.example.pi_dev {
     opens com.example.pi_dev.Entities.Messaging to javafx.base;
     exports com.example.pi_dev.Entities.Events;
     exports com.example.pi_dev.Entities.Blog;
+    exports com.example.pi_dev.Entities.Booking;
+    opens com.example.pi_dev.Entities.Blog to javafx.base;
+    opens com.example.pi_dev.Entities.Booking to javafx.base;
     exports com.example.pi_dev.Iservices.Events;
     exports com.example.pi_dev.Services.Users;
     opens com.example.pi_dev.Services.Users to javafx.base;
@@ -131,6 +134,7 @@ module com.example.pi_dev {
     opens com.example.pi_dev.Services.Messaging to javafx.base;
     exports com.example.pi_dev.Services.Events;
     exports com.example.pi_dev.Services.Blog;
+    exports com.example.pi_dev.Services.Booking;
     exports com.example.pi_dev.Test.Booking to javafx.graphics;
     opens com.example.pi_dev.Test.Booking to javafx.fxml;
     exports com.example.pi_dev.Test.Marketplace to javafx.graphics;

@@ -26,5 +26,5 @@ public interface IreactionServices {
     boolean toggleReaction(Reaction reaction);
 
     // Get existing reaction of a user on a post or comment
-    Reaction getUserReaction(Integer idPost, Integer idCommentaire, int idUser);
+    Reaction getUserReaction(Integer idPost, Integer idCommentaire, String idUser); // FIXED: String
 }

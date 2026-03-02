@@ -9,8 +9,8 @@ public class Commentaire {
     private String contenu;
     private LocalDateTime date;
     private int idPost;
-    private int idUser;
-    private Integer idParent; // null = top-level, non-null = reply
+    private String idUser; // CHANGED: int → String (UUID)
+    private Integer idParent;
 
     private List<Reaction> reactions;
 
@@ -19,7 +19,7 @@ public class Commentaire {
         this.date = LocalDateTime.now();
     }
 
-    public Commentaire(String contenu, int idPost, int idUser) {
+    public Commentaire(String contenu, int idPost, String idUser) {
         this.contenu = contenu;
         this.idPost = idPost;
         this.idUser = idUser;
@@ -28,7 +28,7 @@ public class Commentaire {
         this.reactions = new ArrayList<>();
     }
 
-    public Commentaire(String contenu, int idPost, int idUser, int idParent) {
+    public Commentaire(String contenu, int idPost, String idUser, int idParent) {
         this.contenu = contenu;
         this.idPost = idPost;
         this.idUser = idUser;
@@ -37,7 +37,7 @@ public class Commentaire {
         this.reactions = new ArrayList<>();
     }
 
-    public Commentaire(int idCommentaire, String contenu, LocalDateTime date, int idPost, int idUser, Integer idParent) {
+    public Commentaire(int idCommentaire, String contenu, LocalDateTime date, int idPost, String idUser, Integer idParent) {
         this.idCommentaire = idCommentaire;
         this.contenu = contenu;
         this.date = date;
@@ -55,8 +55,8 @@ public class Commentaire {
     public void setDate(LocalDateTime date) { this.date = date; }
     public int getIdPost() { return idPost; }
     public void setIdPost(int idPost) { this.idPost = idPost; }
-    public int getIdUser() { return idUser; }
-    public void setIdUser(int idUser) { this.idUser = idUser; }
+    public String getIdUser() { return idUser; } // CHANGED
+    public void setIdUser(String idUser) { this.idUser = idUser; } // CHANGED
     public Integer getIdParent() { return idParent; }
     public void setIdParent(Integer idParent) { this.idParent = idParent; }
     public List<Reaction> getReactions() { return reactions; }

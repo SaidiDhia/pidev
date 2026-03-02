@@ -27,7 +27,7 @@ public class Place {
     }
 
     public Place(String address, int capacity, String category, String city, String description, int id, String hostId,
-            String imageUrl, int maxGuests, double pricePerDay, String title, Status status) {
+                 String imageUrl, int maxGuests, double pricePerDay, String title, Status status) {
         this.address = address;
         this.capacity = capacity;
         this.category = category;

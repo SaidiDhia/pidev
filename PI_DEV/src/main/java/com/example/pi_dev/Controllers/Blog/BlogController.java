@@ -6,11 +6,14 @@ import com.example.pi_dev.Entities.Blog.Reaction;
 import com.example.pi_dev.Services.Blog.AI_ModerationService;
 import com.example.pi_dev.Services.Blog.ModerationResult;
 import com.example.pi_dev.Services.Blog.Commentaire_Services;
+import com.example.pi_dev.Services.Blog.NotificationService;
 import com.example.pi_dev.Services.Blog.Posting_Services;
 import com.example.pi_dev.Services.Blog.Reaction_Services;
 import com.example.pi_dev.Services.Blog.TranslationService;
 import com.example.pi_dev.Services.Blog.SaveService;
 
+import com.example.pi_dev.Entities.Users.User;
+import com.example.pi_dev.Utils.Users.UserSession;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -45,49 +48,63 @@ import java.util.concurrent.CompletableFuture;
 
 public class BlogController implements Initializable {
 
-    @FXML public TextArea         newPostContent;
-    @FXML public TextField        newPostMediaPath;
-    @FXML public Label            postErrorLabel;
-    @FXML public Button           publishBtn;
-    @FXML public ComboBox<String> visibilityCombo;
-    @FXML public VBox             postsFeedContainer;
-    @FXML public VBox             emptyStateBox;
-    @FXML public Label            postCountLabel;
-    @FXML public Label            currentUsernameLabel;
-    @FXML public ScrollPane       mainScrollPane;
-    @FXML public VBox             archiveView;
-    @FXML public VBox             archiveFeedContainer;
-    @FXML public VBox             archiveEmptyBox;
-    @FXML public Label            archiveCountLabel;
+    @FXML private TextArea         newPostContent;
+    @FXML private TextField        newPostMediaPath;
+    @FXML private Label            postErrorLabel;
+    @FXML private Button           publishBtn;
+    @FXML private ComboBox<String> visibilityCombo;
+    @FXML private VBox             postsFeedContainer;
+    @FXML private VBox             emptyStateBox;
+    @FXML private Label            postCountLabel;
+    @FXML private Label            currentUsernameLabel;
+    @FXML private ScrollPane       mainScrollPane;
+    @FXML private VBox             archiveView;
+    @FXML private VBox             archiveFeedContainer;
+    @FXML private VBox             archiveEmptyBox;
+    @FXML private Label            archiveCountLabel;
+
+    @FXML private VBox             notifPanel;
+    @FXML private Label            notifBadge;
+    @FXML private VBox             notifListContainer;
+    @FXML private Button           notifTabAll;
+    @FXML private Button           notifTabUnread;
 
     private final Posting_Services     postService        = new Posting_Services();
     private final Commentaire_Services commentService     = new Commentaire_Services();
     private final Reaction_Services    reactionService    = new Reaction_Services();
     private final AI_ModerationService moderationService  = new AI_ModerationService();
     private final TranslationService   translationService = new TranslationService();
+    private final NotificationService  notificationService = new NotificationService();
 
     // ═══════════════════════════════════════════
-    // Current User
+    // Current User — NOW String (UUID)
     // ═══════════════════════════════════════════
-    private int    currentUserId   = 1;
-    private String currentUsername = "Utilisateur";
+    private String currentUserId   = "00000000-0000-0000-0000-000000000002"; // default, will be set by setCurrentUser
+    private String currentUsername = "Utilisateur2";
 
-    public void setCurrentUser(int userId, String username) {
+    public void setCurrentUser(String userId, String username) {
         this.currentUserId   = userId;
         this.currentUsername = username;
         if (currentUsernameLabel != null)
             currentUsernameLabel.setText(username);
     }
 
-    private final ObservableList<Post>  postsList         = FXCollections.observableArrayList();
-    private final Map<Integer, Integer> reportCounts      = new HashMap<>();
-    private final Set<Integer>          hiddenPostIds     = new HashSet<>();
-    private SaveService saveService;
-    private Set<Integer>               savedPostIds      = new HashSet<>();
-    private final Set<Integer>          aiHiddenPostIds   = new HashSet<>();
-    private final Map<Integer, String>  translationCache  = new HashMap<>();
-    private final Set<Integer>          translatedPostIds = new HashSet<>();
-    private final List<LocalDateTime>   commentTimestamps = new ArrayList<>();
+    private final ObservableList<Post>        postsList         = FXCollections.observableArrayList();
+    private final Map<Integer, Integer>       reportCounts      = new HashMap<>();
+    private final Map<Integer, Set<String>>   commentReportMap  = new HashMap<>(); // Set<String> for UUID reporters
+    private final Set<Integer>                hiddenPostIds     = new HashSet<>();
+    private SaveService                       saveService;
+    private Set<Integer>                      savedPostIds      = new HashSet<>();
+    private final Set<Integer>                aiHiddenPostIds   = new HashSet<>();
+    private final Map<Integer, String>        translationCache  = new HashMap<>();
+    private final Set<Integer>                translatedPostIds = new HashSet<>();
+    private final List<LocalDateTime>         commentTimestamps = new ArrayList<>();
+
+    // ── Notifications (DB-backed) ─────────────────────────────────────
+    // We use NotificationService.NotifRecord instead of in-memory Notif.
+    // notifications list is loaded from DB for the current user on login / refresh.
+    private List<NotificationService.NotifRecord> notifications = new ArrayList<>();
+    private boolean showUnreadOnly = false;
 
     private static final int MAX_COMMENTS_IN_WINDOW = 3;
     private static final int COMMENT_WINDOW_MINUTES = 1;
@@ -111,11 +128,18 @@ public class BlogController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        User u = UserSession.getInstance().getCurrentUser();
+        if (u != null) {
+            currentUserId = u.getUserId().toString();
+            currentUsername = u.getFullName() != null ? u.getFullName() : u.getEmail();
+        }
         currentUsernameLabel.setText(currentUsername);
         visibilityCombo.setItems(FXCollections.observableArrayList("🌐 Public", "🔒 Privé"));
         visibilityCombo.getSelectionModel().selectFirst();
         saveService = new SaveService(currentUserId);
         savedPostIds = saveService.loadSavedPostIds();
+        notificationService.ensureTable();
+        loadNotificationsFromDB();
         loadPosts();
     }
 
@@ -132,15 +156,13 @@ public class BlogController implements Initializable {
         if (hiddenPostIds.contains(post.getIdPost())) return false;
         if (aiHiddenPostIds.contains(post.getIdPost())) return false;
         String statut = post.getStatut() != null ? post.getStatut().toLowerCase() : "public";
-        // AI-hidden posts (statut="hidden") are never visible to anyone in the feed
         if (statut.equals("hidden")) return false;
-        // Private posts only visible to their owner
-        if (statut.contains("private")) return post.getIdUser() == currentUserId;
+        if (statut.contains("private")) return currentUserId.equals(post.getIdUser()); // FIXED: .equals()
         return true;
     }
 
     private boolean isOwner(Post post) {
-        return post.getIdUser() == currentUserId;
+        return currentUserId.equals(post.getIdUser()); // FIXED: .equals()
     }
 
     private void rebuildFeed() {
@@ -371,11 +393,7 @@ public class BlogController implements Initializable {
         saveItem.setOnAction(e -> {
             boolean nowSaved = saveService.toggle(post.getIdPost());
             savedPostIds = saveService.loadSavedPostIds();
-            if (nowSaved) {
-                showToast("Publication sauvegardée ✓");
-            } else {
-                showToast("Retiré des sauvegardés");
-            }
+            showToast(nowSaved ? "Publication sauvegardée ✓" : "Retiré des sauvegardés");
             rebuildFeed();
             if (archiveView.isVisible()) rebuildArchive();
         });
@@ -468,16 +486,16 @@ public class BlogController implements Initializable {
             });
 
             progress.setOnMousePressed(e -> {
-                Duration total = player.getTotalDuration();
-                if (total != null) player.seek(Duration.seconds(progress.getValue() * total.toSeconds()));
+                javafx.util.Duration total = player.getTotalDuration();
+                if (total != null) player.seek(javafx.util.Duration.seconds(progress.getValue() * total.toSeconds()));
             });
             progress.setOnMouseDragged(e -> {
-                Duration total = player.getTotalDuration();
-                if (total != null) player.seek(Duration.seconds(progress.getValue() * total.toSeconds()));
+                javafx.util.Duration total = player.getTotalDuration();
+                if (total != null) player.seek(javafx.util.Duration.seconds(progress.getValue() * total.toSeconds()));
             });
 
             player.currentTimeProperty().addListener((obs, old, now) -> {
-                Duration total = player.getTotalDuration();
+                javafx.util.Duration total = player.getTotalDuration();
                 if (total != null && total.toSeconds() > 0) {
                     progress.setValue(now.toSeconds() / total.toSeconds());
                     int secs = (int) now.toSeconds();
@@ -485,7 +503,7 @@ public class BlogController implements Initializable {
                 }
             });
 
-            player.setOnEndOfMedia(() -> { player.seek(Duration.ZERO); playing[0] = false; playPause.setText("▶"); });
+            player.setOnEndOfMedia(() -> { player.seek(javafx.util.Duration.ZERO); playing[0] = false; playPause.setText("▶"); });
 
             VBox videoCard = new VBox(0, view, controls);
             videoCard.setStyle("-fx-background-color:#000000; -fx-background-radius:10;");
@@ -495,7 +513,6 @@ public class BlogController implements Initializable {
             clip.heightProperty().bind(videoCard.heightProperty());
             videoCard.setClip(clip);
 
-            // Dispose player when card is removed from scene (prevents broken video on feed rebuild)
             videoCard.sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (newScene == null) {
                     player.stop();
@@ -567,11 +584,22 @@ public class BlogController implements Initializable {
         spamLabel.setStyle("-fx-text-fill:#EF4444; -fx-font-size:11px; -fx-font-family:'Segoe UI',Arial; -fx-padding:0 0 6 0;");
         spamLabel.setVisible(false); spamLabel.setManaged(false);
 
+        // Sort: most reactions first; tie-break by newest date
+        List<Commentaire> sorted = new ArrayList<>(comments);
+        sorted.sort((a, b) -> {
+            int rA = reactionService.getReactionsByCommentaire(a.getIdCommentaire()).size();
+            int rB = reactionService.getReactionsByCommentaire(b.getIdCommentaire()).size();
+            if (rB != rA) return Integer.compare(rB, rA);
+            LocalDateTime dA = a.getDate() != null ? a.getDate() : LocalDateTime.MIN;
+            LocalDateTime dB = b.getDate() != null ? b.getDate() : LocalDateTime.MIN;
+            return dB.compareTo(dA);
+        });
+
         VBox commentsList = new VBox(4);
-        for (Commentaire c : comments)
+        for (Commentaire c : sorted)
             commentsList.getChildren().add(buildCommentItem(c, post, spamLabel));
 
-        HBox addForm = buildAddCommentForm(post, commentsList, null, spamLabel);
+        HBox addForm = buildAddCommentForm(post, commentsList, null, null, spamLabel);
         section.getChildren().addAll(spamLabel, commentsList, addForm);
         return section;
     }
@@ -583,18 +611,24 @@ public class BlogController implements Initializable {
         HBox mainRow = new HBox(10);
         mainRow.setAlignment(Pos.TOP_LEFT);
 
-        Label avatar = new Label("U");
+        boolean isMyComment = currentUserId.equals(comment.getIdUser()); // FIXED: .equals()
+        String avatarLetter = isMyComment ? currentUsername.substring(0, 1).toUpperCase() : "U";
+        Label avatar = new Label(avatarLetter);
         avatar.setMinSize(32, 32); avatar.setMaxSize(32, 32);
         avatar.setAlignment(Pos.CENTER);
-        avatar.setStyle("-fx-background-color:#DBEAFE; -fx-background-radius:16; -fx-text-fill:#1E40AF; -fx-font-size:12px; -fx-font-weight:bold;");
+        avatar.setStyle(isMyComment
+                ? "-fx-background-color:#BFDBFE; -fx-background-radius:16; -fx-text-fill:#1E40AF; -fx-font-size:12px; -fx-font-weight:bold;"
+                : "-fx-background-color:#DBEAFE; -fx-background-radius:16; -fx-text-fill:#1E40AF; -fx-font-size:12px; -fx-font-weight:bold;");
 
         VBox rightCol = new VBox(4);
         HBox.setHgrow(rightCol, Priority.ALWAYS);
 
         VBox bubble = new VBox(3);
         bubble.setStyle("-fx-background-color:#FFFFFF; -fx-background-radius:4 14 14 14; -fx-padding:8 12 8 12; -fx-effect:dropshadow(gaussian,rgba(0,0,0,0.04),5,0,0,1);");
-        Label nameL = new Label("Utilisateur");
+
+        Label nameL = new Label(isMyComment ? currentUsername + " (moi)" : "Utilisateur");
         nameL.setStyle("-fx-font-size:12px; -fx-font-weight:bold; -fx-text-fill:#111827; -fx-font-family:'Segoe UI',Arial;");
+
         Label textL = new Label(comment.getContenu());
         textL.setWrapText(true);
         textL.setStyle("-fx-font-size:13px; -fx-text-fill:#374151; -fx-font-family:'Segoe UI',Arial;");
@@ -612,25 +646,118 @@ public class BlogController implements Initializable {
         Button cReactBtn = linkButton((alreadyReactedC ? "♥ " : "♡ ") + cReacts.size(), alreadyReactedC ? "#EF4444" : "#6B7280");
         cReactBtn.setOnAction(e -> handleCommentReact(comment, cReactBtn));
 
-        Button replyToggle = linkButton("↩ Répondre", "#1E40AF");
-        actionRow.getChildren().addAll(dateL, cReactBtn, replyToggle);
+        List<Commentaire> replies = commentService.getRepliesByCommentaire(comment.getIdCommentaire());
+        String replyLabel = replies.isEmpty() ? "↩ Répondre" : "↩ Répondre · " + replies.size();
+        Button replyToggle = linkButton(replyLabel, "#1E40AF");
+
+        MenuButton moreBtn = new MenuButton("•••");
+        moreBtn.setStyle(
+                "-fx-background-color:transparent; -fx-border-color:transparent;" +
+                        "-fx-text-fill:#9CA3AF; -fx-font-size:11px; -fx-padding:1 5 1 5; -fx-cursor:HAND;");
+
+        if (isMyComment) {
+            MenuItem editItem = new MenuItem("✏  Modifier");
+            editItem.setOnAction(e -> {
+                TextField editField = new TextField(comment.getContenu());
+                editField.setStyle(
+                        "-fx-font-size:12px; -fx-background-radius:6;" +
+                                "-fx-border-color:#3B82F6; -fx-border-radius:6; -fx-padding:4 8 4 8;");
+                int textIdx = bubble.getChildren().indexOf(textL);
+                bubble.getChildren().set(textIdx, editField);
+
+                Button confirmBtn = linkButton("✓ Enregistrer", "#22C55E");
+                Button cancelBtn  = linkButton("Annuler", "#9CA3AF");
+                HBox editBtns = new HBox(8, confirmBtn, cancelBtn);
+                editBtns.setPadding(new Insets(4, 0, 0, 0));
+                bubble.getChildren().add(editBtns);
+
+                confirmBtn.setOnAction(ev -> {
+                    String updated = editField.getText().trim();
+                    if (!updated.isEmpty()) {
+                        comment.setContenu(updated);
+                        commentService.modifierCommentaire(comment);
+                        textL.setText(updated);
+                    }
+                    int fieldIdx = bubble.getChildren().indexOf(editField);
+                    if (fieldIdx >= 0) bubble.getChildren().set(fieldIdx, textL);
+                    bubble.getChildren().remove(editBtns);
+                });
+                cancelBtn.setOnAction(ev -> {
+                    int fieldIdx = bubble.getChildren().indexOf(editField);
+                    if (fieldIdx >= 0) bubble.getChildren().set(fieldIdx, textL);
+                    bubble.getChildren().remove(editBtns);
+                });
+            });
+
+            MenuItem deleteItem = new MenuItem("🗑  Supprimer");
+            deleteItem.setStyle("-fx-text-fill:#EF4444;");
+            deleteItem.setOnAction(e -> {
+                commentService.supprimerCommentaire(comment.getIdCommentaire());
+                javafx.scene.Node parent = wrapper.getParent();
+                if (parent instanceof VBox) {
+                    FadeTransition ft = new FadeTransition(Duration.millis(180), wrapper);
+                    ft.setFromValue(1); ft.setToValue(0);
+                    ft.setOnFinished(ev -> ((VBox) parent).getChildren().remove(wrapper));
+                    ft.play();
+                }
+            });
+
+            moreBtn.getItems().addAll(editItem, new SeparatorMenuItem(), deleteItem);
+
+        } else {
+            Set<String> reporters = commentReportMap.computeIfAbsent(
+                    comment.getIdCommentaire(), k -> new HashSet<>()); // FIXED: Set<String>
+
+            boolean alreadyReported = reporters.contains(currentUserId);
+            MenuItem reportItem = new MenuItem(alreadyReported ? "⚑  Déjà signalé" : "⚑  Signaler");
+            reportItem.setDisable(alreadyReported);
+
+            reportItem.setOnAction(e -> {
+                reporters.add(currentUserId); // FIXED: add String UUID
+                int count = reporters.size();
+                reportItem.setText("⚑  Déjà signalé");
+                reportItem.setDisable(true);
+
+                if (count >= 3) {
+                    commentService.supprimerCommentaire(comment.getIdCommentaire());
+                    commentReportMap.remove(comment.getIdCommentaire());
+                    javafx.scene.Node parent = wrapper.getParent();
+                    if (parent instanceof VBox) {
+                        FadeTransition ft = new FadeTransition(Duration.millis(200), wrapper);
+                        ft.setFromValue(1); ft.setToValue(0);
+                        ft.setOnFinished(ev -> ((VBox) parent).getChildren().remove(wrapper));
+                        ft.play();
+                    }
+                    showToast("🗑 Commentaire supprimé après 3 signalements.");
+                } else {
+                    showToast("Commentaire signalé (" + count + "/3)");
+                }
+            });
+
+            moreBtn.getItems().add(reportItem);
+        }
+
+        actionRow.getChildren().addAll(dateL, cReactBtn, replyToggle, moreBtn);
 
         VBox replyThread = new VBox(6);
         replyThread.setPadding(new Insets(8, 0, 0, 44));
         replyThread.setVisible(false); replyThread.setManaged(false);
 
-        List<Commentaire> replies = commentService.getRepliesByCommentaire(comment.getIdCommentaire());
         for (Commentaire reply : replies)
-            replyThread.getChildren().add(buildReplyBubble(reply));
+            replyThread.getChildren().add(buildReplyBubble(reply, post, replyThread, replyToggle, spamLabel));
 
-        HBox replyInput = buildAddCommentForm(post, replyThread, comment, spamLabel);
+        HBox replyInput = buildAddCommentForm(post, replyThread, comment, replyToggle, spamLabel);
         replyThread.getChildren().add(replyInput);
 
         replyToggle.setOnAction(e -> {
             boolean showing = replyThread.isVisible();
             replyThread.setVisible(!showing);
             replyThread.setManaged(!showing);
-            replyToggle.setText(showing ? "↩ Répondre" : "↩ Masquer");
+            int count = (int) replyThread.getChildren().stream()
+                    .filter(n -> !(n instanceof HBox)).count();
+            replyToggle.setText(showing
+                    ? (count > 0 ? "↩ Répondre · " + count : "↩ Répondre")
+                    : (count > 0 ? "↩ Masquer · " + count  : "↩ Masquer"));
         });
 
         rightCol.getChildren().addAll(bubble, actionRow, replyThread);
@@ -639,12 +766,15 @@ public class BlogController implements Initializable {
         return wrapper;
     }
 
-    private VBox buildReplyBubble(Commentaire reply) {
+    private VBox buildReplyBubble(Commentaire reply, Post post, VBox replyThread,
+                                  Button parentReplyToggle, Label spamLabel) {
         VBox wrapper = new VBox(0);
         HBox row = new HBox(8);
         row.setAlignment(Pos.TOP_LEFT);
 
-        Label avatar = new Label("U");
+        boolean isMyReply = currentUserId.equals(reply.getIdUser()); // FIXED: .equals()
+        String letter = isMyReply ? currentUsername.substring(0, 1).toUpperCase() : "U";
+        Label avatar = new Label(letter);
         avatar.setMinSize(26, 26); avatar.setMaxSize(26, 26);
         avatar.setAlignment(Pos.CENTER);
         avatar.setStyle("-fx-background-color:#DBEAFE; -fx-background-radius:13; -fx-text-fill:#1E40AF; -fx-font-size:10px; -fx-font-weight:bold;");
@@ -653,14 +783,13 @@ public class BlogController implements Initializable {
 
         VBox bubble = new VBox(2);
         bubble.setStyle("-fx-background-color:#EFF6FF; -fx-background-radius:4 14 14 14; -fx-padding:7 11 7 11;");
-        Label nameL = new Label("Utilisateur");
+        Label nameL = new Label(isMyReply ? currentUsername + " (moi)" : "Utilisateur");
         nameL.setStyle("-fx-font-size:11px; -fx-font-weight:bold; -fx-text-fill:#1E40AF;");
         Label textL = new Label(reply.getContenu());
         textL.setWrapText(true);
         textL.setStyle("-fx-font-size:12px; -fx-text-fill:#374151;");
         bubble.getChildren().addAll(nameL, textL);
 
-        // Reactions row on reply
         HBox replyActionRow = new HBox(10);
         replyActionRow.setAlignment(Pos.CENTER_LEFT);
         replyActionRow.setPadding(new Insets(2, 0, 0, 2));
@@ -673,7 +802,105 @@ public class BlogController implements Initializable {
         Button rReactBtn = linkButton((alreadyReactedR ? "♥ " : "♡ ") + rReacts.size(), alreadyReactedR ? "#EF4444" : "#6B7280");
         rReactBtn.setOnAction(e -> handleCommentReact(reply, rReactBtn));
 
-        replyActionRow.getChildren().addAll(dateL, rReactBtn);
+        Button replyToReplyBtn = linkButton("↩ Répondre", "#1E40AF");
+        replyToReplyBtn.setOnAction(e -> {
+            if (!replyThread.getChildren().isEmpty()) {
+                javafx.scene.Node last = replyThread.getChildren().get(replyThread.getChildren().size() - 1);
+                if (last instanceof HBox) {
+                    HBox form = (HBox) last;
+                    for (javafx.scene.Node n : form.getChildren()) {
+                        if (n instanceof TextField tf) {
+                            tf.setText("@" + (isMyReply ? currentUsername : "Utilisateur") + " ");
+                            tf.requestFocus();
+                            tf.positionCaret(tf.getText().length());
+                            replyThread.setVisible(true);
+                            replyThread.setManaged(true);
+                            int cnt = (int) replyThread.getChildren().stream()
+                                    .filter(nd -> !(nd instanceof HBox)).count();
+                            parentReplyToggle.setText(cnt > 0 ? "↩ Masquer · " + cnt : "↩ Masquer");
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        if (isMyReply) {
+            MenuButton moreBtn = new MenuButton("•••");
+            moreBtn.setStyle("-fx-background-color:transparent; -fx-border-color:transparent;" +
+                    "-fx-text-fill:#9CA3AF; -fx-font-size:10px; -fx-padding:1 4 1 4; -fx-cursor:HAND;");
+
+            MenuItem editItem = new MenuItem("✏  Modifier");
+            editItem.setOnAction(e -> {
+                TextField editField = new TextField(reply.getContenu());
+                editField.setStyle("-fx-font-size:11px; -fx-background-radius:6;" +
+                        "-fx-border-color:#3B82F6; -fx-border-radius:6; -fx-padding:3 7 3 7;");
+                int textIdx = bubble.getChildren().indexOf(textL);
+                bubble.getChildren().set(textIdx, editField);
+
+                Button confirmBtn = linkButton("✓", "#22C55E");
+                Button cancelBtn  = linkButton("✕", "#9CA3AF");
+                HBox editBtns = new HBox(6, confirmBtn, cancelBtn);
+                bubble.getChildren().add(editBtns);
+
+                confirmBtn.setOnAction(ev -> {
+                    String updated = editField.getText().trim();
+                    if (!updated.isEmpty()) {
+                        reply.setContenu(updated);
+                        commentService.modifierCommentaire(reply);
+                        textL.setText(updated);
+                    }
+                    int fi = bubble.getChildren().indexOf(editField);
+                    if (fi >= 0) bubble.getChildren().set(fi, textL);
+                    bubble.getChildren().remove(editBtns);
+                });
+                cancelBtn.setOnAction(ev -> {
+                    int fi = bubble.getChildren().indexOf(editField);
+                    if (fi >= 0) bubble.getChildren().set(fi, textL);
+                    bubble.getChildren().remove(editBtns);
+                });
+            });
+
+            MenuItem deleteItem = new MenuItem("🗑  Supprimer");
+            deleteItem.setOnAction(e -> {
+                commentService.supprimerCommentaire(reply.getIdCommentaire());
+                replyThread.getChildren().remove(wrapper);
+                int cnt = (int) replyThread.getChildren().stream()
+                        .filter(n -> !(n instanceof HBox)).count();
+                parentReplyToggle.setText(cnt > 0 ? "↩ Masquer · " + cnt : "↩ Masquer");
+            });
+
+            moreBtn.getItems().addAll(editItem, new SeparatorMenuItem(), deleteItem);
+            replyActionRow.getChildren().addAll(dateL, rReactBtn, replyToReplyBtn, moreBtn);
+        } else {
+            Set<String> reporters = commentReportMap.computeIfAbsent(
+                    reply.getIdCommentaire(), k -> new HashSet<>()); // FIXED: Set<String>
+            boolean alreadyReported = reporters.contains(currentUserId);
+            MenuItem reportItem = new MenuItem(alreadyReported ? "⚑  Déjà signalé" : "⚑  Signaler");
+            reportItem.setDisable(alreadyReported);
+            reportItem.setOnAction(e -> {
+                reporters.add(currentUserId); // FIXED: String UUID
+                int count = reporters.size();
+                reportItem.setText("⚑  Déjà signalé");
+                reportItem.setDisable(true);
+                if (count >= 3) {
+                    commentService.supprimerCommentaire(reply.getIdCommentaire());
+                    replyThread.getChildren().remove(wrapper);
+                    int cnt = (int) replyThread.getChildren().stream()
+                            .filter(n -> !(n instanceof HBox)).count();
+                    parentReplyToggle.setText(cnt > 0 ? "↩ Masquer · " + cnt : "↩ Masquer");
+                    showToast("🗑 Réponse supprimée après 3 signalements.");
+                } else {
+                    showToast("Réponse signalée (" + count + "/3)");
+                }
+            });
+
+            MenuButton moreBtn = new MenuButton("•••");
+            moreBtn.setStyle("-fx-background-color:transparent; -fx-border-color:transparent;" +
+                    "-fx-text-fill:#9CA3AF; -fx-font-size:10px; -fx-padding:1 4 1 4; -fx-cursor:HAND;");
+            moreBtn.getItems().add(reportItem);
+            replyActionRow.getChildren().addAll(dateL, rReactBtn, replyToReplyBtn, moreBtn);
+        }
 
         col.getChildren().addAll(bubble, replyActionRow);
         row.getChildren().addAll(avatar, col);
@@ -682,7 +909,7 @@ public class BlogController implements Initializable {
     }
 
     private HBox buildAddCommentForm(Post post, VBox targetList,
-                                     Commentaire parentComment, Label spamLabel) {
+                                     Commentaire parentComment, Button replyToggle, Label spamLabel) {
         HBox form = new HBox(8);
         form.setAlignment(Pos.CENTER_LEFT);
         form.setPadding(new Insets(parentComment == null ? 10 : 6, 0, 0, 0));
@@ -720,14 +947,29 @@ public class BlogController implements Initializable {
                 int idx = Math.max(0, targetList.getChildren().size() - 1);
                 targetList.getChildren().add(idx, item);
                 fadeIn(item);
+                // Notify the POST OWNER (not the commenter)
+                if (!currentUserId.equals(post.getIdUser())) {
+                    pushNotif(NotificationService.NotifType.COMMENT,
+                            post.getIdUser(), post.getContenu(), txt);
+                }
             } else {
                 Commentaire reply = new Commentaire(txt, post.getIdPost(), currentUserId, parentComment.getIdCommentaire());
                 commentService.ajouterCommentaire(reply);
-                VBox bubbleNode = buildReplyBubble(reply);
+                VBox bubbleNode = buildReplyBubble(reply, post, targetList, replyToggle, spamLabel);
                 bubbleNode.setOpacity(0);
                 int idx = Math.max(0, targetList.getChildren().size() - 1);
                 targetList.getChildren().add(idx, bubbleNode);
                 fadeIn(bubbleNode);
+                if (replyToggle != null) {
+                    int cnt = (int) targetList.getChildren().stream()
+                            .filter(n -> !(n instanceof HBox)).count();
+                    replyToggle.setText("↩ Masquer · " + cnt);
+                }
+                // Notify the COMMENT OWNER (not the replier)
+                if (!currentUserId.equals(parentComment.getIdUser())) {
+                    pushNotif(NotificationService.NotifType.REPLY_TO_COMMENT,
+                            parentComment.getIdUser(), post.getContenu(), txt);
+                }
             }
             field.clear();
         };
@@ -739,7 +981,7 @@ public class BlogController implements Initializable {
     }
 
     // ═══════════════════════════════════════════
-    // Spam Protection — 1 minute cooldown
+    // Spam Protection
     // ═══════════════════════════════════════════
 
     private boolean canPostComment(Label spamLabel) {
@@ -826,6 +1068,187 @@ public class BlogController implements Initializable {
         mainScrollPane.setVisible(true); mainScrollPane.setManaged(true);
     }
 
+    @FXML
+    private void handleToggleNotifications() {
+        boolean showing = notifPanel.isVisible();
+        notifPanel.setVisible(!showing);
+        notifPanel.setManaged(!showing);
+        if (!showing) {
+            loadNotificationsFromDB(); // always reload from DB to get latest
+            rebuildNotifList();
+        }
+    }
+
+    @FXML
+    private void handleMarkAllRead() {
+        notificationService.markAllRead(currentUserId);
+        notifications.forEach(n -> n.read = true);
+        updateNotifBadge();
+        rebuildNotifList();
+    }
+
+    @FXML
+    private void handleNotifTabAll() {
+        showUnreadOnly = false;
+        notifTabAll.setStyle("-fx-background-color:transparent; -fx-text-fill:#1E40AF; -fx-font-size:12px; -fx-font-weight:bold; -fx-cursor:HAND; -fx-border-color:#1E40AF; -fx-border-width:0 0 2 0; -fx-border-radius:0; -fx-background-radius:0; -fx-padding:10 12 8 12;");
+        notifTabUnread.setStyle("-fx-background-color:transparent; -fx-text-fill:#6B7280; -fx-font-size:12px; -fx-cursor:HAND; -fx-border-color:transparent; -fx-border-width:0 0 2 0; -fx-border-radius:0; -fx-background-radius:0; -fx-padding:10 12 8 12;");
+        rebuildNotifList();
+    }
+
+    @FXML
+    private void handleNotifTabUnread() {
+        showUnreadOnly = true;
+        notifTabUnread.setStyle("-fx-background-color:transparent; -fx-text-fill:#1E40AF; -fx-font-size:12px; -fx-font-weight:bold; -fx-cursor:HAND; -fx-border-color:#1E40AF; -fx-border-width:0 0 2 0; -fx-border-radius:0; -fx-background-radius:0; -fx-padding:10 12 8 12;");
+        notifTabAll.setStyle("-fx-background-color:transparent; -fx-text-fill:#6B7280; -fx-font-size:12px; -fx-cursor:HAND; -fx-border-color:transparent; -fx-border-width:0 0 2 0; -fx-border-radius:0; -fx-background-radius:0; -fx-padding:10 12 8 12;");
+        rebuildNotifList();
+    }
+
+    // ═══════════════════════════════════════════
+    // Notification Helpers (DB-backed)
+    // ═══════════════════════════════════════════
+
+    /** Load the current user's notifications from DB. */
+    private void loadNotificationsFromDB() {
+        notifications = notificationService.getForUser(currentUserId);
+        updateNotifBadge();
+    }
+
+    /**
+     * Persist a notification for the RECIPIENT (not the actor).
+     * recipientUserId = the owner of the post/comment being interacted with.
+     * Only call this when recipientUserId != currentUserId.
+     */
+    private void pushNotif(NotificationService.NotifType type,
+                           String recipientUserId,
+                           String postPreview, String contentPreview) {
+        notificationService.push(type, recipientUserId, currentUsername, postPreview, contentPreview);
+        // If we are also the recipient (shouldn't happen due to guard), reload
+        if (recipientUserId.equals(currentUserId)) {
+            loadNotificationsFromDB();
+            if (notifPanel.isVisible()) rebuildNotifList();
+        }
+        // Otherwise, the recipient will see it when they log in / refresh notifications.
+    }
+
+    private void updateNotifBadge() {
+        if (notifBadge == null) return;
+        long unread = notifications.stream().filter(n -> !n.read).count();
+        if (unread > 0) {
+            notifBadge.setText(unread > 9 ? "9+" : String.valueOf(unread));
+            notifBadge.setVisible(true);
+            notifBadge.setManaged(true);
+        } else {
+            notifBadge.setVisible(false);
+            notifBadge.setManaged(false);
+        }
+    }
+
+    private void rebuildNotifList() {
+        notifListContainer.getChildren().clear();
+        List<NotificationService.NotifRecord> list = showUnreadOnly
+                ? notifications.stream().filter(n -> !n.read).toList()
+                : notifications;
+
+        if (list.isEmpty()) {
+            Label empty = new Label(showUnreadOnly ? "Aucune notification non lue" : "Aucune notification");
+            empty.setStyle("-fx-font-size:12px; -fx-text-fill:#9CA3AF; -fx-font-family:'Segoe UI',Arial; -fx-padding:28 0 28 0;");
+            empty.setMaxWidth(Double.MAX_VALUE);
+            empty.setAlignment(Pos.CENTER);
+            notifListContainer.getChildren().add(empty);
+            return;
+        }
+
+        for (NotificationService.NotifRecord notif : list) {
+            HBox row = new HBox(12);
+            row.setAlignment(Pos.TOP_LEFT);
+            row.setPadding(new Insets(12, 16, 12, 16));
+            row.setStyle(notif.read
+                    ? "-fx-background-color:#FFFFFF; -fx-cursor:HAND;"
+                    : "-fx-background-color:#EFF6FF; -fx-cursor:HAND;");
+            row.setOnMouseEntered(e  -> row.setStyle(row.getStyle().replace("#FFFFFF", "#F9FAFB").replace("#EFF6FF", "#DBEAFE")));
+            row.setOnMouseExited(e   -> row.setStyle(notif.read ? "-fx-background-color:#FFFFFF; -fx-cursor:HAND;" : "-fx-background-color:#EFF6FF; -fx-cursor:HAND;"));
+            row.setOnMouseClicked(e  -> {
+                notif.read = true;
+                notificationService.markRead(notif.id);
+                updateNotifBadge();
+                rebuildNotifList();
+            });
+
+            String icon = switch (notif.type) {
+                case COMMENT           -> "💬";
+                case REPLY_TO_COMMENT  -> "↩";
+                case REACTION_POST     -> "♥";
+                case REACTION_COMMENT  -> "♥";
+            };
+            Label iconLabel = new Label(icon);
+            iconLabel.setMinSize(36, 36); iconLabel.setMaxSize(36, 36);
+            iconLabel.setAlignment(Pos.CENTER);
+            iconLabel.setStyle("-fx-background-color:#DBEAFE; -fx-background-radius:18; -fx-font-size:15px;");
+
+            VBox textCol = new VBox(3);
+            HBox.setHgrow(textCol, Priority.ALWAYS);
+
+            String verb = switch (notif.type) {
+                case COMMENT           -> " a commenté votre publication";
+                case REPLY_TO_COMMENT  -> " a répondu à votre commentaire";
+                case REACTION_POST     -> " a réagi à votre publication";
+                case REACTION_COMMENT  -> " a réagi à votre commentaire";
+            };
+            Label msgLabel = new Label(notif.actorUsername + verb);
+            msgLabel.setWrapText(true);
+            msgLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#111827; -fx-font-family:'Segoe UI',Arial;");
+
+            if (notif.postPreview != null && !notif.postPreview.isBlank()) {
+                String preview = notif.postPreview.length() > 50
+                        ? notif.postPreview.substring(0, 50) + "…"
+                        : notif.postPreview;
+                Label postLabel = new Label("📄 " + preview);
+                postLabel.setStyle("-fx-font-size:11px; -fx-text-fill:#6B7280; -fx-font-family:'Segoe UI',Arial;");
+                postLabel.setWrapText(true);
+                textCol.getChildren().add(postLabel);
+            }
+
+            if (notif.contentPreview != null && !notif.contentPreview.isBlank()) {
+                String preview = notif.contentPreview.length() > 60
+                        ? notif.contentPreview.substring(0, 60) + "…"
+                        : notif.contentPreview;
+                Label commentLabel = new Label("« " + preview + " »");
+                commentLabel.setStyle("-fx-font-size:11px; -fx-text-fill:#374151; -fx-font-style:italic; -fx-font-family:'Segoe UI',Arial;");
+                commentLabel.setWrapText(true);
+                textCol.getChildren().add(commentLabel);
+            }
+
+            textCol.getChildren().add(0, msgLabel);
+
+            VBox rightCol = new VBox();
+            rightCol.setAlignment(Pos.TOP_RIGHT);
+            Label dateLabel = new Label(formatNotifDate(notif.date));
+            dateLabel.setStyle("-fx-font-size:10px; -fx-text-fill:#9CA3AF; -fx-font-family:'Segoe UI',Arial;");
+
+            if (!notif.read) {
+                Label dot = new Label("●");
+                dot.setStyle("-fx-text-fill:#1E40AF; -fx-font-size:8px; -fx-padding:4 0 0 0;");
+                rightCol.getChildren().addAll(dateLabel, dot);
+            } else {
+                rightCol.getChildren().add(dateLabel);
+            }
+
+            row.getChildren().addAll(iconLabel, textCol, rightCol);
+            Separator sep = new Separator();
+            sep.setStyle("-fx-padding:0;");
+            notifListContainer.getChildren().addAll(row, sep);
+        }
+    }
+
+    private String formatNotifDate(LocalDateTime date) {
+        long minutes = java.time.Duration.between(date, LocalDateTime.now()).toMinutes();
+        if (minutes < 1)  return "À l'instant";
+        if (minutes < 60) return minutes + " min";
+        long hours = minutes / 60;
+        if (hours < 24)   return hours + " h";
+        return date.format(DateTimeFormatter.ofPattern("dd MMM"));
+    }
+
     // ═══════════════════════════════════════════
     // Card Handlers
     // ═══════════════════════════════════════════
@@ -837,6 +1260,11 @@ public class BlogController implements Initializable {
         if (added) {
             btn.setText("♥  " + count);
             btn.setStyle("-fx-background-color:#EF4444; -fx-background-radius:8; -fx-text-fill:white; -fx-font-size:12px; -fx-padding:6 12 6 12; -fx-cursor:HAND;");
+            // Notify the POST OWNER when someone reacts (not when un-reacting)
+            if (!currentUserId.equals(post.getIdUser())) {
+                pushNotif(NotificationService.NotifType.REACTION_POST,
+                        post.getIdUser(), post.getContenu(), null);
+            }
         } else {
             btn.setText("♥  " + count);
             btn.setStyle("-fx-background-color:transparent; -fx-background-radius:8; -fx-text-fill:#EF4444; -fx-font-size:12px; -fx-padding:6 12 6 12; -fx-cursor:HAND;");
@@ -850,6 +1278,11 @@ public class BlogController implements Initializable {
         if (added) {
             btn.setText("♥ " + count);
             btn.setStyle("-fx-background-color:transparent; -fx-text-fill:#EF4444; -fx-font-size:11px; -fx-font-weight:bold; -fx-font-family:'Segoe UI',Arial; -fx-padding:2 6 2 0; -fx-cursor:HAND; -fx-border-color:transparent;");
+            // Notify the COMMENT OWNER when someone reacts
+            if (!currentUserId.equals(comment.getIdUser())) {
+                pushNotif(NotificationService.NotifType.REACTION_COMMENT,
+                        comment.getIdUser(), null, comment.getContenu());
+            }
         } else {
             btn.setText("♡ " + count);
             btn.setStyle("-fx-background-color:transparent; -fx-text-fill:#6B7280; -fx-font-size:11px; -fx-font-weight:bold; -fx-font-family:'Segoe UI',Arial; -fx-padding:2 6 2 0; -fx-cursor:HAND; -fx-border-color:transparent;");

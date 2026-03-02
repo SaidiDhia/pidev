@@ -25,13 +25,13 @@
         <!-- Table -->
         <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
             <columns>
-                <TableColumn fx:id="colProperty" text="Property" prefWidth="180"/>
-                <TableColumn fx:id="colDates"    text="Dates"    prefWidth="180"/>
-                <TableColumn fx:id="colGuests"   text="Guests"   prefWidth="70"/>
-                <TableColumn fx:id="colTotal"    text="Total ($)" prefWidth="90"/>
-                <TableColumn fx:id="colStatus"   text="Status"   prefWidth="100"/>
-                <TableColumn fx:id="colPdf"      text="Receipt"   prefWidth="85"/>
-                <TableColumn fx:id="colActions"  text="Actions"  prefWidth="160"/>
+                <TableColumn fx:id="colProperty" text="Property" prefWidth="300"/>
+                <TableColumn fx:id="colDates"    text="Dates"    prefWidth="250"/>
+                <TableColumn fx:id="colGuests"   text="Guests"   prefWidth="100"/>
+                <TableColumn fx:id="colTotal"    text="Total ($)" prefWidth="120"/>
+                <TableColumn fx:id="colStatus"   text="Status"   prefWidth="120"/>
+                <TableColumn fx:id="colPdf"      text="Receipt"   prefWidth="120"/>
+                <TableColumn fx:id="colActions"  text="Actions"  prefWidth="250"/>
             </columns>
             <placeholder>
                 <Label styleClass="section-subtitle" text="No bookings found."/>

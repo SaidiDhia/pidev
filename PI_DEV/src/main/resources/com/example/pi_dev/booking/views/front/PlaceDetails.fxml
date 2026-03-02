@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -32,11 +33,21 @@
                     <!-- Main content: image + pricing card -->
                     <HBox spacing="24" alignment="TOP_LEFT">
 
-                        <!-- Left: Big Image -->
-                        <VBox HBox.hgrow="ALWAYS" spacing="0">
-                            <ImageView fx:id="placeImage" fitWidth="700" fitHeight="420"
+                        <!-- Left: Big Image + Thumbnail Gallery -->
+                        <VBox HBox.hgrow="ALWAYS" spacing="8">
+                            <ImageView fx:id="placeImage" fitWidth="700" fitHeight="380"
                                        preserveRatio="false"
                                        style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);"/>
+
+                            <!-- Thumbnail gallery (horizontal scroll) -->
+                            <ScrollPane hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+                                        fitToHeight="true" prefHeight="85"
+                                        style="-fx-background: transparent; -fx-background-color: transparent; -fx-padding: 0;">
+                                <content>
+                                    <HBox fx:id="thumbnailsContainer" spacing="8"
+                                          style="-fx-padding: 4 0 4 0;"/>
+                                </content>
+                            </ScrollPane>
                         </VBox>
 
                         <!-- Right: Pricing Card -->

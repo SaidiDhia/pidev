@@ -22,7 +22,7 @@ public class Commentaire_Services implements IcommentaireServices {
             PreparedStatement pst = connection.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS);
             pst.setString(1, commentaire.getContenu());
             pst.setInt(2, commentaire.getIdPost());
-            pst.setInt(3, commentaire.getIdUser());
+            pst.setString(3, commentaire.getIdUser()); // FIXED: setString
             if (commentaire.getIdParent() != null) pst.setInt(4, commentaire.getIdParent());
             else pst.setNull(4, Types.INTEGER);
             int rowsAffected = pst.executeUpdate();
@@ -60,7 +60,6 @@ public class Commentaire_Services implements IcommentaireServices {
     @Override
     public List<Commentaire> getCommentairesByPost(int idPost) {
         List<Commentaire> list = new ArrayList<>();
-        // Only top-level comments
         String requete = "SELECT * FROM commentaires WHERE id_post = ? AND id_parent IS NULL ORDER BY date ASC";
         try {
             PreparedStatement pst = connection.prepareStatement(requete);
@@ -71,7 +70,6 @@ public class Commentaire_Services implements IcommentaireServices {
         return list;
     }
 
-    // NEW — load replies from DB (persistent across sessions)
     public List<Commentaire> getRepliesByCommentaire(int idParent) {
         List<Commentaire> list = new ArrayList<>();
         String requete = "SELECT * FROM commentaires WHERE id_parent = ? ORDER BY date ASC";
@@ -97,7 +95,6 @@ public class Commentaire_Services implements IcommentaireServices {
 
     @Override
     public void supprimerCommentaire(int idCommentaire) {
-        // Delete replies first, then the comment itself
         try {
             PreparedStatement p1 = connection.prepareStatement("DELETE FROM commentaires WHERE id_parent = ?");
             p1.setInt(1, idCommentaire); p1.executeUpdate();
@@ -107,8 +104,8 @@ public class Commentaire_Services implements IcommentaireServices {
     }
 
     private Commentaire mapRow(ResultSet rs) throws SQLException {
-        int idUser = 0;
-        try { idUser = rs.getInt("id_user"); } catch (Exception ignored) {}
+        String idUser = null;
+        try { idUser = rs.getString("id_user"); } catch (Exception ignored) {} // FIXED: getString
         Integer idParent = null;
         try {
             Object p = rs.getObject("id_parent");
@@ -119,7 +116,7 @@ public class Commentaire_Services implements IcommentaireServices {
                 rs.getString("contenu"),
                 rs.getTimestamp("date").toLocalDateTime(),
                 rs.getInt("id_post"),
-                idUser,
+                idUser, // FIXED: String
                 idParent
         );
     }

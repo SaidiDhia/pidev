@@ -23,7 +23,7 @@ public class Posting_Services implements IpostServices {
             pst.setString(1, post.getContenu());
             pst.setString(2, post.getMedia());
             pst.setString(3, post.getStatut());
-            pst.setInt(4, post.getIdUser());
+            pst.setString(4, post.getIdUser()); // FIXED: setString
             int rowsAffected = pst.executeUpdate();
             if (rowsAffected > 0) {
                 ResultSet generatedKeys = pst.getGeneratedKeys();
@@ -94,15 +94,15 @@ public class Posting_Services implements IpostServices {
     }
 
     private Post mapRow(ResultSet rs) throws SQLException {
-        int idUser = 0;
-        try { idUser = rs.getInt("id_user"); } catch (Exception ignored) {}
+        String idUser = null;
+        try { idUser = rs.getString("id_user"); } catch (Exception ignored) {} // FIXED: getString
         return new Post(
                 rs.getInt("id_post"),
                 rs.getString("contenu"),
                 rs.getString("media"),
                 rs.getTimestamp("date_creation").toLocalDateTime(),
                 rs.getString("statut"),
-                idUser
+                idUser // FIXED: String
         );
     }
 }

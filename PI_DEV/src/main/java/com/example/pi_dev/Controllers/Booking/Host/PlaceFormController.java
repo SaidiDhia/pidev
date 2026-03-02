@@ -8,6 +8,10 @@ import com.example.pi_dev.Utils.Booking.Session;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
+import javafx.stage.FileChooser;
 
 public class PlaceFormController {
 
@@ -37,6 +41,10 @@ public class PlaceFormController {
     private Button submitBtn;
     @FXML
     private Label geoStatusLabel;
+    @FXML
+    private FlowPane photosPreview;
+    @FXML
+    private Label photoCountLabel;
 
     private Place editingPlace;
     private Double pendingLat;
@@ -116,6 +124,32 @@ public class PlaceFormController {
                 }
             });
         }).start();
+    }
+
+    @FXML
+    private void handleAddPhotos() {
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+        java.util.List<java.io.File> files = chooser.showOpenMultipleDialog(null);
+        if (files != null && !files.isEmpty()) {
+            if (photoCountLabel != null) {
+                photoCountLabel.setText(files.size() + " photo(s) selected");
+            }
+            if (photosPreview != null) {
+                photosPreview.getChildren().clear();
+                for (java.io.File f : files) {
+                    ImageView iv = new ImageView(new Image(f.toURI().toString(), 120, 90, true, true));
+                    iv.setFitWidth(120);
+                    iv.setFitHeight(90);
+                    photosPreview.getChildren().add(iv);
+                }
+            }
+            if (!files.isEmpty()) {
+                imageUrlField.setText(files.get(0).toURI().toString());
+            }
+        }
     }
 
     @FXML

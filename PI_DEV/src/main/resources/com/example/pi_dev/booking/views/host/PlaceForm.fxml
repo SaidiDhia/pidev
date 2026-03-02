@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -90,23 +91,43 @@
                         <TextField fx:id="categoryField" promptText="e.g. Apartment, House, Villa" styleClass="text-input"/>
                     </VBox>
 
-                    <!-- Image URL -->
-                    <VBox spacing="8">
-                        <Label styleClass="text-p" style="-fx-font-weight: bold;" text="Image URL"/>
-                        <TextField fx:id="imageUrlField" promptText="https://example.com/image.jpg" styleClass="text-input"/>
+                    <Separator opacity="0.35"/>
+
+                    <!-- ── Photos Section ──────────────────────────────────── -->
+                    <VBox spacing="12">
+                        <Label styleClass="text-p" style="-fx-font-weight: bold;" text="📷 Photos"/>
+                        <Label styleClass="text-p" style="-fx-text-fill: #6B7280; -fx-font-size: 12px;"
+                               text="Upload photos from your computer. Click a thumbnail to set it as primary (⭐)."/>
+
+                        <!-- Add Photos button + count -->
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Button text="📷 Add Photos" styleClass="btn"
+                                    style="-fx-background-color: #7C3AED; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 7 16 7 16; -fx-cursor: hand; -fx-font-weight: bold;"
+                                    onAction="#handleAddPhotos"/>
+                            <Label fx:id="photoCountLabel" styleClass="text-p"
+                                   style="-fx-text-fill: #6B7280;" text="No photos selected"/>
+                        </HBox>
+
+                        <!-- Thumbnail preview grid -->
+                        <FlowPane fx:id="photosPreview" hgap="10" vgap="10"
+                                  style="-fx-background-color: #F3F4F6; -fx-background-radius: 10; -fx-padding: 10;"
+                                  minHeight="100"/>
                     </VBox>
 
                     <Separator opacity="0.35"/>
 
                     <!-- Feedback Labels -->
-                    <Label fx:id="errorLabel" styleClass="error-label" text="" wrapText="true"/>
+                    <Label fx:id="errorLabel"   styleClass="error-label"   text="" wrapText="true"/>
                     <Label fx:id="successLabel" styleClass="success-label" text="" wrapText="true"/>
 
                     <!-- Actions -->
                     <HBox alignment="CENTER_RIGHT" spacing="14">
-                        <Button text="Cancel" styleClass="btn" style="-fx-background-color: transparent; -fx-border-color: #D1D5DB; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #374151;" onAction="#handleCancel"/>
+                        <Button text="Cancel" styleClass="btn"
+                                style="-fx-background-color: transparent; -fx-border-color: #D1D5DB; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #374151;"
+                                onAction="#handleCancel"/>
                         <Button fx:id="submitBtn" text="Submit for Approval" prefWidth="200"
-                                styleClass="btn" style="-fx-background-color: #2563EB; -fx-text-fill: white;" onAction="#handleSubmit"/>
+                                styleClass="btn" style="-fx-background-color: #2563EB; -fx-text-fill: white;"
+                                onAction="#handleSubmit"/>
                     </HBox>
 
                 </VBox>

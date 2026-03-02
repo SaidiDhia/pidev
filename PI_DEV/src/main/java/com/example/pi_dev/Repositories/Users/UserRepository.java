@@ -93,6 +93,15 @@ public class UserRepository {
         }
     }
 
+    public void updateRole(UUID userId, RoleEnum role) throws SQLException {
+        String sql = "UPDATE users SET role=? WHERE user_id = ?";
+        try (PreparedStatement ps = UserDatabaseConnection.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setString(1, role.name());
+            ps.setString(2, userId.toString());
+            ps.executeUpdate();
+        }
+    }
+
     // TFA Methods
     public void saveTfaSecret(UUID userId, String secretKey) throws SQLException {
         String sql = "INSERT INTO tfa_secrets (user_id, secret_key) VALUES (?, ?) ON DUPLICATE KEY UPDATE secret_key = ?";

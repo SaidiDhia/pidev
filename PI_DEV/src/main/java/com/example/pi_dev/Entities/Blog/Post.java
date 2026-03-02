@@ -10,7 +10,7 @@ public class Post {
     private String media;
     private LocalDateTime dateCreation;
     private String statut;
-    private int idUser;
+    private String idUser; // CHANGED: int → String (UUID)
 
     private List<Commentaire> commentaires;
     private List<Reaction> reactions;
@@ -21,7 +21,7 @@ public class Post {
         this.dateCreation = LocalDateTime.now();
     }
 
-    public Post(String contenu, String media, String statut, int idUser) {
+    public Post(String contenu, String media, String statut, String idUser) {
         this.contenu = contenu;
         this.media = media;
         this.statut = statut;
@@ -31,7 +31,7 @@ public class Post {
         this.reactions = new ArrayList<>();
     }
 
-    public Post(int idPost, String contenu, String media, LocalDateTime dateCreation, String statut, int idUser) {
+    public Post(int idPost, String contenu, String media, LocalDateTime dateCreation, String statut, String idUser) {
         this.idPost = idPost;
         this.contenu = contenu;
         this.media = media;
@@ -52,8 +52,8 @@ public class Post {
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
-    public int getIdUser() { return idUser; }
-    public void setIdUser(int idUser) { this.idUser = idUser; }
+    public String getIdUser() { return idUser; } // CHANGED
+    public void setIdUser(String idUser) { this.idUser = idUser; } // CHANGED
     public List<Commentaire> getCommentaires() { return commentaires; }
     public void setCommentaires(List<Commentaire> commentaires) { this.commentaires = commentaires; }
     public List<Reaction> getReactions() { return reactions; }

@@ -25,11 +25,11 @@
         <!-- Table -->
         <TableView fx:id="placesTable" VBox.vgrow="ALWAYS" styleClass="table-view">
             <columns>
-                <TableColumn fx:id="colTitle"   text="Title"       prefWidth="250"/>
-                <TableColumn fx:id="colCity"    text="City"        prefWidth="150"/>
-                <TableColumn fx:id="colPrice"   text="Price/Day"   prefWidth="100"/>
-                <TableColumn fx:id="colStatus"  text="Status"      prefWidth="100"/>
-                <TableColumn fx:id="colActions" text="Actions"     prefWidth="160"/>
+                <TableColumn fx:id="colTitle"   text="Title"       prefWidth="350"/>
+                <TableColumn fx:id="colCity"    text="City"        prefWidth="200"/>
+                <TableColumn fx:id="colPrice"   text="Price/Day"   prefWidth="120"/>
+                <TableColumn fx:id="colStatus"  text="Status"      prefWidth="120"/>
+                <TableColumn fx:id="colActions" text="Actions"     prefWidth="200"/>
             </columns>
             <placeholder>
                 <Label styleClass="section-subtitle" text="No places listed yet."/>

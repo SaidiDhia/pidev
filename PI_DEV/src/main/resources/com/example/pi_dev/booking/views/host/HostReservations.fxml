@@ -8,14 +8,14 @@
 
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.pi_dev.Controllers.Booking.Admin.AdminReservationsController"
+      fx:controller="com.example.pi_dev.Controllers.Booking.Host.HostReservationsController"
       stylesheets="@../../style.css"
       spacing="20"
       style="-fx-background-color: white; -fx-padding: 24 32 32 32;">
 
     <VBox spacing="4">
-        <Label styleClass="text-h2" text="Booking Management"/>
-        <Label styleClass="section-subtitle" text="Confirm, reject, or cancel any reservation"/>
+        <Label styleClass="text-h2" text="My Place Reservations"/>
+        <Label styleClass="section-subtitle" text="Review and manage bookings from guests for your places"/>
     </VBox>
 
     <TableView fx:id="bookingsTable" VBox.vgrow="ALWAYS" styleClass="table-view">
@@ -25,10 +25,10 @@
             <TableColumn fx:id="colGuests"   text="Guests"      prefWidth="100"/>
             <TableColumn fx:id="colTotal"    text="Total ($)"   prefWidth="120"/>
             <TableColumn fx:id="colStatus"   text="Status"      prefWidth="120"/>
-            <TableColumn fx:id="colActions"  text="Actions"     prefWidth="350"/>
+            <TableColumn fx:id="colActions"  text="Actions"     prefWidth="250"/>
         </columns>
         <placeholder>
-            <Label styleClass="section-subtitle" text="No pending reservations."/>
+            <Label styleClass="section-subtitle" text="No reservations found."/>
         </placeholder>
     </TableView>
 

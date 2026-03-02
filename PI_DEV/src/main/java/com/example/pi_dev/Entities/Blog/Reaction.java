@@ -8,11 +8,11 @@ public class Reaction {
     private LocalDateTime date;
     private Integer idPost;
     private Integer idCommentaire;
-    private int idUser;
+    private String idUser; // CHANGED: int → String (UUID)
 
     public Reaction() { this.date = LocalDateTime.now(); }
 
-    public Reaction(String type, int idPost, int idUser) {
+    public Reaction(String type, int idPost, String idUser) {
         this.type = type;
         this.idPost = idPost;
         this.idCommentaire = null;
@@ -20,7 +20,7 @@ public class Reaction {
         this.date = LocalDateTime.now();
     }
 
-    public Reaction(String type, Integer idPost, Integer idCommentaire, int idUser) {
+    public Reaction(String type, Integer idPost, Integer idCommentaire, String idUser) {
         this.type = type;
         this.idPost = idPost;
         this.idCommentaire = idCommentaire;
@@ -28,7 +28,7 @@ public class Reaction {
         this.date = LocalDateTime.now();
     }
 
-    public Reaction(int idReaction, String type, LocalDateTime date, Integer idPost, Integer idCommentaire, int idUser) {
+    public Reaction(int idReaction, String type, LocalDateTime date, Integer idPost, Integer idCommentaire, String idUser) {
         this.idReaction = idReaction;
         this.type = type;
         this.date = date;
@@ -47,8 +47,8 @@ public class Reaction {
     public void setIdPost(Integer idPost) { this.idPost = idPost; }
     public Integer getIdCommentaire() { return idCommentaire; }
     public void setIdCommentaire(Integer idCommentaire) { this.idCommentaire = idCommentaire; }
-    public int getIdUser() { return idUser; }
-    public void setIdUser(int idUser) { this.idUser = idUser; }
+    public String getIdUser() { return idUser; } // CHANGED
+    public void setIdUser(String idUser) { this.idUser = idUser; } // CHANGED
 
     @Override
     public String toString() {

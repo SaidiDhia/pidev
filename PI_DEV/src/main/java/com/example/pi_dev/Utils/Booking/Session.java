@@ -1,6 +1,30 @@
 package com.example.pi_dev.Utils.Booking;
-
+import com.example.pi_dev.enums.RoleEnum;
+import com.example.pi_dev.Entities.Users.User;
+import com.example.pi_dev.Utils.Users.UserSession;
 public class Session {
-    public static String currentUserId = "123e4567-e89b-12d3-a456-426614174000";; // temporary hardcoded user
-    public static boolean isAdmin = false;
+    public static String currentUserId;
+
+    static {
+        update();
+    }
+
+    public static void update() {
+        User user = UserSession.getInstance().getCurrentUser();
+        if (user != null) {
+            currentUserId = user.getUserId().toString();
+        } else {
+            currentUserId = null;
+        }
+    }
+
+    public static boolean isAdmin() {
+        User user = UserSession.getInstance().getCurrentUser();
+        return user != null && user.getRole() == RoleEnum.ADMIN;
+    }
+
+    public static boolean isHost() {
+        User user = UserSession.getInstance().getCurrentUser();
+        return user != null && user.getRole() == RoleEnum.HOST;
+    }
 }

@@ -89,15 +89,18 @@ public class MyBookingsController {
             }
         });
 
-        // Actions column
+        // Actions column: Edit | Delete | Cancel
         colActions.setCellFactory(col -> new TableCell<>() {
             private final Button editBtn = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
-            private final HBox box = new HBox(6, editBtn, deleteBtn);
+            private final Button cancelBtn = new Button("✖ Cancel");
+            private final HBox box = new HBox(6, editBtn, deleteBtn, cancelBtn);
 
             {
                 editBtn.getStyleClass().addAll("btn", "btn-sm");
                 deleteBtn.getStyleClass().addAll("btn", "btn-sm", "btn-danger");
+                cancelBtn.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; " +
+                        "-fx-background-radius: 6; -fx-padding: 3 10 3 10; -fx-cursor: hand; -fx-font-size: 11px;");
 
                 editBtn.setOnAction(e -> {
                     BookingService.BookingView bv = getTableView().getItems().get(getIndex());
@@ -106,6 +109,10 @@ public class MyBookingsController {
                 deleteBtn.setOnAction(e -> {
                     BookingService.BookingView bv = getTableView().getItems().get(getIndex());
                     handleDelete(bv);
+                });
+                cancelBtn.setOnAction(e -> {
+                    BookingService.BookingView bv = getTableView().getItems().get(getIndex());
+                    handleCancel(bv);
                 });
             }
 
@@ -116,9 +123,18 @@ public class MyBookingsController {
                     setGraphic(null);
                 } else {
                     BookingService.BookingView bv = getTableView().getItems().get(getIndex());
-                    boolean isPending = bv.booking.getStatus() == Booking.Status.PENDING;
+                    Booking.Status status = bv.booking.getStatus();
+                    boolean isPending = status == Booking.Status.PENDING;
+                    boolean isConfirmed = status == Booking.Status.CONFIRMED;
+
                     editBtn.setDisable(!isPending);
-                    deleteBtn.setDisable(!isPending && bv.booking.getStatus() != Booking.Status.CANCELLED);
+                    deleteBtn.setDisable(!isPending && status != Booking.Status.CANCELLED);
+
+                    // Cancel button only visible for PENDING or CONFIRMED
+                    boolean canCancel = isPending || isConfirmed;
+                    cancelBtn.setVisible(canCancel);
+                    cancelBtn.setManaged(canCancel);
+
                     setGraphic(box);
                 }
             }
@@ -152,7 +168,8 @@ public class MyBookingsController {
             return;
         }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pi_dev/booking/views/front/BookingDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pi_dev/booking/views/front/BookingDialog.fxml"));
             Node root = loader.load();
             BookingDialogController ctrl = loader.getController();
             Place place = placeService.getPlaceById(bv.booking.getPlaceId());
@@ -181,6 +198,48 @@ public class MyBookingsController {
             if (btn == ButtonType.YES) {
                 bookingService.supprimerBooking(bv.booking.getId());
                 loadData();
+            }
+        });
+    }
+
+    private void handleCancel(BookingService.BookingView bv) {
+        Booking.Status status = bv.booking.getStatus();
+
+        // Safety guard (button should be hidden for these, but just in case)
+        if (status != Booking.Status.PENDING && status != Booking.Status.CONFIRMED) {
+            new Alert(Alert.AlertType.WARNING,
+                    "Annulation impossible pour le statut : " + status.name(), ButtonType.OK).showAndWait();
+            return;
+        }
+
+        // Confirmation dialog
+        String msg = status == Booking.Status.CONFIRMED
+                ? "Confirmer l'annulation de cette réservation ?\n\nUn remboursement sera calculé selon la politique de remboursement."
+                : "Confirmer l'annulation de cette réservation ?\n\n(Aucun remboursement – réservation en attente.)";
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, msg, ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Annuler la réservation");
+        confirm.showAndWait().ifPresent(btn -> {
+            if (btn == ButtonType.YES) {
+                try {
+                    double refund = bookingService.cancelByUser(bv.booking.getId());
+                    loadData();
+
+                    // Build success message with refund info
+                    String successMsg;
+                    if (refund > 0) {
+                        double percent = (refund / bv.booking.getTotalPrice()) * 100;
+                        successMsg = String.format(
+                                "Réservation annulée avec succès.%nRemboursement : %.0f%% = %.2f$",
+                                percent, refund);
+                    } else {
+                        successMsg = "Réservation annulée avec succès.\nRemboursement : 0$";
+                    }
+                    new Alert(Alert.AlertType.INFORMATION, successMsg, ButtonType.OK).showAndWait();
+
+                } catch (RuntimeException ex) {
+                    new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK).showAndWait();
+                }
             }
         });
     }

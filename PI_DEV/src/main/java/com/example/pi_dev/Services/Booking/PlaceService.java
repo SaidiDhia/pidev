@@ -17,13 +17,13 @@ public class PlaceService implements IPlaceService {
     }
 
     @Override
-    public void ajouterPlace(Place p) {
+    public int ajouterPlace(Place p) {
         String sql = "INSERT INTO place " +
                 "(host_id, title, description, price_per_day, capacity, max_guests, address, city, category, status, image_url, lat, lng) "
                 +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+        try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, p.getHostId());
             ps.setString(2, p.getTitle());
             ps.setString(3, p.getDescription());
@@ -45,7 +45,15 @@ public class PlaceService implements IPlaceService {
                 ps.setNull(13, Types.DOUBLE);
 
             ps.executeUpdate();
-            System.out.println("Place ajoutée");
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    int newId = keys.getInt(1);
+                    p.setId(newId);
+                    System.out.println("Place ajoutée id=" + newId);
+                    return newId;
+                }
+            }
+            throw new RuntimeException("Place insérée mais ID non récupéré.");
         } catch (SQLException e) {
             throw new RuntimeException("Erreur ajout place", e);
         }
@@ -122,7 +130,7 @@ public class PlaceService implements IPlaceService {
         String sql = "SELECT * FROM place ORDER BY id DESC";
 
         try (Statement st = con.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
+             ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 list.add(mapPlace(rs));
             }

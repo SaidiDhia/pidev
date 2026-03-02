@@ -1,10 +1,12 @@
 package com.example.pi_dev.Entities.Booking;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Booking {
     private int id;
     private String userId;
+    private String hostId; // The ID of the place owner
     private int placeId;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -12,6 +14,12 @@ public class Booking {
     private int guestsCount;
     private Status status;
     private String pdfPath;
+
+    // Cancellation fields
+    private LocalDateTime cancelledAt;
+    private double refundAmount;
+    private String cancelledBy;
+    private String cancelReason;
 
     public enum Status {
         PENDING, CONFIRMED, REJECTED, CANCELLED, COMPLETED
@@ -21,7 +29,7 @@ public class Booking {
     }
 
     public Booking(LocalDate endDate, double totalPrice, Status status, LocalDate startDate, int placeId, int id,
-            String userId, int guestsCount) {
+                   String userId, int guestsCount) {
         this.endDate = endDate;
         this.totalPrice = totalPrice;
         this.status = status;
@@ -33,7 +41,7 @@ public class Booking {
     }
 
     public Booking(int guestsCount, LocalDate endDate, int placeId, LocalDate startDate, Status status,
-            double totalPrice) {
+                   double totalPrice) {
         this.guestsCount = guestsCount;
         this.endDate = endDate;
         this.placeId = placeId;
@@ -64,6 +72,14 @@ public class Booking {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(String hostId) {
+        this.hostId = hostId;
     }
 
     public int getGuestsCount() {
@@ -112,5 +128,39 @@ public class Booking {
 
     public void setPdfPath(String pdfPath) {
         this.pdfPath = pdfPath;
+    }
+
+    // --- Cancellation getters/setters ---
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
+    }
+
+    public double getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(double refundAmount) {
+        this.refundAmount = refundAmount;
+    }
+
+    public String getCancelledBy() {
+        return cancelledBy;
+    }
+
+    public void setCancelledBy(String cancelledBy) {
+        this.cancelledBy = cancelledBy;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
     }
 }

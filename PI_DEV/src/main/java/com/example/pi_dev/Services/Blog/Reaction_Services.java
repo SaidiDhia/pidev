@@ -13,10 +13,28 @@ public class Reaction_Services implements IreactionServices {
 
     public Reaction_Services() {
         connection = BlogDataBase.getInstance().getConnection();
+        ensureSchema();
     }
 
-    // Toggle: if user already reacted → remove it. If not → add it.
-    // Returns true = liked, false = unliked
+    private void ensureSchema() {
+        try (Statement st = connection.createStatement()) {
+            try (ResultSet rs = st.executeQuery("SHOW COLUMNS FROM reactions LIKE 'id_user'")) {
+                if (rs.next()) {
+                    String type = rs.getString("Type");
+                    if (type == null || !type.toLowerCase().startsWith("varchar")) {
+                        try (Statement alter = connection.createStatement()) {
+                            alter.executeUpdate("ALTER TABLE reactions MODIFY id_user VARCHAR(36) NOT NULL");
+                        }
+                    }
+                }
+            }
+            // Optional FK; ignore errors if it already exists or data prevents adding it now
+            try {
+                st.executeUpdate("ALTER TABLE reactions ADD CONSTRAINT fk_reactions_user FOREIGN KEY (id_user) REFERENCES users(user_id)");
+            } catch (SQLException ignored) {}
+        } catch (SQLException ignored) {}
+    }
+
     public boolean toggleReaction(Reaction reaction) {
         Reaction existing = getUserReaction(reaction.getIdPost(), reaction.getIdCommentaire(), reaction.getIdUser());
         if (existing != null) {
@@ -28,7 +46,7 @@ public class Reaction_Services implements IreactionServices {
         }
     }
 
-    public Reaction getUserReaction(Integer idPost, Integer idCommentaire, int idUser) {
+    public Reaction getUserReaction(Integer idPost, Integer idCommentaire, String idUser) { // FIXED: String
         String requete;
         if (idPost != null)
             requete = "SELECT * FROM reactions WHERE id_post = ? AND id_user = ? AND id_commentaire IS NULL";
@@ -37,7 +55,7 @@ public class Reaction_Services implements IreactionServices {
         try {
             PreparedStatement pst = connection.prepareStatement(requete);
             pst.setInt(1, idPost != null ? idPost : idCommentaire);
-            pst.setInt(2, idUser);
+            pst.setString(2, idUser); // FIXED: setString
             ResultSet rs = pst.executeQuery();
             if (rs.next()) return mapRow(rs);
         } catch (SQLException e) { e.printStackTrace(); }
@@ -54,13 +72,35 @@ public class Reaction_Services implements IreactionServices {
             else pst.setNull(2, Types.INTEGER);
             if (reaction.getIdCommentaire() != null) pst.setInt(3, reaction.getIdCommentaire());
             else pst.setNull(3, Types.INTEGER);
-            pst.setInt(4, reaction.getIdUser());
+            pst.setString(4, reaction.getIdUser()); // FIXED: setString
             int rowsAffected = pst.executeUpdate();
             if (rowsAffected > 0) {
                 ResultSet generatedKeys = pst.getGeneratedKeys();
                 if (generatedKeys.next()) reaction.setIdReaction(generatedKeys.getInt(1));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            if (e.getMessage() != null && e.getMessage().toLowerCase().contains("incorrect integer value")) {
+                ensureSchema();
+                try {
+                    PreparedStatement pst = connection.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS);
+                    pst.setString(1, reaction.getType());
+                    if (reaction.getIdPost() != null) pst.setInt(2, reaction.getIdPost());
+                    else pst.setNull(2, Types.INTEGER);
+                    if (reaction.getIdCommentaire() != null) pst.setInt(3, reaction.getIdCommentaire());
+                    else pst.setNull(3, Types.INTEGER);
+                    pst.setString(4, reaction.getIdUser());
+                    int rowsAffected = pst.executeUpdate();
+                    if (rowsAffected > 0) {
+                        ResultSet generatedKeys = pst.getGeneratedKeys();
+                        if (generatedKeys.next()) reaction.setIdReaction(generatedKeys.getInt(1));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -151,15 +191,15 @@ public class Reaction_Services implements IreactionServices {
     private Reaction mapRow(ResultSet rs) throws SQLException {
         Integer idPost = rs.getObject("id_post") != null ? rs.getInt("id_post") : null;
         Integer idCommentaire = rs.getObject("id_commentaire") != null ? rs.getInt("id_commentaire") : null;
-        int idUser = 0;
-        try { idUser = rs.getInt("id_user"); } catch (Exception ignored) {}
+        String idUser = null;
+        try { idUser = rs.getString("id_user"); } catch (Exception ignored) {} // FIXED: getString
         return new Reaction(
                 rs.getInt("id_reaction"),
                 rs.getString("type"),
                 rs.getTimestamp("date").toLocalDateTime(),
                 idPost,
                 idCommentaire,
-                idUser
+                idUser // FIXED: String
         );
     }
 }

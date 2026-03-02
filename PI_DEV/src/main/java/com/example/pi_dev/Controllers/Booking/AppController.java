@@ -1,8 +1,6 @@
 package com.example.pi_dev.Controllers.Booking;
 
-import com.example.pi_dev.enums.RoleEnum;
-import com.example.pi_dev.Entities.Users.User;
-import com.example.pi_dev.Utils.Users.UserSession;
+import com.example.pi_dev.Utils.Booking.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -17,49 +15,41 @@ public class AppController {
     private StackPane contentPane;
 
     @FXML
-    private Button browseBtn;
-
+    private Button btnListYourPlace;
     @FXML
-    private Button listPlaceBtn;
-
+    private Button btnMyBookings;
     @FXML
-    private Button myBookingsBtn;
-
+    private Button btnMyPlaces;
     @FXML
-    private Button myPlacesBtn;
-
+    private Button btnReservations;
     @FXML
-    private Button adminBtn;
+    private Button btnAdmin;
 
     @FXML
     public void initialize() {
-        checkUserRoles();
+        updateNavbarVisibility();
         loadView("/com/example/pi_dev/booking/views/front/PlaceBrowse.fxml");
     }
 
-    private void checkUserRoles() {
-        if (UserSession.getInstance().isLoggedIn()) {
-            User user = UserSession.getInstance().getCurrentUser();
-            boolean isAdmin = user.getRole() == RoleEnum.ADMIN;
-            boolean isHost = user.getRole() == RoleEnum.HOST;
+    private void updateNavbarVisibility() {
+        boolean isAdmin = Session.isAdmin();
+        boolean isHost = Session.isHost();
 
-            // Show admin tab only for admins
-            if (adminBtn != null) {
-                adminBtn.setVisible(isAdmin);
-                adminBtn.setManaged(isAdmin);
-            }
+        // Admin strictly sees Admin button
+        btnAdmin.setVisible(isAdmin);
+        btnAdmin.setManaged(isAdmin);
 
-            // Host features
-            if (myPlacesBtn != null) {
-                myPlacesBtn.setVisible(isHost || isAdmin);
-                myPlacesBtn.setManaged(isHost || isAdmin);
-            }
-            
-            if (listPlaceBtn != null) {
-                listPlaceBtn.setVisible(isHost || isAdmin || user.getRole() == RoleEnum.PARTICIPANT);
-                listPlaceBtn.setManaged(isHost || isAdmin || user.getRole() == RoleEnum.PARTICIPANT);
-            }
-        }
+        // Host strictly sees My Places and Reservations
+        // Admins should NOT see these in the main booking navbar according to user request
+        btnMyPlaces.setVisible(isHost);
+        btnMyPlaces.setManaged(isHost);
+
+        btnReservations.setVisible(isHost);
+        btnReservations.setManaged(isHost);
+
+        // All logged-in users can see these
+        btnListYourPlace.setVisible(true);
+        btnMyBookings.setVisible(true);
     }
 
     @FXML
@@ -80,6 +70,11 @@ public class AppController {
     @FXML
     private void handleMyPlaces() {
         loadView("/com/example/pi_dev/booking/views/host/MyPlaces.fxml");
+    }
+
+    @FXML
+    private void handleReservations() {
+        loadView("/com/example/pi_dev/booking/views/host/HostReservations.fxml");
     }
 
     @FXML
