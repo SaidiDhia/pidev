@@ -7,7 +7,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/18" 
             xmlns:fx="http://javafx.com/fxml/1" 
-            fx:controller="com.example.pi_dev.Controllers.Marketplace.FactureListController"
+            fx:controller="com.example.pi_dev.marketplace.Controllers.FactureListController"
             stylesheets="@../css/style.css"
 
             styleClass="root">

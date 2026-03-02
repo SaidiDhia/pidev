@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane style="-fx-background-color: transparent; -fx-border-color: transparent;" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" prefHeight="800" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.Controllers.Events.catalogueController">
+<ScrollPane style="-fx-background-color: transparent; -fx-border-color: transparent;" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" prefHeight="800" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.events.Controllers.catalogueController">
     <content>
         <VBox style="-fx-background-color: linear-gradient(to bottom, #CAD4DC, #ffffff); -fx-padding: 0;" prefWidth="1200">
     <children>

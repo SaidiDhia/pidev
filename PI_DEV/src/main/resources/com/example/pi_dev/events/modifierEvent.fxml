@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="800.0" prefWidth="1000.0" spacing="20.0" style="-fx-background-color: #f8f9fa; -fx-padding: 30;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.Controllers.Events.modifierEventController">
+<VBox alignment="CENTER" prefHeight="800.0" prefWidth="1000.0" spacing="20.0" style="-fx-background-color: #f8f9fa; -fx-padding: 30;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.events.Controllers.modifierEventController">
    <children>
       <!-- Header -->
       <HBox alignment="CENTER_LEFT" spacing="15">

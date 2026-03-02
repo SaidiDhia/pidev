@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox style="-fx-background-color: linear-gradient(to bottom, #CAD4DC, #ffffff); -fx-padding: 0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.Controllers.Events.EventController">
+<VBox style="-fx-background-color: linear-gradient(to bottom, #CAD4DC, #ffffff); -fx-padding: 0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.events.Controllers.EventController">
    <children>
       <HBox alignment="CENTER_LEFT" style="-fx-background-color: linear-gradient(to bottom right, #86A7BF, #2D70B3); -fx-padding: 20; -fx-spacing: 20;">
          <children>

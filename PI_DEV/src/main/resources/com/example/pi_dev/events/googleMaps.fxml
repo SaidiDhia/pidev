@@ -8,7 +8,7 @@
 <VBox prefHeight="700.0" prefWidth="800.0" spacing="15.0" 
       style="-fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef); -fx-padding: 20;" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="com.example.pi_dev.Controllers.Events.GoogleMapsController">
+      fx:controller="com.example.pi_dev.events.Controllers.GoogleMapsController">
     
     <children>
         <!-- Header -->

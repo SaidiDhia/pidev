@@ -5,7 +5,7 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.pi_dev.Controllers.Marketplace.OrdersManagementController"
+            fx:controller="com.example.pi_dev.marketplace.Controllers.OrdersManagementController"
             stylesheets="@../css/style.css"
             styleClass="root" minHeight="650">
 

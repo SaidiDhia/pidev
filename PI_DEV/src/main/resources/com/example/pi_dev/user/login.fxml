@@ -15,7 +15,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.shape.Rectangle?>
 
-<BorderPane prefHeight="800.0" prefWidth="1200.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.Controllers.Users.LoginController" style="-fx-background-color: #F8FAFC;">
+<BorderPane prefHeight="800.0" prefWidth="1200.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.pi_dev.user.controllers.LoginController" style="-fx-background-color: #F8FAFC;">
     <top>
         <!-- Top Navbar -->
         <VBox styleClass="auth-top-navbar">

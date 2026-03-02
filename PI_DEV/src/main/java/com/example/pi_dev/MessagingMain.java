@@ -1,7 +1,7 @@
 package com.example.pi_dev;
 
-import com.example.pi_dev.Database.Messaging.DatabaseConnection;
-import com.example.pi_dev.Session.Session;
+import com.example.pi_dev.messaging.messagingdatabase.DatabaseConnection;
+import com.example.pi_dev.messaging.messagingsession.Session;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

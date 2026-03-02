@@ -1,6 +1,6 @@
 package com.example.pi_dev;
 
-import com.example.pi_dev.Database.Users.UserDatabaseConnection;
+import com.example.pi_dev.user.database.UserDatabaseConnection;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

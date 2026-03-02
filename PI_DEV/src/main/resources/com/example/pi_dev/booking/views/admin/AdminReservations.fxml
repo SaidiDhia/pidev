@@ -8,7 +8,7 @@
 
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.pi_dev.Controllers.Booking.Admin.AdminReservationsController"
+      fx:controller="com.example.pi_dev.booking.Controllers.Admin.AdminReservationsController"
       stylesheets="@../../style.css"
       spacing="20"
       style="-fx-background-color: white; -fx-padding: 24 32 32 32;">

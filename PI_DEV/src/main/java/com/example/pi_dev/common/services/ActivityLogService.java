@@ -1,7 +1,7 @@
 package com.example.pi_dev.common.services;
 
 import com.example.pi_dev.common.models.ActivityLog;
-import com.example.pi_dev.Database.Users.UserDatabaseConnection;
+import com.example.pi_dev.user.database.UserDatabaseConnection;
 
 import java.sql.*;
 import java.time.LocalDateTime;
