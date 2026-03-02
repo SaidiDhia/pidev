@@ -59,7 +59,7 @@ module com.example.pi_dev {
     requires jdk.jsobject;
     requires itextpdf;
     requires io;
-    requires freetts;
+
 
     // Open the entire module for FXGL and other reflective libraries
     opens com.example.pi_dev to javafx.fxml, com.almasb.fxgl.all;

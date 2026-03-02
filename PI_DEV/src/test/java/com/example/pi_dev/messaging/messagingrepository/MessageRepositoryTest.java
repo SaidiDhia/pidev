@@ -1,7 +1,9 @@
 package com.example.pi_dev.messaging.messagingrepository;
 
-import com.example.pi_dev.messaging.messagingmodel.Conversation;
-import com.example.pi_dev.messaging.messagingmodel.Message;
+import com.example.pi_dev.Entities.Conversation;
+import com.example.pi_dev.Entities.Message;
+import com.example.pi_dev.Repositories.ConversationRepository;
+import com.example.pi_dev.Repositories.MessageRepository;
 import org.junit.jupiter.api.*;
 import java.sql.SQLException;
 import java.util.List;

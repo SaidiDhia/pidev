@@ -9,7 +9,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.pi_dev.booking.Controllers.Front.MyBookingsController"
+            fx:controller="com.example.pi_dev.Controllers.Front.MyBookingsController"
             stylesheets="@../../style.css">
 
     <VBox spacing="24" style="-fx-background-color: #F9FAFB; -fx-padding: 32 40 40 40;"
